@@ -21,10 +21,6 @@ class CKSIncrementalStore: NSIncrementalStore {
     lazy var cachedValues:NSMutableDictionary={
         return NSMutableDictionary()
     }()
-    lazy var operationQueue:NSOperationQueue={
-        
-        return NSOperationQueue()
-    }()
     
     override class func initialize()
     {
@@ -68,6 +64,7 @@ class CKSIncrementalStore: NSIncrementalStore {
 //        }
         return true
     }
+    
     override func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> AnyObject? {
         
         
@@ -81,30 +78,87 @@ class CKSIncrementalStore: NSIncrementalStore {
             var saveChangesRequest:NSSaveChangesRequest=request as! NSSaveChangesRequest
             return self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context, error: error)
         }
-        else if request.requestType==NSPersistentStoreRequestType.BatchUpdateRequestType
+        else
         {
-            var batchUpdateRequest:NSBatchUpdateRequest=request as! NSBatchUpdateRequest
-            return self.executeInResponseToBatchUpdateRequest(batchUpdateRequest, context: context, error: error)
+            var exception=NSException(name: "Unknown Request Type", reason: "Unknown Request passed to NSManagedObjectContext", userInfo: nil)
         }
+        
         return nil
+    }
+    override func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?, error: NSErrorPointer) -> AnyObject? {
+        
+        NSLog("Relationship Fault \(relationship.destinationEntity?.name)")
+        if relationship.toMany==false
+        {
+            return NSManagedObject()
+        }
+        return NSManagedObject()
     }
     override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> NSIncrementalStoreNode? {
         
         var uniqueIdentifier:NSString=self.identifier(objectID) as! NSString
-        var object:CKRecord=self.cachedValues.objectForKey(uniqueIdentifier) as! CKRecord
-        var keys:NSArray=object.allKeys() as NSArray
+        var object:CKRecord?
+        var checkInCache: AnyObject?=self.cachedValues.objectForKey(uniqueIdentifier)
+        if((checkInCache) != nil)
+        {
+            object=checkInCache as? CKRecord
+        }
+        else
+        {
+            var operationQueue:NSOperationQueue=NSOperationQueue()
+            var recordIDIdentifier:AnyObject=self.identifier(objectID)
+            var recordID:CKRecordID=CKRecordID(recordName: recordIDIdentifier as! String)
+        var fetchRecordsOperation:CKFetchRecordsOperation=CKFetchRecordsOperation(recordIDs: [CKRecordID(recordName: recordIDIdentifier as! String)])
+        
+            fetchRecordsOperation.fetchRecordsCompletionBlock=({(recordIDs,error)-> Void in
+                
+                if error==nil
+                {
+                    var recordsDictionary:NSDictionary=recordIDs as NSDictionary
+                    var record:CKRecord=recordsDictionary.objectForKey(recordID) as! CKRecord
+                    self.cachedValues.setObject(record, forKey: record.recordID.recordName)
+                    object=record as CKRecord
+
+                }
+            })
+            operationQueue.addOperation(fetchRecordsOperation)
+            operationQueue.waitUntilAllOperationsAreFinished()
+        }
+        var keys:NSArray=object!.allKeys() as NSArray
         var values:NSMutableDictionary=NSMutableDictionary()
+        var relationships:NSDictionary=objectID.entity.relationshipsByName as NSDictionary
+        
         for key in keys
         {
-            values.setValue(object.objectForKey(key as! String), forKey: key as! String)
+            var objectForKey: AnyObject!=object!.objectForKey(key as! String)
+            if objectForKey is CKReference
+            {
+                var reference:CKReference=objectForKey as! CKReference
+                var referenceEntity:NSRelationshipDescription=relationships.objectForKey(key) as! NSRelationshipDescription
+                var referenceObjectID:NSManagedObjectID=self.objectID(reference.recordID.recordName, entity: referenceEntity.destinationEntity!) as NSManagedObjectID
+                values.setValue(referenceObjectID, forKey: key as! String)
+            }
+            else
+            {
+                values.setValue(objectForKey, forKey: key as! String)
+            }
         }
         var incrementalStoreNode:NSIncrementalStoreNode=NSIncrementalStoreNode(objectID: objectID, withValues: values as [NSObject : AnyObject], version: 1)
         return incrementalStoreNode
     }
-//    override func obtainPermanentIDsForObjects(array: [AnyObject], error: NSErrorPointer) -> [AnyObject]? {
-//        
-//
-//    }
+    
+    override func obtainPermanentIDsForObjects(array: [AnyObject], error: NSErrorPointer) -> [AnyObject]? {
+        
+        var objectIDs:NSMutableArray=NSMutableArray()
+        
+        for managedObject in array
+        {
+            var mObj:NSManagedObject=managedObject as! NSManagedObject
+            objectIDs.addObject(self.objectID(NSUUID().UUIDString, entity: mObj.entity))
+        }
+        
+        return objectIDs as [AnyObject]
+    }
     // MARK : Request Methods
     func executeInResponseToFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
@@ -121,42 +175,72 @@ class CKSIncrementalStore: NSIncrementalStore {
             results.addObject(object)
         })
         
-        self.operationQueue.addOperation(ckOperation)
-        self.operationQueue.waitUntilAllOperationsAreFinished()
+        var operationQueue:NSOperationQueue=NSOperationQueue()
+        operationQueue.addOperation(ckOperation)
+        operationQueue.waitUntilAllOperationsAreFinished()
         return results
 
     }
     func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
-        var insertedObjects=saveRequest.insertedObjects
-        var updatedObjects=saveRequest.updatedObjects
-        var deletedObjects=saveRequest.deletedObjects
-        
-        
+        var operation:CKModifyRecordsOperation=self.cloudKitModifyRecordsOperationFromSaveChangesRequest(saveRequest, context: context)
+        var savedRecords:NSArray?
+        var deletedRecords:NSArray?
+        operation.modifyRecordsCompletionBlock=({(savedRecords,deletedRecords,error)->Void in
+            
+            if(error==nil)
+            {
+                NSLog("Saved Changes Successfully")
+            }
+            else
+            {
+                NSLog("All Changes Not Saved Successfully \(error)")
+            }
+        })
+        var operationQueue=NSOperationQueue()
+        operationQueue.addOperation(operation)
+        operationQueue.waitUntilAllOperationsAreFinished()
         
         return NSArray()
     }
-    func executeInResponseToBatchUpdateRequest(batchUpdateRequest:NSBatchUpdateRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
-    {
-        return NSArray()
-    }
-    override func obtainPermanentIDsForObjects(array: [AnyObject], error: NSErrorPointer) -> [AnyObject]? {
-        
-        var objectIDs:NSMutableArray=NSMutableArray()
-        
-        for managedObject in array
-        {
-            var mObj:NSManagedObject=managedObject as! NSManagedObject
-            objectIDs.addObject(self.objectID(NSUUID().UUIDString, entity: mObj.entity))
-        }
-        
-        return objectIDs as [AnyObject]
-    }
+
+
     // MARK : Mapping Methods
 
-    func cloudKitModifyRecordsOperationFromSaveChangesRequest(saveChangesRequest:NSSaveChangesRequest,context:NSManagedObjectContext)->NSOperation
+    func cloudKitModifyRecordsOperationFromSaveChangesRequest(saveChangesRequest:NSSaveChangesRequest,context:NSManagedObjectContext)->CKModifyRecordsOperation
     {
-        return NSOperation()
+        var allObjects:NSArray=NSArray()
+        if((saveChangesRequest.insertedObjects) != nil)
+        {
+            allObjects=allObjects.arrayByAddingObjectsFromArray((saveChangesRequest.insertedObjects! as NSSet).allObjects)
+        }
+        if((saveChangesRequest.updatedObjects) != nil)
+        {
+            allObjects=allObjects.arrayByAddingObjectsFromArray((saveChangesRequest.updatedObjects! as NSSet).allObjects)
+        }
+        
+        var ckRecordsToModify:NSMutableArray=NSMutableArray()
+        
+        for managedObject in allObjects
+        {
+            ckRecordsToModify.addObject(self.ckRecordFromManagedObject(managedObject as! NSManagedObject))
+        }
+        
+        var deletedObjects:NSArray=NSArray()
+        if((saveChangesRequest.deletedObjects) != nil)
+        {
+            deletedObjects=deletedObjects.arrayByAddingObjectsFromArray((saveChangesRequest.deletedObjects! as NSSet).allObjects)
+        }
+        var ckRecordsToDelete:NSMutableArray=NSMutableArray()
+        for managedObject in deletedObjects
+        {
+            ckRecordsToDelete.addObject(self.ckRecordFromManagedObject(managedObject as! NSManagedObject).recordID)
+        }
+        
+        var ckModifyRecordsOperation:CKModifyRecordsOperation=CKModifyRecordsOperation(recordsToSave: ckRecordsToModify as [AnyObject], recordIDsToDelete: ckRecordsToDelete as [AnyObject])
+        
+        
+        return ckModifyRecordsOperation
     }
     func cloudKitRequestOperationFromFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext)->NSOperation
     {
@@ -189,16 +273,44 @@ class CKSIncrementalStore: NSIncrementalStore {
         var record:CKRecord=CKRecord(recordType: managedObject.entity.name, recordID: recordID)
 
         var attributes:NSDictionary=managedObject.entity.attributesByName as NSDictionary
+        var relationships:NSDictionary=managedObject.entity.relationshipsByName as NSDictionary
         
-        for key in attributes.allKeys
+        for var i=0;i<attributes.allKeys.count;i++
         {
-//            var key:String=key as! String
-//            
-//            managedObject.dynamicType
-//            var valueForKey: AnyObject?=managedObject.valueForKey(key)
-//            record.setObject(valueForKey as! NSString, forKey: key)
-        
+            var key:String=attributes.allKeys[i] as! String
+            var valueForKey:AnyObject?=managedObject.valueForKey(key)
+            
+            if valueForKey is NSString
+            {
+                record.setObject(valueForKey as! NSString, forKey: key)
+            }
+            else if valueForKey is NSDate
+            {
+                record.setObject(valueForKey as! NSDate, forKey: key)
+            }
+            else if valueForKey is NSNumber
+            {
+                record.setObject(valueForKey as! NSNumber, forKey: key)
+            }
+            
         }
+
+        for var i=0;i<relationships.allKeys.count;i++
+        {
+            var key:String=relationships.allKeys[i] as! String
+            var relationship:NSRelationshipDescription=relationships.objectForKey(i) as! NSRelationshipDescription
+            
+            if relationship.toMany==false
+            {
+                var valueForKey:AnyObject?=managedObject.valueForKey(key)
+                var id: AnyObject=self.identifier(valueForKey!.objectID)
+                var ckRecordID:CKRecordID=CKRecordID(recordName: id as! String)
+                var ckReference:CKReference=CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
+                record.setObject(ckReference, forKey: key)
+            }
+
+        }
+        
         return record
         
     }

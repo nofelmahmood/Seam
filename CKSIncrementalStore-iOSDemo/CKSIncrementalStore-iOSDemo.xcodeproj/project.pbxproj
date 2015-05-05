@@ -14,6 +14,9 @@
 		101AD13B1AF7828D0022D0F0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 101AD13A1AF7828D0022D0F0 /* Images.xcassets */; };
 		101AD13E1AF7828D0022D0F0 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 101AD13C1AF7828D0022D0F0 /* LaunchScreen.xib */; };
 		101AD14A1AF7828D0022D0F0 /* CKSIncrementalStore_iOSDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101AD1491AF7828D0022D0F0 /* CKSIncrementalStore_iOSDemoTests.swift */; };
+		1022623C1AF7945500E06C64 /* CKSIncrementalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1022623B1AF7945500E06C64 /* CKSIncrementalStore.swift */; };
+		102262421AF7950000E06C64 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 102262411AF7950000E06C64 /* CoreData.framework */; };
+		102262441AF7950600E06C64 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 102262431AF7950600E06C64 /* CloudKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +41,9 @@
 		101AD1431AF7828D0022D0F0 /* CKSIncrementalStore-iOSDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "CKSIncrementalStore-iOSDemoTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		101AD1481AF7828D0022D0F0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		101AD1491AF7828D0022D0F0 /* CKSIncrementalStore_iOSDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKSIncrementalStore_iOSDemoTests.swift; sourceTree = "<group>"; };
+		1022623B1AF7945500E06C64 /* CKSIncrementalStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKSIncrementalStore.swift; path = ../../CKSIncrementalStore.swift; sourceTree = "<group>"; };
+		102262411AF7950000E06C64 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		102262431AF7950600E06C64 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -45,6 +51,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				102262441AF7950600E06C64 /* CloudKit.framework in Frameworks */,
+				102262421AF7950000E06C64 /* CoreData.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +69,8 @@
 		101AD1221AF7828C0022D0F0 = {
 			isa = PBXGroup;
 			children = (
+				102262431AF7950600E06C64 /* CloudKit.framework */,
+				102262411AF7950000E06C64 /* CoreData.framework */,
 				101AD12D1AF7828D0022D0F0 /* CKSIncrementalStore-iOSDemo */,
 				101AD1461AF7828D0022D0F0 /* CKSIncrementalStore-iOSDemoTests */,
 				101AD12C1AF7828D0022D0F0 /* Products */,
@@ -79,6 +89,7 @@
 		101AD12D1AF7828D0022D0F0 /* CKSIncrementalStore-iOSDemo */ = {
 			isa = PBXGroup;
 			children = (
+				1022623B1AF7945500E06C64 /* CKSIncrementalStore.swift */,
 				101AD1301AF7828D0022D0F0 /* AppDelegate.swift */,
 				101AD1351AF7828D0022D0F0 /* ViewController.swift */,
 				101AD1371AF7828D0022D0F0 /* Main.storyboard */,
@@ -215,6 +226,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1022623C1AF7945500E06C64 /* CKSIncrementalStore.swift in Sources */,
 				101AD1361AF7828D0022D0F0 /* ViewController.swift in Sources */,
 				101AD1311AF7828D0022D0F0 /* AppDelegate.swift in Sources */,
 				101AD1341AF7828D0022D0F0 /* CKSIncrementalStore_iOSDemo.xcdatamodeld in Sources */,
@@ -415,6 +427,7 @@
 				101AD14F1AF7828D0022D0F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		101AD1501AF7828D0022D0F0 /* Build configuration list for PBXNativeTarget "CKSIncrementalStore-iOSDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -423,6 +436,7 @@
 				101AD1521AF7828D0022D0F0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

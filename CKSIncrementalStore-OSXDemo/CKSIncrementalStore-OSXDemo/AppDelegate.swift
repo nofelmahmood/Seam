@@ -60,13 +60,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if !shouldFail && (error == nil) {
             coordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
             let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("CKSIncrementalStore_OSXDemo.storedata")
-            if coordinator!.addPersistentStoreWithType(NSXMLStoreType, configuration: nil, URL: url, options: nil, error: &error) == nil {
+            if coordinator!.addPersistentStoreWithType(CKSIncrementalStore.self, configuration: nil, URL: url, options: nil, error: &error) == nil {
                 coordinator = nil
             }
         }
         
         if shouldFail || (error != nil) {
-            // Report any error we got.
             var dict = [String: AnyObject]()
             dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
             dict[NSLocalizedFailureReasonErrorKey] = failureReason

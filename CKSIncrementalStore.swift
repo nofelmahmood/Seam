@@ -85,15 +85,14 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         return nil
     }
-    override func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?, error: NSErrorPointer) -> AnyObject? {
-        
-        NSLog("Relationship Fault \(relationship.destinationEntity?.name)")
-        if relationship.toMany==false
-        {
-            return NSManagedObject()
-        }
-        return NSManagedObject()
-    }
+//    override func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?, error: NSErrorPointer) -> AnyObject? {
+//        
+//        if relationship.toMany==false
+//        {
+//            return NSManagedObject()
+//        }
+//        return NSManagedObject()
+//    }
     override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> NSIncrementalStoreNode? {
         
         var uniqueIdentifier:NSString=self.identifier(objectID) as! NSString
@@ -292,10 +291,8 @@ class CKSIncrementalStore: NSIncrementalStore {
             {
                 record.setObject(valueForKey as! NSNumber, forKey: key)
             }
-            
         }
-
-        for var i=0;i<relationships.allKeys.count;i++
+       for var i=0;i<relationships.allKeys.count;i++
         {
             var key:String=relationships.allKeys[i] as! String
             var relationship:NSRelationshipDescription=relationships.objectForKey(i) as! NSRelationshipDescription

@@ -10,21 +10,50 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
-let CKSStoreType="CloudKitStoreType"
-let CKSStoreDefaultDatabaseType="CloudKitStoreDefaultDatabaseType"
-enum CloudKitStoreDatabaseType
-{
-    case Public,Private
-}
+
+let CKSIncrementalStoreDatabaseType="CKSIncrementalStoreDatabaseType"
+let CKSIncrementalStorePrivateDatabaseType="CKSIncrementalStorePrivateDatabaseType"
+let CKSIncrementalStorePublicDatabaseType="CKSIncrementalStorePublicDatabaseType"
+
 class CKSIncrementalStore: NSIncrementalStore {
     
     lazy var cachedValues:NSMutableDictionary={
         return NSMutableDictionary()
     }()
     
+    var database:CKDatabase?
+    
+    var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
+    var backingMOC:NSManagedObjectContext?
+    
     override class func initialize()
     {
         NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: self.type)
+    }
+    override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator, configurationName name: String?, URL url: NSURL, options: [NSObject : AnyObject]?) {
+        
+        
+        if options![CKSIncrementalStoreDatabaseType] != nil
+        {
+            var optionValue: AnyObject?=options![CKSIncrementalStoreDatabaseType]
+            if optionValue! as! String == CKSIncrementalStorePrivateDatabaseType
+            {
+                self.database=CKContainer.defaultContainer().privateCloudDatabase
+            }
+            else if optionValue! as! String == CKSIncrementalStorePublicDatabaseType
+            {
+                self.database=CKContainer.defaultContainer().publicCloudDatabase
+            }
+            
+        }
+        else
+        {
+            self.database=CKContainer.defaultContainer().privateCloudDatabase
+        }
+        
+        super.init(persistentStoreCoordinator: root, configurationName: name, URL: url, options: options)
+        
+        
     }
     
     class var type:String{
@@ -33,35 +62,11 @@ class CKSIncrementalStore: NSIncrementalStore {
     
     override func loadMetadata(error: NSErrorPointer) -> Bool {
         
-//        var storeURL=self.URL
         self.metadata=[
             NSStoreUUIDKey:NSProcessInfo().globallyUniqueString,
             NSStoreTypeKey:self.dynamicType.type
         ]
-//        var model:NSManagedObjectModel!=self.persistentStoreCoordinator?.managedObjectModel.copy() as! NSManagedObjectModel
-//        
-//        
-//        for entity in model.entities
-//        {
-//            if entity.superentity==true
-//            {
-//                continue
-//            }
-//            var enDes:NSEntityDescription=entity as! NSEntityDescription
-//            var lastModifiedAttributeDesc:NSAttributeDescription=NSAttributeDescription()
-//            lastModifiedAttributeDesc.name="lastModifiedDate"
-//            lastModifiedAttributeDesc.attributeType=NSAttributeType.DateAttributeType
-//            lastModifiedAttributeDesc.indexed=true
-//            
-//            var creationAttributeDesc:NSAttributeDescription=NSAttributeDescription()
-//            creationAttributeDesc.name="createdDate"
-//            creationAttributeDesc.attributeType=NSAttributeType.DateAttributeType
-//            creationAttributeDesc.indexed=true
-//            
-//            enDes.properties.append(lastModifiedAttributeDesc)
-//            enDes.properties.append(creationAttributeDesc)
-//
-//        }
+
         return true
     }
     
@@ -163,6 +168,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     {
         var ckOperation:CKQueryOperation=self.cloudKitRequestOperationFromFetchRequest(fetchRequest, context: context) as! CKQueryOperation
         
+        ckOperation.database=self.database
         var record:CKRecord?
         var results:NSMutableArray=NSMutableArray()
         ckOperation.recordFetchedBlock=({ (record) -> Void in
@@ -183,6 +189,8 @@ class CKSIncrementalStore: NSIncrementalStore {
     func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
         var operation:CKModifyRecordsOperation=self.cloudKitModifyRecordsOperationFromSaveChangesRequest(saveRequest, context: context)
+
+        operation.database=self.database
         var savedRecords:NSArray?
         var deletedRecords:NSArray?
         operation.modifyRecordsCompletionBlock=({(savedRecords,deletedRecords,error)->Void in
@@ -238,7 +246,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         var ckModifyRecordsOperation:CKModifyRecordsOperation=CKModifyRecordsOperation(recordsToSave: ckRecordsToModify as [AnyObject], recordIDsToDelete: ckRecordsToDelete as [AnyObject])
         
-        
+        ckModifyRecordsOperation.database=self.database
         return ckModifyRecordsOperation
     }
     func cloudKitRequestOperationFromFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext)->NSOperation
@@ -261,7 +269,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         {
             queryOperation.desiredKeys=fetchRequest.propertiesToFetch
         }
-        queryOperation.database=CKContainer.defaultContainer().privateCloudDatabase
+        queryOperation.database=self.database
         return queryOperation
     }
     

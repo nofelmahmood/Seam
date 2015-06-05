@@ -24,7 +24,14 @@ class CKSIncrementalStore: NSIncrementalStore {
     var database:CKDatabase?
     
     var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
-    var backingMOC:NSManagedObjectContext?
+    lazy var backingMOC:NSManagedObjectContext={
+        
+        var moc=NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
+        moc.persistentStoreCoordinator=self.backingPersistentStoreCoordinator
+        moc.retainsRegisteredObjects=true
+        
+        return moc
+    }()
     
     override class func initialize()
     {
@@ -32,27 +39,20 @@ class CKSIncrementalStore: NSIncrementalStore {
     }
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator, configurationName name: String?, URL url: NSURL, options: [NSObject : AnyObject]?) {
         
+        self.database=CKContainer.defaultContainer().privateCloudDatabase
         
-        if options![CKSIncrementalStoreDatabaseType] != nil
+        if options != nil && options![CKSIncrementalStoreDatabaseType] != nil
         {
             var optionValue: AnyObject?=options![CKSIncrementalStoreDatabaseType]
-            if optionValue! as! String == CKSIncrementalStorePrivateDatabaseType
-            {
-                self.database=CKContainer.defaultContainer().privateCloudDatabase
-            }
-            else if optionValue! as! String == CKSIncrementalStorePublicDatabaseType
+            
+            if optionValue! as! String == CKSIncrementalStorePublicDatabaseType
             {
                 self.database=CKContainer.defaultContainer().publicCloudDatabase
             }
             
         }
-        else
-        {
-            self.database=CKContainer.defaultContainer().privateCloudDatabase
-        }
         
         super.init(persistentStoreCoordinator: root, configurationName: name, URL: url, options: options)
-        
         
     }
     
@@ -66,8 +66,47 @@ class CKSIncrementalStore: NSIncrementalStore {
             NSStoreUUIDKey:NSProcessInfo().globallyUniqueString,
             NSStoreTypeKey:self.dynamicType.type
         ]
+        
+        var storeURL=self.URL
+        var model:AnyObject=(self.persistentStoreCoordinator?.managedObjectModel.copy())!
 
+        if !(NSFileManager.defaultManager().fileExistsAtPath((storeURL?.path)!))
+        {
+            self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
+            var error: NSError? = nil
+            if self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil, error: &error) == nil
+            {
+                return false
+            }
+        }
+        
         return true
+
+
+    }
+    func doCKSubcriptions(usingModel model:NSManagedObjectModel)
+    {
+        var subcriptions=[AnyObject]()
+        for entity in model.entities
+        {
+            if entity.superentity != nil
+            {
+                continue
+            }
+            
+            var subcription:CKSubscription=CKSubscription(recordType: entity.name, predicate: NSPredicate(value: true), options: CKSubscriptionOptions.FiresOnRecordCreation | CKSubscriptionOptions.FiresOnRecordDeletion | CKSubscriptionOptions.FiresOnRecordUpdate)
+            
+            subcriptions.append(subcription)
+        }
+        
+//        var subcriptionsOperation=CKModifySubscriptionsOperation(subscriptionsToSave: subcriptions, subscriptionIDsToDelete: nil)
+//        subcriptionsOperation.database=self.database
+//        subcriptionsOperation.modifySubscriptionsCompletionBlock=((savedRecords, deletedRecordIDs, error) -> Void in
+//            
+//            
+//        
+//        )
+    
     }
     
     override func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> AnyObject? {
@@ -249,6 +288,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         ckModifyRecordsOperation.database=self.database
         return ckModifyRecordsOperation
     }
+    
     func cloudKitRequestOperationFromFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext)->NSOperation
     {
         var requestPredicate:NSPredicate=NSPredicate(value: true)

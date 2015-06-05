@@ -15,6 +15,13 @@ let CKSIncrementalStoreDatabaseType="CKSIncrementalStoreDatabaseType"
 let CKSIncrementalStorePrivateDatabaseType="CKSIncrementalStorePrivateDatabaseType"
 let CKSIncrementalStorePublicDatabaseType="CKSIncrementalStorePublicDatabaseType"
 
+enum CKSLocalStoreRecordChangeType:Int
+{
+    case RecordUpdated = 1
+    case RecordCreated
+    case RecordDeleted
+}
+
 class CKSIncrementalStore: NSIncrementalStore {
     
     lazy var cachedValues:NSMutableDictionary={
@@ -29,6 +36,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         var moc=NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
         moc.persistentStoreCoordinator=self.backingPersistentStoreCoordinator
         moc.retainsRegisteredObjects=true
+        
         
         return moc
     }()
@@ -69,19 +77,42 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         var storeURL=self.URL
         var model:AnyObject=(self.persistentStoreCoordinator?.managedObjectModel.copy())!
+        self.doCKSubcriptions(usingModel: model as! NSManagedObjectModel)
 
         if !(NSFileManager.defaultManager().fileExistsAtPath((storeURL?.path)!))
         {
+            for entity in model.entities
+            {
+                if entity.superentity != nil
+                {
+                    continue
+                }
+                
+                var recordIDAttributeDescription = NSAttributeDescription()
+                recordIDAttributeDescription.name="cKRecordID"
+                recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
+                recordIDAttributeDescription.indexed=true
+                
+                var recordChangeTypeAttributeDescription = NSAttributeDescription()
+                recordChangeTypeAttributeDescription.name="changeType"
+                recordChangeTypeAttributeDescription.attributeType=NSAttributeType.Integer16AttributeType
+                recordChangeTypeAttributeDescription.indexed=true
+                
+                (entity as! NSEntityDescription).properties.extend([recordChangeTypeAttributeDescription,recordIDAttributeDescription])
+                
+            }
+            
             self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
             var error: NSError? = nil
             if self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil, error: &error) == nil
             {
+                println("Persistent Store Failed")
                 return false
             }
+            println("Persistent Store passed")
         }
         
         return true
-
 
     }
     func doCKSubcriptions(usingModel model:NSManagedObjectModel)
@@ -96,17 +127,26 @@ class CKSIncrementalStore: NSIncrementalStore {
             
             var subcription:CKSubscription=CKSubscription(recordType: entity.name, predicate: NSPredicate(value: true), options: CKSubscriptionOptions.FiresOnRecordCreation | CKSubscriptionOptions.FiresOnRecordDeletion | CKSubscriptionOptions.FiresOnRecordUpdate)
             
+            var subcriptionInfo=CKNotificationInfo()
+            subcriptionInfo.shouldSendContentAvailable=true
+            subcriptionInfo.alertBody="Record Type \(subcription.recordType)"
             subcriptions.append(subcription)
+            
         }
         
-//        var subcriptionsOperation=CKModifySubscriptionsOperation(subscriptionsToSave: subcriptions, subscriptionIDsToDelete: nil)
-//        subcriptionsOperation.database=self.database
-//        subcriptionsOperation.modifySubscriptionsCompletionBlock=((savedRecords, deletedRecordIDs, error) -> Void in
-//            
-//            
-//        
-//        )
-    
+        var subcriptionsOperation=CKModifySubscriptionsOperation(subscriptionsToSave: subcriptions, subscriptionIDsToDelete: nil)
+        subcriptionsOperation.database=self.database
+        subcriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,error) -> Void in
+            
+            if error != nil
+            {
+                println("Error \(error.localizedDescription)")
+            }
+            else
+            {
+                println("Successfull")
+            }
+        })
     }
     
     override func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> AnyObject? {

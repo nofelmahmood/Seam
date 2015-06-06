@@ -15,9 +15,13 @@ let CKSIncrementalStoreDatabaseType="CKSIncrementalStoreDatabaseType"
 let CKSIncrementalStorePrivateDatabaseType="CKSIncrementalStorePrivateDatabaseType"
 let CKSIncrementalStorePublicDatabaseType="CKSIncrementalStorePublicDatabaseType"
 
+let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStore_OnlineStoreZone"
+
+let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
+
 enum CKSLocalStoreRecordChangeType:Int
 {
-    case RecordUpdated = 1
+    case RecordUpdated
     case RecordCreated
     case RecordDeleted
 }
@@ -29,6 +33,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     }()
     
     var database:CKDatabase?
+    var cloudDatabaseCustomZoneID:CKRecordZoneID?
     
     var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
     lazy var backingMOC:NSManagedObjectContext={
@@ -77,16 +82,20 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         var storeURL=self.URL
         var model:AnyObject=(self.persistentStoreCoordinator?.managedObjectModel.copy())!
-        self.doCKSubcriptions(usingModel: model as! NSManagedObjectModel)
+        
+        self.createCKSCloudDatabaseCustomZone()
 
         if !(NSFileManager.defaultManager().fileExistsAtPath((storeURL?.path)!))
         {
-            for entity in model.entities
+            for e in model.entities
             {
+                var entity=e as! NSEntityDescription
+                
                 if entity.superentity != nil
                 {
                     continue
                 }
+                
                 
                 var recordIDAttributeDescription = NSAttributeDescription()
                 recordIDAttributeDescription.name="cKRecordID"
@@ -98,43 +107,50 @@ class CKSIncrementalStore: NSIncrementalStore {
                 recordChangeTypeAttributeDescription.attributeType=NSAttributeType.Integer16AttributeType
                 recordChangeTypeAttributeDescription.indexed=true
                 
-                (entity as! NSEntityDescription).properties.extend([recordChangeTypeAttributeDescription,recordIDAttributeDescription])
+                entity.properties.append(recordIDAttributeDescription)
+                entity.properties.append(recordChangeTypeAttributeDescription)
                 
             }
-            
             self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
             var error: NSError? = nil
             if self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil, error: &error) == nil
             {
-                println("Persistent Store Failed")
                 return false
             }
-            println("Persistent Store passed")
         }
         
         return true
 
     }
-    func doCKSubcriptions(usingModel model:NSManagedObjectModel)
+    func createCKSCloudDatabaseCustomZone()
     {
-        var subcriptions=[AnyObject]()
-        for entity in model.entities
-        {
-            if entity.superentity != nil
+        var zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)
+        
+        self.database?.saveRecordZone(zone, completionHandler: { (zoneFromServer, error) -> Void in
+            
+            if error != nil
             {
-                continue
+                println("CKSIncrementalStore CustomZone creation failed")
+            }
+            else
+            {
+                self.cloudDatabaseCustomZoneID=zone.zoneID
+                self.createCKSCloudDatabaseCustomZoneSubcription()
             }
             
-            var subcription:CKSubscription=CKSubscription(recordType: entity.name, predicate: NSPredicate(value: true), options: CKSubscriptionOptions.FiresOnRecordCreation | CKSubscriptionOptions.FiresOnRecordDeletion | CKSubscriptionOptions.FiresOnRecordUpdate)
-            
-            var subcriptionInfo=CKNotificationInfo()
-            subcriptionInfo.shouldSendContentAvailable=true
-            subcriptionInfo.alertBody="Record Type \(subcription.recordType)"
-            subcriptions.append(subcription)
-            
-        }
+        })
+    }
+    func createCKSCloudDatabaseCustomZoneSubcription()
+    {
+        var subcription:CKSubscription = CKSubscription(zoneID: self.cloudDatabaseCustomZoneID, subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: nil)
         
-        var subcriptionsOperation=CKModifySubscriptionsOperation(subscriptionsToSave: subcriptions, subscriptionIDsToDelete: nil)
+        var subcriptionNotificationInfo = CKNotificationInfo()
+        subcriptionNotificationInfo.alertBody=""
+        subcriptionNotificationInfo.shouldSendContentAvailable = true
+        subcription.notificationInfo=subcriptionNotificationInfo
+        subcriptionNotificationInfo.shouldBadge=false
+        
+        var subcriptionsOperation=CKModifySubscriptionsOperation(subscriptionsToSave: [subcription], subscriptionIDsToDelete: nil)
         subcriptionsOperation.database=self.database
         subcriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,error) -> Void in
             
@@ -146,7 +162,11 @@ class CKSIncrementalStore: NSIncrementalStore {
             {
                 println("Successfull")
             }
+            
         })
+        
+        var operationQueue = NSOperationQueue()
+        operationQueue.addOperation(subcriptionsOperation)
     }
     
     override func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> AnyObject? {

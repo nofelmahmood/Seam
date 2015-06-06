@@ -10,6 +10,29 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
+class CKSIncrementalStoreSyncEngine: NSObject {
+    
+    static let defaultEngine=CKSIncrementalStoreSyncEngine()
+}
+class CKSIncrementalStoreSyncPushNotificationHandler
+{
+    static let defaultHandler=CKSIncrementalStoreSyncPushNotificationHandler()
+    
+    func handlePush(#userInfo:[NSObject : AnyObject])
+    {
+        var ckNotification = CKNotification(fromRemoteNotificationDictionary: userInfo)
+        
+        if ckNotification.notificationType == CKNotificationType.RecordZone
+        {
+            var recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: userInfo)
+            if recordZoneNotification.recordZoneID.zoneName == CKSIncrementalStoreCloudDatabaseCustomZoneName
+            {
+                
+            }
+            
+        }
+    }
+}
 
 let CKSIncrementalStoreDatabaseType="CKSIncrementalStoreDatabaseType"
 let CKSIncrementalStorePrivateDatabaseType="CKSIncrementalStorePrivateDatabaseType"
@@ -17,7 +40,10 @@ let CKSIncrementalStorePublicDatabaseType="CKSIncrementalStorePublicDatabaseType
 
 let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStore_OnlineStoreZone"
 
+let CKSIncrementalStoreCloudDatabaseCustomZoneIDKey = "CKSIncrementalStoreCloudDatabaseCustomZoneIDKey"
+
 let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
+
 
 enum CKSLocalStoreRecordChangeType:Int
 {
@@ -96,7 +122,6 @@ class CKSIncrementalStore: NSIncrementalStore {
                     continue
                 }
                 
-                
                 var recordIDAttributeDescription = NSAttributeDescription()
                 recordIDAttributeDescription.name="cKRecordID"
                 recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
@@ -118,6 +143,36 @@ class CKSIncrementalStore: NSIncrementalStore {
                 return false
             }
         }
+        
+        var fetchZones=CKFetchRecordZonesOperation.fetchAllRecordZonesOperation()
+        
+        fetchZones.fetchRecordZonesCompletionBlock=({(recordZonesByZoneID,error)-> Void in
+            
+            
+            var fetchRecordChangesOperation=CKFetchRecordChangesOperation(recordZoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName), previousServerChangeToken: nil)
+            
+            fetchRecordChangesOperation.recordChangedBlock=({(ckRecord) -> Void in
+                
+                println("CKRecord Fetched \(ckRecord)")
+                
+            })
+            
+            fetchRecordChangesOperation.recordWithIDWasDeletedBlock=({(ckRecordID) -> Void in
+                
+                println("CKRecord Deleted")
+            })
+            
+            fetchRecordChangesOperation.fetchRecordChangesCompletionBlock=({(changeToken,clientChangeToken,error)-> Void in
+                
+//                println("Fetching complete \(error.localizedDescription)")
+            })
+            var operationQueue=NSOperationQueue()
+            operationQueue.addOperation(fetchRecordChangesOperation)
+            
+        })
+        
+        var operationQueue=NSOperationQueue()
+        operationQueue.addOperation(fetchZones)
         
         return true
 

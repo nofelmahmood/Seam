@@ -10,9 +10,57 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
+let CKSIncrementalStoreSyncEngineFetchChangeTokenKey="CKSIncrementalStoreSyncEngineFetchChangeTokenKey"
 class CKSIncrementalStoreSyncEngine: NSObject {
     
     static let defaultEngine=CKSIncrementalStoreSyncEngine()
+    var localStoreMOC:NSManagedObjectContext?
+    
+    func getLocalChanges()->[AnyObject]
+    {
+        var entityNames=self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entities.map({(entity)->String in
+            
+            return (entity as! NSEntityDescription).name!
+        })
+        
+        var changedObjectIDs:[AnyObject]=[]
+        
+        for name in entityNames!
+        {
+            var fetchRequest=NSFetchRequest(entityName: name)
+            var predicate = NSPredicate(format: "\(CKSIncrementalStoreLocalStoreChangeTypeAttributeName) == ", "")
+        }
+        
+        return [AnyObject]()
+    }
+    func performSync()
+    {
+        var fetchChangeToken:AnyObject?
+        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey) != nil
+        {
+            fetchChangeToken=NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey)
+        }
+        
+        var fetchChangesOperation = CKFetchRecordChangesOperation(recordZoneID: CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName).zoneID, previousServerChangeToken: fetchChangeToken! as! CKServerChangeToken)
+        
+        fetchChangesOperation.recordChangedBlock=({(record)->Void in
+            
+        })
+        
+        fetchChangesOperation.recordWithIDWasDeletedBlock=({(recordID)->Void in
+            
+        })
+        fetchChangesOperation.fetchRecordChangesCompletionBlock=({(serverChangeToken,clientChangeToken,error)->Void in
+            
+            if error == nil
+            {
+                
+            }
+            
+        })
+        var operationQueue = NSOperationQueue()
+        operationQueue.addOperation(fetchChangesOperation)
+    }
 }
 class CKSIncrementalStoreSyncPushNotificationHandler
 {
@@ -45,10 +93,12 @@ let CKSIncrementalStoreCloudDatabaseCustomZoneIDKey = "CKSIncrementalStoreCloudD
 let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
 
 
+let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="changeType"
+let CKSIncrementalStoreLocalStoreRecordIDAttributeName="recordID"
+
 enum CKSLocalStoreRecordChangeType:Int
 {
     case RecordUpdated
-    case RecordCreated
     case RecordDeleted
 }
 
@@ -123,12 +173,12 @@ class CKSIncrementalStore: NSIncrementalStore {
                 }
                 
                 var recordIDAttributeDescription = NSAttributeDescription()
-                recordIDAttributeDescription.name="cKRecordID"
+                recordIDAttributeDescription.name=CKSIncrementalStoreLocalStoreRecordIDAttributeName
                 recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
                 recordIDAttributeDescription.indexed=true
                 
                 var recordChangeTypeAttributeDescription = NSAttributeDescription()
-                recordChangeTypeAttributeDescription.name="changeType"
+                recordChangeTypeAttributeDescription.name=CKSIncrementalStoreLocalStoreChangeTypeAttributeName
                 recordChangeTypeAttributeDescription.attributeType=NSAttributeType.Integer16AttributeType
                 recordChangeTypeAttributeDescription.indexed=true
                 
@@ -164,6 +214,10 @@ class CKSIncrementalStore: NSIncrementalStore {
             
             fetchRecordChangesOperation.fetchRecordChangesCompletionBlock=({(changeToken,clientChangeToken,error)-> Void in
                 
+                if error == nil
+                {
+                    NSUserDefaults.standardUserDefaults().setObject(changeToken, forKey: "dasd")
+                }
 //                println("Fetching complete \(error.localizedDescription)")
             })
             var operationQueue=NSOperationQueue()

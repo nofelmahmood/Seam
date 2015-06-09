@@ -28,7 +28,15 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         for name in entityNames!
         {
             var fetchRequest=NSFetchRequest(entityName: name)
-            var predicate = NSPredicate(format: "\(CKSIncrementalStoreLocalStoreChangeTypeAttributeName) == ", "")
+            var predicate = NSPredicate(format: "%K = %@ || %K = %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName,CKSLocalStoreRecordChangeType.RecordUpdated.rawValue,CKSIncrementalStoreLocalStoreChangeTypeAttributeName,CKSLocalStoreRecordChangeType.RecordDeleted.rawValue)
+            fetchRequest.resultType=NSFetchRequestResultType.DictionaryResultType
+            fetchRequest.propertiesToFetch = [CKSIncrementalStoreLocalStoreRecordIDAttributeName]
+            var error:NSErrorPointer=nil
+            var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
+            if error == nil && results?.count > 0
+            {
+                changedObjectIDs.extend(results!)
+            }
         }
         
         return [AnyObject]()
@@ -96,10 +104,11 @@ let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Syn
 let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="changeType"
 let CKSIncrementalStoreLocalStoreRecordIDAttributeName="recordID"
 
-enum CKSLocalStoreRecordChangeType:Int
+enum CKSLocalStoreRecordChangeType:Int16
 {
-    case RecordUpdated
-    case RecordDeleted
+    case RecordNoChange = 0
+    case RecordUpdated  = 1
+    case RecordDeleted  = 2
 }
 
 class CKSIncrementalStore: NSIncrementalStore {
@@ -194,40 +203,6 @@ class CKSIncrementalStore: NSIncrementalStore {
             }
         }
         
-        var fetchZones=CKFetchRecordZonesOperation.fetchAllRecordZonesOperation()
-        
-        fetchZones.fetchRecordZonesCompletionBlock=({(recordZonesByZoneID,error)-> Void in
-            
-            
-            var fetchRecordChangesOperation=CKFetchRecordChangesOperation(recordZoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName), previousServerChangeToken: nil)
-            
-            fetchRecordChangesOperation.recordChangedBlock=({(ckRecord) -> Void in
-                
-                println("CKRecord Fetched \(ckRecord)")
-                
-            })
-            
-            fetchRecordChangesOperation.recordWithIDWasDeletedBlock=({(ckRecordID) -> Void in
-                
-                println("CKRecord Deleted")
-            })
-            
-            fetchRecordChangesOperation.fetchRecordChangesCompletionBlock=({(changeToken,clientChangeToken,error)-> Void in
-                
-                if error == nil
-                {
-                    NSUserDefaults.standardUserDefaults().setObject(changeToken, forKey: "dasd")
-                }
-//                println("Fetching complete \(error.localizedDescription)")
-            })
-            var operationQueue=NSOperationQueue()
-            operationQueue.addOperation(fetchRecordChangesOperation)
-            
-        })
-        
-        var operationQueue=NSOperationQueue()
-        operationQueue.addOperation(fetchZones)
-        
         return true
 
     }
@@ -239,7 +214,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             
             if error != nil
             {
-                println("CKSIncrementalStore CustomZone creation failed")
+                println("CKSIncrementalStore Custom Zone creation failed")
             }
             else
             {
@@ -294,18 +269,12 @@ class CKSIncrementalStore: NSIncrementalStore {
         else
         {
             var exception=NSException(name: "Unknown Request Type", reason: "Unknown Request passed to NSManagedObjectContext", userInfo: nil)
+            exception.raise()
         }
         
-        return nil
+        return []
     }
-//    override func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?, error: NSErrorPointer) -> AnyObject? {
-//        
-//        if relationship.toMany==false
-//        {
-//            return NSManagedObject()
-//        }
-//        return NSManagedObject()
-//    }
+
     override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> NSIncrementalStoreNode? {
         
         var uniqueIdentifier:NSString=self.identifier(objectID) as! NSString

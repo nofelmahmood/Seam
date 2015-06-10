@@ -126,8 +126,6 @@ class CKSIncrementalStore: NSIncrementalStore {
         var moc=NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
         moc.persistentStoreCoordinator=self.backingPersistentStoreCoordinator
         moc.retainsRegisteredObjects=true
-        
-        
         return moc
     }()
     
@@ -166,12 +164,11 @@ class CKSIncrementalStore: NSIncrementalStore {
         ]
         
         var storeURL=self.URL
-        var model:AnyObject=(self.persistentStoreCoordinator?.managedObjectModel.copy())!
-        
-        self.createCKSCloudDatabaseCustomZone()
+//        self.createCKSCloudDatabaseCustomZone()
 
-        if !(NSFileManager.defaultManager().fileExistsAtPath((storeURL?.path)!))
+        if true
         {
+            var model:AnyObject=(self.persistentStoreCoordinator?.managedObjectModel.copy())!
             for e in model.entities
             {
                 var entity=e as! NSEntityDescription
@@ -196,11 +193,13 @@ class CKSIncrementalStore: NSIncrementalStore {
                 
             }
             self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
-            var error: NSError? = nil
-            if self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil, error: &error) == nil
-            {
-                return false
-            }
+        }
+        
+        var error: NSError? = nil
+        if self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil, error: &error)! == nil
+        {
+            print("Backing Store Error \(error)")
+            return false
         }
         
         return true
@@ -295,9 +294,12 @@ class CKSIncrementalStore: NSIncrementalStore {
                 }
                 return true
             })
+            println("Keys \(keys.description)")
             var values = managedObject.dictionaryWithValuesForKeys(keys)
+            println("Values \(values)")
             var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: values, version: 1)
             
+            println("IncrementalStoreNode \(incrementalStoreNode)")
             return incrementalStoreNode
         }
         
@@ -375,14 +377,17 @@ class CKSIncrementalStore: NSIncrementalStore {
         {
             fetchRequest.predicate = predicate
         }
-        var error:NSErrorPointer=nil
+        
+        var error:NSErrorPointer = nil
         var resultsFromLocalStore = self.backingMOC.executeFetchRequest(fetchRequest, error: error)
         if error == nil && resultsFromLocalStore?.count > 0
         {
             resultsFromLocalStore = resultsFromLocalStore?.map({(result)->NSManagedObject in
                 
-                var objectID = self.newObjectIDForEntity((fetchRequest.entity)!, referenceObject: (result as! NSManagedObject).valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName)!)
+                var managedObject:NSManagedObject = result as! NSManagedObject
+                var objectID = self.newObjectIDForEntity((fetchRequest.entity)!, referenceObject: managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName)!)
                 var object = context.objectWithID(objectID)
+                println(object.dictionaryWithValuesForKeys((self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[(object.entity.name)!]?.attributesByName.keys.array)!))
                 return object
             })
             
@@ -483,7 +488,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             var cksRecordIDs = Array(objectsInEntity).map({(object)->String in
                 
                 var managedObject:NSManagedObject = object as! NSManagedObject
-                return managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName)! as! String
+                return self.referenceObjectForObjectID(managedObject.objectID) as! String
             })
             fetchRequestForBackingObjects.predicate = NSPredicate(format: "%K IN %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,cksRecordIDs)
             var error:NSErrorPointer = nil
@@ -495,8 +500,8 @@ class CKSIncrementalStore: NSIncrementalStore {
                 {
                     var managedObject:NSManagedObject = results![i] as! NSManagedObject
                     var updatedObject:NSManagedObject = objectsInEntity[i as Int] as! NSManagedObject
-                    var keys = managedObject.entity.attributesByName.keys.array
-                    var dictionary = updatedObject.dictionaryWithValuesForKeys(keys)
+                    var keys = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[(managedObject.entity.name)!]?.attributesByName.keys.array
+                    var dictionary = updatedObject.dictionaryWithValuesForKeys(keys!)
                     managedObject.setValuesForKeysWithDictionary(dictionary)
                     managedObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
                 }

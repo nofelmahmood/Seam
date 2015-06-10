@@ -277,55 +277,80 @@ class CKSIncrementalStore: NSIncrementalStore {
 
     override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> NSIncrementalStoreNode? {
         
-        var uniqueIdentifier:NSString=self.identifier(objectID) as! NSString
-        var object:CKRecord?
-        var checkInCache: AnyObject?=self.cachedValues.objectForKey(uniqueIdentifier)
-        if((checkInCache) != nil)
-        {
-            object=checkInCache as? CKRecord
-        }
-        else
-        {
-            var operationQueue:NSOperationQueue=NSOperationQueue()
-            var recordIDIdentifier:AnyObject=self.identifier(objectID)
-            var recordID:CKRecordID=CKRecordID(recordName: recordIDIdentifier as! String)
-        var fetchRecordsOperation:CKFetchRecordsOperation=CKFetchRecordsOperation(recordIDs: [CKRecordID(recordName: recordIDIdentifier as! String)])
+        var recordID:String = self.referenceObjectForObjectID(objectID) as! String
+        var fetchRequest = NSFetchRequest(entityName: (objectID.entity.name)!)
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,recordID)
+        var error:NSErrorPointer = nil
+        var results = self.backingMOC.executeFetchRequest(fetchRequest, error: error)
         
-            fetchRecordsOperation.fetchRecordsCompletionBlock=({(recordIDs,error)-> Void in
+        if error == nil && results?.count > 0
+        {
+            var managedObject:NSManagedObject = results?.first as! NSManagedObject
+            var keys = managedObject.entity.attributesByName.keys.array.filter({(key)->Bool in
                 
-                if error==nil
+                if (key as! String) == CKSIncrementalStoreLocalStoreRecordIDAttributeName || (key as! String) == CKSIncrementalStoreLocalStoreChangeTypeAttributeName
                 {
-                    var recordsDictionary:NSDictionary=recordIDs as NSDictionary
-                    var record:CKRecord=recordsDictionary.objectForKey(recordID) as! CKRecord
-                    self.cachedValues.setObject(record, forKey: record.recordID.recordName)
-                    object=record as CKRecord
-
+                    return false
                 }
+                return true
             })
-            operationQueue.addOperation(fetchRecordsOperation)
-            operationQueue.waitUntilAllOperationsAreFinished()
+            var values = managedObject.dictionaryWithValuesForKeys(keys)
+            var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: values, version: 1)
+            
+            return incrementalStoreNode
         }
-        var keys:NSArray=object!.allKeys() as NSArray
-        var values:NSMutableDictionary=NSMutableDictionary()
-        var relationships:NSDictionary=objectID.entity.relationshipsByName as NSDictionary
         
-        for key in keys
-        {
-            var objectForKey: AnyObject!=object!.objectForKey(key as! String)
-            if objectForKey is CKReference
-            {
-                var reference:CKReference=objectForKey as! CKReference
-                var referenceEntity:NSRelationshipDescription=relationships.objectForKey(key) as! NSRelationshipDescription
-                var referenceObjectID:NSManagedObjectID=self.objectID(reference.recordID.recordName, entity: referenceEntity.destinationEntity!) as NSManagedObjectID
-                values.setValue(referenceObjectID, forKey: key as! String)
-            }
-            else
-            {
-                values.setValue(objectForKey, forKey: key as! String)
-            }
-        }
-        var incrementalStoreNode:NSIncrementalStoreNode=NSIncrementalStoreNode(objectID: objectID, withValues: values as [NSObject : AnyObject], version: 1)
-        return incrementalStoreNode
+        return nil
+//        var uniqueIdentifier:NSString=self.identifier(objectID) as! NSString
+//        var object:CKRecord?
+//        var checkInCache: AnyObject?=self.cachedValues.objectForKey(uniqueIdentifier)
+//        if((checkInCache) != nil)
+//        {
+//            object=checkInCache as? CKRecord
+//        }
+//        else
+//        {
+//            var operationQueue:NSOperationQueue=NSOperationQueue()
+//            var recordIDIdentifier:AnyObject=self.identifier(objectID)
+//            var recordID:CKRecordID=CKRecordID(recordName: recordIDIdentifier as! String)
+//        var fetchRecordsOperation:CKFetchRecordsOperation=CKFetchRecordsOperation(recordIDs: [CKRecordID(recordName: recordIDIdentifier as! String)])
+//        
+//            fetchRecordsOperation.fetchRecordsCompletionBlock=({(recordIDs,error)-> Void in
+//                
+//                if error==nil
+//                {
+//                    var recordsDictionary:NSDictionary=recordIDs as NSDictionary
+//                    var record:CKRecord=recordsDictionary.objectForKey(recordID) as! CKRecord
+//                    self.cachedValues.setObject(record, forKey: record.recordID.recordName)
+//                    object=record as CKRecord
+//
+//                }
+//            })
+//            operationQueue.addOperation(fetchRecordsOperation)
+//            operationQueue.waitUntilAllOperationsAreFinished()
+//        }
+//        var keys:NSArray=object!.allKeys() as NSArray
+//        var values:NSMutableDictionary=NSMutableDictionary()
+//        var relationships:NSDictionary=objectID.entity.relationshipsByName as NSDictionary
+//        
+//        for key in keys
+//        {
+//            var objectForKey: AnyObject!=object!.objectForKey(key as! String)
+//            if objectForKey is CKReference
+//            {
+//                var reference:CKReference=objectForKey as! CKReference
+//                var referenceEntity:NSRelationshipDescription=relationships.objectForKey(key) as! NSRelationshipDescription
+//                var referenceObjectID:NSManagedObjectID=self.objectID(reference.recordID.recordName, entity: referenceEntity.destinationEntity!) as NSManagedObjectID
+//                values.setValue(referenceObjectID, forKey: key as! String)
+//            }
+//            else
+//            {
+//                values.setValue(objectForKey, forKey: key as! String)
+//            }
+//        }
+//        var incrementalStoreNode:NSIncrementalStoreNode=NSIncrementalStoreNode(objectID: objectID, withValues: values as [NSObject : AnyObject], version: 1)
+//        return incrementalStoreNode
     }
     
     override func obtainPermanentIDsForObjects(array: [AnyObject], error: NSErrorPointer) -> [AnyObject]? {
@@ -340,6 +365,16 @@ class CKSIncrementalStore: NSIncrementalStore {
     // MARK : Request Methods
     func executeInResponseToFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
+        var predicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName,NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue))
+        
+        if fetchRequest.predicate != nil
+        {
+            fetchRequest.predicate = NSCompoundPredicate(type: NSCompoundPredicateType.AndPredicateType, subpredicates: [(fetchRequest.predicate)!,predicate])
+        }
+        else
+        {
+            fetchRequest.predicate = predicate
+        }
         var error:NSErrorPointer=nil
         var resultsFromLocalStore = self.backingMOC.executeFetchRequest(fetchRequest, error: error)
         if error == nil && resultsFromLocalStore?.count > 0
@@ -377,9 +412,44 @@ class CKSIncrementalStore: NSIncrementalStore {
 
     func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
-        
         // Inserted Objects
-        for object in context.insertedObjects
+        self.insertObjectsInBackingStore(Array(context.insertedObjects))
+        
+        // Updated Objects
+        self.setObjectsInBackingStore(Array(context.updatedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordUpdated)
+        
+        // Deleted Objects
+        self.setObjectsInBackingStore(Array(context.deletedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordDeleted)
+        
+        var error:NSErrorPointer = nil
+        self.backingMOC.save(error)
+        
+//        var operation:CKModifyRecordsOperation=self.cloudKitModifyRecordsOperationFromSaveChangesRequest(saveRequest, context: context)
+//
+//        operation.database=self.database
+//        var savedRecords:NSArray?
+//        var deletedRecords:NSArray?
+//        operation.modifyRecordsCompletionBlock=({(savedRecords,deletedRecords,error)->Void in
+//            
+//            if(error==nil)
+//            {
+//                NSLog("Saved Changes Successfully")
+//            }
+//            else
+//            {
+//                NSLog("All Changes Not Saved Successfully \(error)")
+//            }
+//        })
+//        var operationQueue=NSOperationQueue()
+//        operationQueue.addOperation(operation)
+//        operationQueue.waitUntilAllOperationsAreFinished()
+        
+        return NSArray()
+    }
+
+    func insertObjectsInBackingStore(objects:Array<AnyObject>)
+    {
+        for object in objects
         {
             var managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(((object as! NSManagedObject).entity.name)!, inManagedObjectContext: self.backingMOC) as! NSManagedObject
             var keys = (object as! NSManagedObject).entity.attributesByName.keys.array
@@ -388,69 +458,62 @@ class CKSIncrementalStore: NSIncrementalStore {
             managedObject.setValue(self.referenceObjectForObjectID((object as! NSManagedObject).objectID), forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
             managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
         }
-        
-        // Updated Objects
-        var cksRecordIDs = Array(context.updatedObjects).map({(object)->String in
-            
-            var managedObject:NSManagedObject = object as! NSManagedObject
-            return managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName)! as! String
-        })
-        
-        var fetchRequestForBackingObjects = NSFetchRequest(entityName: ((context.updatedObjects.first as! NSManagedObject).entity.name)!)
-        fetchRequestForBackingObjects.predicate = NSPredicate(format: "%K IN %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,cksRecordIDs)
-        var error:NSErrorPointer = nil
-        var results = self.backingMOC.executeFetchRequest(fetchRequestForBackingObjects, error: error)
-        
-        if error == nil && results?.count > 0
+    }
+    func setObjectsInBackingStore(objects:Array<AnyObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)
+    {
+        var objectsByEntityNames:Dictionary<String,Array<AnyObject>> = Dictionary<String,Array<AnyObject>>()
+        for object in objects
         {
-            for var i=0; i <  mresults?.count; i++
+            var managedObject = object as! NSManagedObject
+            if objectsByEntityNames[(managedObject.entity.name)!] == nil
             {
-                var managedObject:NSManagedObject = results![i] as! NSManagedObject
-                var updatedObject:NSManagedObject = Array(context.updatedObjects)[i] as! NSManagedObject
-                var keys = managedObject.entity.attributesByName.keys.array
-                var dictionary = updatedObject.dictionaryWithValuesForKeys(keys)
-                managedObject.setValuesForKeysWithDictionary(dictionary)
-                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-            }
-        }
-        
-        // Deleted Objects
-        var deletedObjectRecordIDs = Array(context.deletedObjects).map({(object)->String in
-            
-            var managedObject:NSManagedObject = object as! NSManagedObject
-            return managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName)! as! String
-        })
-        
-        for object in context.deletedObjects
-        {
-            
-        }
-        error = nil
-        self.backingMOC.save(error)
-        
-        var operation:CKModifyRecordsOperation=self.cloudKitModifyRecordsOperationFromSaveChangesRequest(saveRequest, context: context)
-
-        operation.database=self.database
-        var savedRecords:NSArray?
-        var deletedRecords:NSArray?
-        operation.modifyRecordsCompletionBlock=({(savedRecords,deletedRecords,error)->Void in
-            
-            if(error==nil)
-            {
-                NSLog("Saved Changes Successfully")
+                objectsByEntityNames[(managedObject.entity.name)!] = [managedObject]
             }
             else
             {
-                NSLog("All Changes Not Saved Successfully \(error)")
+                objectsByEntityNames[(managedObject.entity.name)!]?.append(managedObject)
             }
-        })
-        var operationQueue=NSOperationQueue()
-        operationQueue.addOperation(operation)
-        operationQueue.waitUntilAllOperationsAreFinished()
+        }
         
-        return NSArray()
+        var objectEntityNames = objectsByEntityNames.keys.array
+        for key in objectEntityNames
+        {
+            var objectsInEntity:Array<AnyObject> = objectsByEntityNames[key]!
+            var fetchRequestForBackingObjects = NSFetchRequest(entityName: key)
+            var cksRecordIDs = Array(objectsInEntity).map({(object)->String in
+                
+                var managedObject:NSManagedObject = object as! NSManagedObject
+                return managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName)! as! String
+            })
+            fetchRequestForBackingObjects.predicate = NSPredicate(format: "%K IN %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,cksRecordIDs)
+            var error:NSErrorPointer = nil
+            var results = self.backingMOC.executeFetchRequest(fetchRequestForBackingObjects, error: error)
+            
+            if error == nil && results?.count > 0
+            {
+                for var i=0; i<results?.count; i++
+                {
+                    var managedObject:NSManagedObject = results![i] as! NSManagedObject
+                    var updatedObject:NSManagedObject = objectsInEntity[i as Int] as! NSManagedObject
+                    var keys = managedObject.entity.attributesByName.keys.array
+                    var dictionary = updatedObject.dictionaryWithValuesForKeys(keys)
+                    managedObject.setValuesForKeysWithDictionary(dictionary)
+                    managedObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+                }
+            }
+        }
     }
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     // MARK : Mapping Methods
 

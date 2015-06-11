@@ -23,18 +23,18 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             return (entity as! NSEntityDescription).name!
         })
         
-        var changedRecordIDsByEntity:Dictionary<String,Array<AnyObject>>=Dictionary<String,Array<AnyObject>>()
+        var deletedManagedObjects:Array<AnyObject> = Array<AnyObject>()
+        var updatedManagedObjects:Array<AnyObject> = Array<AnyObject>()
         
         for name in entityNames!
         {
             var fetchRequest=NSFetchRequest(entityName: name)
-            var predicate = NSPredicate(format: "%K = %@ || %K = %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName,CKSLocalStoreRecordChangeType.RecordUpdated.rawValue,CKSIncrementalStoreLocalStoreChangeTypeAttributeName,CKSLocalStoreRecordChangeType.RecordDeleted.rawValue)
+            var predicate = NSPredicate(format: "%K == %@ || %K == %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName,CKSLocalStoreRecordChangeType.RecordUpdated.rawValue,CKSIncrementalStoreLocalStoreChangeTypeAttributeName,CKSLocalStoreRecordChangeType.RecordDeleted.rawValue)
             
             var error:NSErrorPointer=nil
             var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
             if error == nil && results?.count > 0
             {
-                changedRecordIDsByEntity[name] = results
             }
         }
         return [AnyObject]()
@@ -42,32 +42,49 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     
     func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)->Array<AnyObject>
     {
-        var ckRecords = managedObjects.map({(object)->CKRecord in
+         return managedObjects.map({(object)->CKRecord in
             
             var managedObject:NSManagedObject = object as! NSManagedObject
             var ckRecordID = CKRecordID(recordName: (managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String), zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: nil))
             var ckRecord = CKRecord(recordType: (managedObject.entity.name)!, recordID: ckRecordID)
-            var entityProperties = managedObject.entity.properties
+            var entityProperties = managedObject.entity.properties.filter({(object)->Bool in
+                
+                if object is NSAttributeDescription
+                {
+                    var attributeDescription:NSAttributeDescription = object as! NSAttributeDescription
+                    switch attributeDescription.name
+                    {
+                        case CKSIncrementalStoreLocalStoreRecordIDAttributeName,CKSIncrementalStoreLocalStoreChangeTypeAttributeName:
+                            return false
+                        default:
+                            break
+                    }
+                }
+                return true
+            })
             
             for property in entityProperties
             {
                 if property is NSAttributeDescription
                 {
                     var attributeDescription:NSAttributeDescription = property as! NSAttributeDescription
-                    if attributeDescription.attributeType == NSAttributeType.StringAttributeType
+                    switch attributeDescription.attributeType
                     {
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! String, forKey: attributeDescription.name)
+                        case .StringAttributeType:
+                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! String, forKey: attributeDescription.name)
+                            
+                        case .DateAttributeType:
+                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSDate, forKey: attributeDescription.name)
+                            
+                        case .BinaryDataAttributeType:
+                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
+                            
+                        case .BooleanAttributeType, .DecimalAttributeType, .DoubleAttributeType, .FloatAttributeType, .Integer16AttributeType, .Integer32AttributeType, .Integer32AttributeType, .Integer64AttributeType:
+                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
+                            
+                        default:
+                            break
                     }
-                    else if attributeDescription.attributeType == NSAttributeType.DateAttributeType
-                    {
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSDate, forKey: attributeDescription.name)
-                    }
-                    else if attributeDescription.attributeType == NSAttributeType.BinaryDataAttributeType
-                    {
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
-                    }
-                    
-
                 }
                 else if property is NSRelationshipDescription
                 {
@@ -97,13 +114,17 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             
             return ckRecord
         })
-        
-        return Array<AnyObject>()
     }
     
     func deletedCKRecordIDs(fromManagedObjects managedObjects:Array<AnyObject>)->Array<AnyObject>
     {
-        return Array<AnyObject>()
+        return managedObjects.map({(object)->CKRecordID in
+            
+            var managedObject:NSManagedObject = object as! NSManagedObject
+            var ckRecordID = CKRecordID(recordName: managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: nil))
+            
+            return ckRecordID
+        })
     }
     
     func performSync()
@@ -408,13 +429,8 @@ class CKSIncrementalStore: NSIncrementalStore {
 
     func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
-        // Inserted Objects
         self.insertObjectsInBackingStore(Array(context.insertedObjects))
-        
-        // Updated Objects
         self.setObjectsInBackingStore(Array(context.updatedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordUpdated)
-        
-        // Deleted Objects
         self.setObjectsInBackingStore(Array(context.deletedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordDeleted)
         
         var error:NSErrorPointer = nil

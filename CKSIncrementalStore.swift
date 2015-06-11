@@ -16,7 +16,40 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     static let defaultEngine=CKSIncrementalStoreSyncEngine()
     var localStoreMOC:NSManagedObjectContext?
     
-    func getLocalChanges()->[AnyObject]
+    func performSync()
+    {
+        var localChangesInServerRepresentation = self.getLocalChangesInServerRepresentation()
+        var insertedOrUpdatedCKRecords = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
+        var deletedCKRecordIDs = localChangesInServerRepresentation.deletedRecordIDs
+        
+        var fetchChangeToken:AnyObject?
+        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey) != nil
+        {
+            fetchChangeToken=NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey)
+        }
+        
+        var fetchChangesOperation = CKFetchRecordChangesOperation(recordZoneID: CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName).zoneID, previousServerChangeToken: fetchChangeToken! as! CKServerChangeToken)
+        
+        fetchChangesOperation.recordChangedBlock=({(record)->Void in
+            
+        })
+        
+        fetchChangesOperation.recordWithIDWasDeletedBlock=({(recordID)->Void in
+            
+        })
+        fetchChangesOperation.fetchRecordChangesCompletionBlock=({(serverChangeToken,clientChangeToken,error)->Void in
+            
+            if error == nil
+            {
+                
+            }
+            
+        })
+        var operationQueue = NSOperationQueue()
+        operationQueue.addOperation(fetchChangesOperation)
+    }
+    
+    func getLocalChangesInServerRepresentation()->(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedRecordIDs:Array<AnyObject>)
     {
         var entityNames=self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entities.map({(entity)->String in
             
@@ -35,9 +68,39 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
             if error == nil && results?.count > 0
             {
+                var insertedOrUpdatedManagedObjects = results?.filter({(object)->Bool in
+                    
+                    var managedObject:NSManagedObject = object as! NSManagedObject
+                    if (managedObject.valueForKey(CKSIncrementalStoreLocalStoreChangeTypeAttributeName)) as! NSNumber == NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue)
+                    {
+                        return true
+                    }
+                    return false
+                })
+                
+                var deletedManagedObjects = results?.filter({(object)->Bool in
+                    
+                    var managedObject:NSManagedObject = object as! NSManagedObject
+                    if (managedObject.valueForKey(CKSIncrementalStoreLocalStoreChangeTypeAttributeName)) as! NSNumber == NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue)
+                    {
+                        return true
+                    }
+                    return false
+                })
+                
+                var insertedOrUpdatedCKRecords = self.insertedOrUpdatedCKRecords(fromManagedObjects: insertedOrUpdatedManagedObjects!)
+                var deletedCKRecordIDs = self.deletedCKRecordIDs(fromManagedObjects: deletedManagedObjects!)
+                
+                return (insertedOrUpdatedCKRecords,deletedCKRecordIDs)
+                
             }
         }
-        return [AnyObject]()
+        
+        return (Array<AnyObject>(),Array<AnyObject>())
+    }
+    func applyLocalChangesToServer()
+    {
+        
     }
     
     func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)->Array<AnyObject>
@@ -125,35 +188,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             
             return ckRecordID
         })
-    }
-    
-    func performSync()
-    {
-        var fetchChangeToken:AnyObject?
-        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey) != nil
-        {
-            fetchChangeToken=NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey)
-        }
-        
-        var fetchChangesOperation = CKFetchRecordChangesOperation(recordZoneID: CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName).zoneID, previousServerChangeToken: fetchChangeToken! as! CKServerChangeToken)
-        
-        fetchChangesOperation.recordChangedBlock=({(record)->Void in
-            
-        })
-        
-        fetchChangesOperation.recordWithIDWasDeletedBlock=({(recordID)->Void in
-            
-        })
-        fetchChangesOperation.fetchRecordChangesCompletionBlock=({(serverChangeToken,clientChangeToken,error)->Void in
-            
-            if error == nil
-            {
-                
-            }
-            
-        })
-        var operationQueue = NSOperationQueue()
-        operationQueue.addOperation(fetchChangesOperation)
     }
 }
 class CKSIncrementalStoreSyncPushNotificationHandler

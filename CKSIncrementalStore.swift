@@ -54,7 +54,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                 if property is NSAttributeDescription
                 {
                     var attributeDescription:NSAttributeDescription = property as! NSAttributeDescription
-                    
                     if attributeDescription.attributeType == NSAttributeType.StringAttributeType
                     {
                         ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! String, forKey: attributeDescription.name)
@@ -63,6 +62,11 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                     {
                         ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSDate, forKey: attributeDescription.name)
                     }
+                    else if attributeDescription.attributeType == NSAttributeType.BinaryDataAttributeType
+                    {
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
+                    }
+                    
 
                 }
                 else if property is NSRelationshipDescription
@@ -70,7 +74,23 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                     var relationshipDescription:NSRelationshipDescription = property as! NSRelationshipDescription
                     if relationshipDescription.toMany == false
                     {
+                        var relationshipManagedObject:NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
+                        var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: nil))
                         
+                        var ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
+                        ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
+                    }
+                    else
+                    {
+                        var relationshipManagedObjects:Array<AnyObject> = managedObject.valueForKey(relationshipDescription.name) as! Array<AnyObject>
+                        var ckReferences = relationshipManagedObjects.map({(object)->CKReference in
+                            
+                            var managedObject:NSManagedObject = object as! NSManagedObject
+                            var ckRecordID = CKRecordID(recordName: managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: nil))
+                            var ckReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
+                            return ckReference
+                        })
+                        ckRecord.setObject(ckReferences, forKey: relationshipDescription.name)
                     }
                 }
             }

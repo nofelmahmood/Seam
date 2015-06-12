@@ -20,7 +20,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     func performSync()->Bool
     {
         var wasSuccessful = false
-        
         var localChanges = self.localChanges()
         var localChangesInServerRepresentation = self.localChangesInServerRepresentation(localChanges: localChanges)
         var insertedOrUpdatedCKRecords = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
@@ -40,17 +39,23 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         return wasSuccessful
     }
     
-    func fetchRecordChangesFromServer()->Array<AnyObject>
+    func savedCKServerChangeToken()->CKServerChangeToken?
     {
-        var oldFetchTokenKeyUnArchived:CKServerChangeToken?
         if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey) != nil
         {
-            var oldFetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey) as! NSData
-            
-            oldFetchTokenKeyUnArchived = NSKeyedUnarchiver.unarchiveObjectWithData(oldFetchTokenKeyArchived) as? CKServerChangeToken
+            var fetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey) as! NSData
+            return NSKeyedUnarchiver.unarchiveObjectWithData(fetchTokenKeyArchived) as? CKServerChangeToken
         }
         
-        var fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: nil), previousServerChangeToken:oldFetchTokenKeyUnArchived)
+        return nil
+    }
+    func saveServerChangeToken(#serverChangeToken:CKServerChangeToken)
+    {
+        NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(serverChangeToken), forKey: CKSIncrementalStoreSyncEngineFetchChangeTokenKey)
+    }
+    func fetchRecordChangesFromServer()->Array<AnyObject>
+    {
+        var fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: nil), previousServerChangeToken:self.savedCKServerChangeToken())
         
         fetchRecordChangesOperation.fetchRecordChangesCompletionBlock = ({(serverChangeToken,clientChangeToken,operationError)->Void in
             
@@ -59,11 +64,13 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         return Array<AnyObject>()
     }
+    
     func applyServerChangesToLocalDatabase()->Bool
     {
         var wasSuccessful = false
         return true
     }
+    
     func applyLocalChangesToServer(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
     {
         var wasSuccessful = false
@@ -74,6 +81,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             if operationError == nil
             {
                 wasSuccessful = true
+                
             }
         })
         
@@ -82,13 +90,15 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         return wasSuccessful
     }
+    
     func localChangesInServerRepresentation(#localChanges:(insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>))->(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)
     {
         return (self.insertedOrUpdatedCKRecords(fromManagedObjects: localChanges.insertedOrUpdatedManagedObjects),self.deletedCKRecordIDs(fromManagedObjects: localChanges.deletedManagedObjects))
     }
+    
     func localChanges()->(insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>)
     {
-        var entityNames=self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entities.map({(entity)->String in
+        var entityNames = self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entities.map({(entity)->String in
             
             return (entity as! NSEntityDescription).name!
         })
@@ -332,9 +342,10 @@ class CKSIncrementalStore: NSIncrementalStore {
             recordIDAttributeDescription.indexed=true
             
             var recordChangeTypeAttributeDescription = NSAttributeDescription()
-            recordChangeTypeAttributeDescription.name=CKSIncrementalStoreLocalStoreChangeTypeAttributeName
-            recordChangeTypeAttributeDescription.attributeType=NSAttributeType.Integer16AttributeType
-            recordChangeTypeAttributeDescription.indexed=true
+            recordChangeTypeAttributeDescription.name = CKSIncrementalStoreLocalStoreChangeTypeAttributeName
+            recordChangeTypeAttributeDescription.attributeType = NSAttributeType.Integer16AttributeType
+            recordChangeTypeAttributeDescription.indexed = true
+            recordChangeTypeAttributeDescription.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue)
             
             entity.properties.append(recordIDAttributeDescription)
             entity.properties.append(recordChangeTypeAttributeDescription)

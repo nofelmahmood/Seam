@@ -189,19 +189,31 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         for type in types
         {
-            var recordIDStrings = ckRecordsWithTypeNames[type]?.map({(object)->String in
+            var recordIDStrings = Set(ckRecordsWithTypeNames[type]!.map({(object)->String in
                 
                 var ckRecord:CKRecord = object as! CKRecord
                 return ckRecord.recordID.recordName
-            })
+            }))
             
             var fetchRequest = NSFetchRequest(entityName: type)
-            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":recordIDStrings!])
+            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":recordIDStrings])
             var error:NSErrorPointer = nil
             var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
-            
+            var ckRecordsForNewObjects:Array<AnyObject> = Array<AnyObject>()
             if error == nil && results?.count > 0
             {
+                var fetchedCKRecordIDs = Set(results!.map({(object)->String in
+                    
+                    var managedObject:NSManagedObject = object as! NSManagedObject
+                    return managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                }))
+
+                ckRecordsForNewObjects = results?.filter({(object)->Void in
+                    
+                    var ckRecord:CKRecord = object as! CKRecord
+                    fetchedCKRecordIDs.contains(ckRecord)
+                })
+                
                 
             }
             

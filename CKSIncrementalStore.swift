@@ -19,6 +19,9 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     
     func performSync()->Bool
     {
+        self.operationQueue = NSOperationQueue()
+        self.operationQueue?.maxConcurrentOperationCount = 1
+
         var wasSuccessful = false
         var localChanges = self.localChanges()
         var localChangesInServerRepresentation = self.localChangesInServerRepresentation(localChanges: localChanges)
@@ -27,13 +30,19 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         if self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
         {
-            if self.fetchRecordChangesFromServer().count > 0
-            {
-                if applyServerChangesToLocalDatabase()
-                {
-                    wasSuccessful = true
-                }
-            }
+            var returnValue = self.fetchRecordChangesFromServer()
+            var insertedOrUpdatedCKRecordsWithTypeNames = returnValue.insertedOrUpdatedCKRecordsWithTypeNames
+            var deletedCKRecordIDs = returnValue.deletedRecordIDs
+            var moreComing = returnValue.moreComing
+            
+            
+//            if self.fetchRecordChangesFromServer().count > 0
+//            {
+//                if applyServerChangesToLocalDatabase()
+//                {
+//                    wasSuccessful = true
+//                }
+//            }
         }
         
         return wasSuccessful
@@ -49,20 +58,50 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         return nil
     }
+    
     func saveServerChangeToken(#serverChangeToken:CKServerChangeToken)
     {
         NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(serverChangeToken), forKey: CKSIncrementalStoreSyncEngineFetchChangeTokenKey)
     }
-    func fetchRecordChangesFromServer()->Array<AnyObject>
+    
+    func fetchRecordChangesFromServer()->(insertedOrUpdatedCKRecordsWithTypeNames:Dictionary<String,Array<CKRecord>>,deletedRecordIDs:Array<CKRecordID>,moreComing:Bool)
     {
         var fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: nil), previousServerChangeToken:self.savedCKServerChangeToken())
         
+        var changedCKRecordsWithTypeNames:Dictionary<String,Array<CKRecord>> = Dictionary<String,Array<CKRecord>>()
+        var deletedCKRecordIDs:Array<CKRecordID> = Array<CKRecordID>()
+        
         fetchRecordChangesOperation.fetchRecordChangesCompletionBlock = ({(serverChangeToken,clientChangeToken,operationError)->Void in
             
+            if operationError == nil
+            {
+                self.saveServerChangeToken(serverChangeToken: serverChangeToken)
+            }
         })
         
+        fetchRecordChangesOperation.recordChangedBlock = ({(record)->Void in
+            
+            var ckRecord:CKRecord = record as CKRecord
+            
+            if changedCKRecordsWithTypeNames[ckRecord.recordType] != nil
+            {
+                changedCKRecordsWithTypeNames[ckRecord.recordType]?.append(ckRecord)
+            }
+            else
+            {
+                changedCKRecordsWithTypeNames[ckRecord.recordType] = [ckRecord]
+            }
+        })
         
-        return Array<AnyObject>()
+        fetchRecordChangesOperation.recordWithIDWasDeletedBlock = ({(recordID)->Void in
+            
+            deletedCKRecordIDs.append(recordID as CKRecordID)
+        })
+        
+        self.operationQueue?.addOperation(fetchRecordChangesOperation)
+        self.operationQueue?.waitUntilAllOperationsAreFinished()
+        
+        return (changedCKRecordsWithTypeNames,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
     }
     
     func applyServerChangesToLocalDatabase()->Bool
@@ -141,6 +180,36 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         }
         
         return (insertedOrUpdatedManagedObjects,deletedManagedObjects)
+    }
+    
+    func insertOrUpdateManagedObjects(fromCKRecordsWithTypeNamesDictionary ckRecordsWithTypeNames:Dictionary<String,Array<AnyObject>>)
+    {
+        var types = ckRecordsWithTypeNames.keys.array
+        var predicate = NSPredicate(format: "%K IN $ckRecordIDs",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+        
+        for type in types
+        {
+            var recordIDStrings = ckRecordsWithTypeNames[type]?.map({(object)->String in
+                
+                var ckRecord:CKRecord = object as! CKRecord
+                return ckRecord.recordID.recordName
+            })
+            
+            var fetchRequest = NSFetchRequest(entityName: type)
+            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":recordIDStrings!])
+            var error:NSErrorPointer = nil
+            var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
+            
+            if error == nil && results?.count > 0
+            {
+                
+            }
+            
+        }
+    }
+    
+    func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<AnyObject>)
+    {
     }
     
     func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)->Array<AnyObject>

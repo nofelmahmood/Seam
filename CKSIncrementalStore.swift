@@ -43,10 +43,11 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             if self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
              
             {
-                
+                if self.updateAndFinalizeLocalChanges(localChanges.insertedOrUpdatedManagedObjects, deletedManagedObjects: localChanges.deletedManagedObjects)
+                {
+                    
+                }
             }
-            
-            
         }
         
         return false
@@ -126,7 +127,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         return wasSuccessful
     }
     
-    func updateLocalChangesWithNoChangeType(insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>)->Bool
+    func updateAndFinalizeLocalChanges(insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>)->Bool
     {
         for object in insertedOrUpdatedManagedObjects
         {

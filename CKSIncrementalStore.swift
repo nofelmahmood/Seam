@@ -45,7 +45,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             {
                 if self.updateAndFinalizeLocalChanges(localChanges.insertedOrUpdatedManagedObjects, deletedManagedObjects: localChanges.deletedManagedObjects)
                 {
-                    
+                    return true
                 }
             }
         }
@@ -103,7 +103,8 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     
     func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
     {
-        var wasSuccessful = false
+        
+        
         return true
     }
     
@@ -201,41 +202,42 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         return (insertedOrUpdatedManagedObjects,deletedManagedObjects)
     }
     
-    func insertOrUpdateManagedObjects(fromCKRecordsWithTypeNamesDictionary ckRecordsWithTypeNames:Dictionary<String,Array<AnyObject>>)
+    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<AnyObject>)
     {
-        var types = ckRecordsWithTypeNames.keys.array
         var predicate = NSPredicate(format: "%K IN $ckRecordIDs",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+        var ckRecordsWithTypeNames:Dictionary<String,Array<AnyObject>> = Dictionary<String,Array<AnyObject>>()
+        
+        for object in ckRecords
+        {
+            var ckRecord:CKRecord = object as! CKRecord
+            if ckRecordsWithTypeNames[ckRecord.recordType] == nil
+            {
+                ckRecordsWithTypeNames[ckRecord.recordType] = [ckRecord]
+            }
+            else
+            {
+                ckRecordsWithTypeNames[ckRecord.recordType]?.append(ckRecord)
+                
+            }
+        }
+        
+        var types = ckRecordsWithTypeNames.keys.array
         
         for type in types
         {
-            var recordIDStrings = Set(ckRecordsWithTypeNames[type]!.map({(object)->String in
-                
-                var ckRecord:CKRecord = object as! CKRecord
-                return ckRecord.recordID.recordName
-            }))
-            
             var fetchRequest = NSFetchRequest(entityName: type)
-            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":recordIDStrings])
             var error:NSErrorPointer = nil
+            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":ckRecordsWithTypeNames[type]!])
             var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
-            var ckRecordsForNewObjects:Array<AnyObject> = Array<AnyObject>()
+            
             if error == nil && results?.count > 0
             {
-                var fetchedCKRecordIDs = Set(results!.map({(object)->String in
-                    
+                for object in results!
+                {
                     var managedObject:NSManagedObject = object as! NSManagedObject
-                    return managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
-                }))
-
-//                ckRecordsForNewObjects = results!.filter({(object)->Bool in
-//                    
-//                    var ckRecord:CKRecord = object as! CKRecord
-//                    fetchedCKRecordIDs.contains(ckRecord)
-//                })
-                
-                
+                    
+                }
             }
-            
         }
     }
     

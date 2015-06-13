@@ -229,15 +229,17 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             var error:NSErrorPointer = nil
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":ckRecordsWithTypeNames[type]!])
             var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
-            
-            if error == nil && results?.count > 0
-            {
-                for object in results!
-                {
-                    var managedObject:NSManagedObject = object as! NSManagedObject
-                    
-                }
-            }
+            var ckRecordIDStringsToUpdate = ckRecordsWithTypeNames[type]!.map({(object)->String in
+                
+                var ckRecord:CKRecord = object as! CKRecord
+                return ckRecord.recordID.recordName
+            })
+//            if error == nil && results?.count > 0
+//            {
+//                var ckRecordsToUpdate = ckRecordsWithTypeNames[type]?.filter({(object)->Bool in
+//                    
+//                })
+//            }
         }
     }
     

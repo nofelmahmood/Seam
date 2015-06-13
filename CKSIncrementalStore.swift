@@ -30,19 +30,17 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         if self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
         {
-            var returnValue = self.fetchRecordChangesFromServer()
-            var insertedOrUpdatedCKRecordsWithTypeNames = returnValue.insertedOrUpdatedCKRecordsWithTypeNames
-            var deletedCKRecordIDs = returnValue.deletedRecordIDs
-            var moreComing = returnValue.moreComing
+            var moreComing = true
+            var insertedOrUpdatedCKRecords = Array<CKRecord>()
+            var deletedCKRecordIDs = Array<CKRecordID>()
+            while moreComing
+            {
+                var returnValue = self.fetchRecordChangesFromServer()
+                insertedOrUpdatedCKRecords += returnValue.insertedOrUpdatedCKRecords
+                deletedCKRecordIDs += returnValue.deletedRecordIDs
+                moreComing = returnValue.moreComing
+            }
             
-            
-//            if self.fetchRecordChangesFromServer().count > 0
-//            {
-//                if applyServerChangesToLocalDatabase()
-//                {
-//                    wasSuccessful = true
-//                }
-//            }
         }
         
         return wasSuccessful
@@ -64,11 +62,11 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(serverChangeToken), forKey: CKSIncrementalStoreSyncEngineFetchChangeTokenKey)
     }
     
-    func fetchRecordChangesFromServer()->(insertedOrUpdatedCKRecordsWithTypeNames:Dictionary<String,Array<CKRecord>>,deletedRecordIDs:Array<CKRecordID>,moreComing:Bool)
+    func fetchRecordChangesFromServer()->(insertedOrUpdatedCKRecords:Array<CKRecord>,deletedRecordIDs:Array<CKRecordID>,moreComing:Bool)
     {
         var fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: nil), previousServerChangeToken:self.savedCKServerChangeToken())
         
-        var changedCKRecordsWithTypeNames:Dictionary<String,Array<CKRecord>> = Dictionary<String,Array<CKRecord>>()
+        var insertedOrUpdatedCKRecords:Array<CKRecord> = Array<CKRecord>()
         var deletedCKRecordIDs:Array<CKRecordID> = Array<CKRecordID>()
         
         fetchRecordChangesOperation.fetchRecordChangesCompletionBlock = ({(serverChangeToken,clientChangeToken,operationError)->Void in
@@ -82,15 +80,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         fetchRecordChangesOperation.recordChangedBlock = ({(record)->Void in
             
             var ckRecord:CKRecord = record as CKRecord
-            
-            if changedCKRecordsWithTypeNames[ckRecord.recordType] != nil
-            {
-                changedCKRecordsWithTypeNames[ckRecord.recordType]?.append(ckRecord)
-            }
-            else
-            {
-                changedCKRecordsWithTypeNames[ckRecord.recordType] = [ckRecord]
-            }
+            insertedOrUpdatedCKRecords.append(ckRecord)
         })
         
         fetchRecordChangesOperation.recordWithIDWasDeletedBlock = ({(recordID)->Void in
@@ -101,10 +91,10 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         self.operationQueue?.addOperation(fetchRecordChangesOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
         
-        return (changedCKRecordsWithTypeNames,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
+        return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
     }
     
-    func applyServerChangesToLocalDatabase()->Bool
+    func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
     {
         var wasSuccessful = false
         return true
@@ -208,11 +198,11 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                     return managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
                 }))
 
-                ckRecordsForNewObjects = results?.filter({(object)->Void in
-                    
-                    var ckRecord:CKRecord = object as! CKRecord
-                    fetchedCKRecordIDs.contains(ckRecord)
-                })
+//                ckRecordsForNewObjects = results!.filter({(object)->Bool in
+//                    
+//                    var ckRecord:CKRecord = object as! CKRecord
+//                    fetchedCKRecordIDs.contains(ckRecord)
+//                })
                 
                 
             }

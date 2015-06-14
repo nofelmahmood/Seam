@@ -205,23 +205,24 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<AnyObject>)
     {
         var predicate = NSPredicate(format: "%K IN $ckRecordIDs",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
-        var ckRecordsWithTypeNames:Dictionary<String,Array<AnyObject>> = Dictionary<String,Array<AnyObject>>()
+        var ckRecordsWithTypeNames:Dictionary<String,Dictionary<String,CKRecord>> = Dictionary<String,Dictionary<String,CKRecord>>()
         
         for object in ckRecords
         {
             var ckRecord:CKRecord = object as! CKRecord
             if ckRecordsWithTypeNames[ckRecord.recordType] == nil
             {
-                ckRecordsWithTypeNames[ckRecord.recordType] = [ckRecord]
+                ckRecordsWithTypeNames[ckRecord.recordType] = [ckRecord.recordID.recordName:ckRecord]
             }
             else
             {
-                ckRecordsWithTypeNames[ckRecord.recordType]?.append(ckRecord)
-                
+                ckRecordsWithTypeNames[ckRecord.recordType]![ckRecord.recordID.recordName] = ckRecord
             }
         }
         
         var types = ckRecordsWithTypeNames.keys.array
+        
+        var managedObjectsWithTypeNames:Dictionary<String,Dictionary<String,NSManagedObject>> = Dictionary<String,Dictionary<String,NSManagedObject>>()
         
         for type in types
         {
@@ -229,16 +230,31 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             var error:NSErrorPointer = nil
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":ckRecordsWithTypeNames[type]!])
             var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
-            var ckRecordIDStringsToUpdate = ckRecordsWithTypeNames[type]!.map({(object)->String in
-                
-                var ckRecord:CKRecord = object as! CKRecord
-                return ckRecord.recordID.recordName
-            })
-//            if error == nil && results?.count > 0
+            
+            managedObjectsWithTypeNames[type] = Dictionary<String,NSManagedObject>()
+            
+            if error == nil && results?.count > 0
+            {
+                for object in results!
+                {
+                    var managedObject:NSManagedObject = object as! NSManagedObject
+                    managedObjectsWithTypeNames[type]![managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String] = managedObject
+                }
+            }
+        }
+        
+        for type in types
+        {
+            var managedObjectsOfType = managedObjectsWithTypeNames[type]
+            var ckRecordsOfType = ckRecordsWithTypeNames[type]
+            var keys = managedObjectsOfType?.keys.array
+            
+//            for key in keys!
 //            {
-//                var ckRecordsToUpdate = ckRecordsWithTypeNames[type]?.filter({(object)->Bool in
-//                    
-//                })
+//                var recordIDString:String = key as String
+//                var ckRecord:CKRecord = ckRecordsOfType[recordIDString] as! CKRecord
+//                var managedObject:NSManagedObject = managedObjectsOfType[recordIDString] as! NSManagedObject
+//                
 //            }
         }
     }

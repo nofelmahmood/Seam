@@ -19,7 +19,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     
     func performSync()->Bool
     {
-        self.deleteSavedServerChangeToken()
+//        self.deleteSavedServerChangeToken()
         self.operationQueue = NSOperationQueue()
         self.operationQueue?.maxConcurrentOperationCount = 1
 

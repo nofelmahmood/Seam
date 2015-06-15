@@ -245,6 +245,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                         var values = ckRecord.dictionaryWithValuesForKeys(keys)
                         managedObject.setValuesForKeysWithDictionary(values)
                         ckRecordsWithTypeName[recordIDString] = nil
+                        managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
                     }
                 }
             }
@@ -255,6 +256,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                 var keys = record.allKeys()
                 var values = record.dictionaryWithValuesForKeys(keys)
                 managedObject.setValuesForKeysWithDictionary(values)
+                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
             }
         }
         
@@ -268,9 +270,40 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         return false
     }
     
-    func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<AnyObject>)
+    func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<AnyObject>)->Bool
     {
+        var predicate = NSPredicate(format: "%K IN $ckRecordIDs",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+        var entityNames = self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entities.map({(object)->String in
+            
+            var entity:NSEntityDescription = object as! NSEntityDescription
+            return entity.name!
+        })
         
+        for name in entityNames!
+        {
+            var fetchRequest = NSFetchRequest(entityName: name)
+            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":ckRecordIDs])
+            var error:NSErrorPointer = nil
+            var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
+            if error == nil && results?.count > 0
+            {
+                for object in results as! [NSManagedObject]
+                {
+                    self.localStoreMOC?.deleteObject(object)
+                }
+                
+            }
+        }
+        
+        var error:NSErrorPointer = nil
+        self.localStoreMOC?.save(error)
+        
+        if error == nil
+        {
+            return true
+        }
+        
+        return false
     }
     
     func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)->Array<AnyObject>

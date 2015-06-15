@@ -222,8 +222,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         var types = ckRecordsWithTypeNames.keys.array
         
-        var managedObjectsWithTypeNames:Dictionary<String,Dictionary<String,NSManagedObject>> = Dictionary<String,Dictionary<String,NSManagedObject>>()
-        
         for type in types
         {
             var fetchRequest = NSFetchRequest(entityName: type)
@@ -231,31 +229,33 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":ckRecordsWithTypeNames[type]!])
             var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
             
-            managedObjectsWithTypeNames[type] = Dictionary<String,NSManagedObject>()
+            var ckRecordsWithTypeName:Dictionary<String,CKRecord> = ckRecordsWithTypeNames[type]!
             
             if error == nil && results?.count > 0
             {
                 for object in results!
                 {
                     var managedObject:NSManagedObject = object as! NSManagedObject
-                    managedObjectsWithTypeNames[type]![managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String] = managedObject
+                    var recordIDString = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                    if ckRecordsWithTypeName[recordIDString] != nil
+                    {
+                        var ckRecord = ckRecordsWithTypeName[recordIDString]!
+                        var keys = managedObject.entity.attributesByName.keys.array
+                        
+                        for key in keys
+                        {
+                            if (ckRecord.objectForKey(key as! String) != nil)
+                            {
+                                managedObject.setValue(ckRecord.objectForKey(key as! String), forKey: key as! String)
+                            }
+                        }
+                        
+                        ckRecordsWithTypeName[recordIDString] = nil
+                    }
                 }
+                
+                
             }
-        }
-        
-        for type in types
-        {
-            var managedObjectsOfType = managedObjectsWithTypeNames[type]
-            var ckRecordsOfType = ckRecordsWithTypeNames[type]
-            var keys = managedObjectsOfType?.keys.array
-            
-//            for key in keys!
-//            {
-//                var recordIDString:String = key as String
-//                var ckRecord:CKRecord = ckRecordsOfType[recordIDString] as! CKRecord
-//                var managedObject:NSManagedObject = managedObjectsOfType[recordIDString] as! NSManagedObject
-//                
-//            }
         }
     }
     

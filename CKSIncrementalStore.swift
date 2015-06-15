@@ -19,7 +19,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     
     func performSync()->Bool
     {
-//        self.deleteSavedServerChangeToken()
         self.operationQueue = NSOperationQueue()
         self.operationQueue?.maxConcurrentOperationCount = 1
 
@@ -144,7 +143,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         var deletedManagedObjects:Array<AnyObject> = Array<AnyObject>()
         var insertedOrUpdatedManagedObjects:Array<AnyObject> = Array<AnyObject>()
         
-        var predicate = NSPredicate(format: "%K == %@ || %K == %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue) ,CKSIncrementalStoreLocalStoreChangeTypeAttributeName,NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue))
+        var predicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue))
         
         for name in entityNames!
         {
@@ -177,7 +176,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                 
             }
         }
-        print("Local Changes \(insertedOrUpdatedManagedObjects) Deleted \(deletedManagedObjects)")
+
         return (insertedOrUpdatedManagedObjects,deletedManagedObjects)
     }
     
@@ -212,7 +211,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             
             if error == nil && results?.count > 0
             {
-                print("Got Matching Results")
                 for object in results!
                 {
                     var managedObject = object as! NSManagedObject
@@ -232,7 +230,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             
             for record in ckRecordsWithTypeName.values.array
             {
-                print("Got Results to be inserted")
                 var managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: self.localStoreMOC!) as! NSManagedObject
                 var keys = record.allKeys().filter({(object)->Bool in
                     var key:String = object as! String
@@ -243,7 +240,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                     return true
                 })
                 var values = record.dictionaryWithValuesForKeys(keys)
-                print("Values \(values)")
                 managedObject.setValuesForKeysWithDictionary(values)
                 managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
                 managedObject.setValue(record.recordID.recordName, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
@@ -735,122 +731,6 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
     }
 
-    // MARK : Mapping Methods
-    func cloudKitModifyRecordsOperationFromSaveChangesRequest(saveChangesRequest:NSSaveChangesRequest,context:NSManagedObjectContext)->CKModifyRecordsOperation
-    {
-        var allObjects:NSArray=NSArray()
-        if((saveChangesRequest.insertedObjects) != nil)
-        {
-            allObjects=allObjects.arrayByAddingObjectsFromArray((saveChangesRequest.insertedObjects! as NSSet).allObjects)
-        }
-        if((saveChangesRequest.updatedObjects) != nil)
-        {
-            allObjects=allObjects.arrayByAddingObjectsFromArray((saveChangesRequest.updatedObjects! as NSSet).allObjects)
-        }
-        
-        var ckRecordsToModify:NSMutableArray=NSMutableArray()
-        
-        for managedObject in allObjects
-        {
-            ckRecordsToModify.addObject(self.ckRecordFromManagedObject(managedObject as! NSManagedObject))
-        }
-        
-        var deletedObjects:NSArray=NSArray()
-        if((saveChangesRequest.deletedObjects) != nil)
-        {
-            deletedObjects=deletedObjects.arrayByAddingObjectsFromArray((saveChangesRequest.deletedObjects! as NSSet).allObjects)
-        }
-        var ckRecordsToDelete:NSMutableArray=NSMutableArray()
-        for managedObject in deletedObjects
-        {
-            ckRecordsToDelete.addObject(self.ckRecordFromManagedObject(managedObject as! NSManagedObject).recordID)
-        }
-        
-        var ckModifyRecordsOperation:CKModifyRecordsOperation=CKModifyRecordsOperation(recordsToSave: ckRecordsToModify as [AnyObject], recordIDsToDelete: ckRecordsToDelete as [AnyObject])
-        
-        ckModifyRecordsOperation.database=self.database
-        return ckModifyRecordsOperation
-    }
-    
-    func cloudKitRequestOperationFromFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext)->NSOperation
-    {
-        var requestPredicate:NSPredicate=NSPredicate(value: true)
-        if (fetchRequest.predicate != nil)
-        {
-            requestPredicate=fetchRequest.predicate!
-        }
-        
-        var query:CKQuery=CKQuery(recordType: fetchRequest.entityName, predicate: requestPredicate)
-        if (fetchRequest.sortDescriptors != nil)
-        {
-            query.sortDescriptors=fetchRequest.sortDescriptors!
-        }
-        
-        var queryOperation:CKQueryOperation=CKQueryOperation(query: query)
-        queryOperation.resultsLimit=fetchRequest.fetchLimit
-        if (fetchRequest.propertiesToFetch != nil)
-        {
-            queryOperation.desiredKeys=fetchRequest.propertiesToFetch
-        }
-        queryOperation.database=self.database
-        return queryOperation
-    }
-    
-    func ckRecordFromManagedObject(managedObject:NSManagedObject)->CKRecord
-    {
-        var identifier:NSString=self.identifier(managedObject.objectID) as! NSString
-        var recordID:CKRecordID=CKRecordID(recordName: identifier as String)
-        var record:CKRecord=CKRecord(recordType: managedObject.entity.name, recordID: recordID)
-
-        var attributes:NSDictionary=managedObject.entity.attributesByName as NSDictionary
-        var relationships:NSDictionary=managedObject.entity.relationshipsByName as NSDictionary
-        
-        for var i=0;i<attributes.allKeys.count;i++
-        {
-            var key:String=attributes.allKeys[i] as! String
-            var valueForKey:AnyObject?=managedObject.valueForKey(key)
-            
-            if valueForKey is NSString
-            {
-                record.setObject(valueForKey as! NSString, forKey: key)
-            }
-            else if valueForKey is NSDate
-            {
-                record.setObject(valueForKey as! NSDate, forKey: key)
-            }
-            else if valueForKey is NSNumber
-            {
-                record.setObject(valueForKey as! NSNumber, forKey: key)
-            }
-        }
-       for var i=0;i<relationships.allKeys.count;i++
-        {
-            var key:String=relationships.allKeys[i] as! String
-            var relationship:NSRelationshipDescription=relationships.objectForKey(i) as! NSRelationshipDescription
-            
-            if relationship.toMany==false
-            {
-                var valueForKey:AnyObject?=managedObject.valueForKey(key)
-                var id: AnyObject=self.identifier(valueForKey!.objectID)
-                var ckRecordID:CKRecordID=CKRecordID(recordName: id as! String)
-                var ckReference:CKReference=CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
-                record.setObject(ckReference, forKey: key)
-            }
-
-        }
-        
-        return record
-        
-    }
-    func identifier(objectID:NSManagedObjectID)->AnyObject
-    {
-        return self.referenceObjectForObjectID(objectID)
-    }
-    func objectID(identifier:String,entity:NSEntityDescription)->NSManagedObjectID
-    {
-        var objectID:NSManagedObjectID=self.newObjectIDForEntity(entity, referenceObject: identifier)
-        return objectID
-    }
     
 
 }

@@ -5,7 +5,7 @@
       location = "container:"
       name = "CKSIncrementalStore">
       <FileRef
-         location = "group:CKSIncrementalStore.swift">
+         location = "group:CKSIncrementalStore/CKSIncrementalStore.swift">
       </FileRef>
    </Group>
    <FileRef

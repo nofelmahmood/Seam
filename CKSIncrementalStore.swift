@@ -202,7 +202,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         return (insertedOrUpdatedManagedObjects,deletedManagedObjects)
     }
     
-    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<AnyObject>)
+    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<AnyObject>)->Bool
     {
         var predicate = NSPredicate(format: "%K IN $ckRecordIDs",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
         var ckRecordsWithTypeNames:Dictionary<String,Dictionary<String,CKRecord>> = Dictionary<String,Dictionary<String,CKRecord>>()
@@ -235,32 +235,42 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             {
                 for object in results!
                 {
-                    var managedObject:NSManagedObject = object as! NSManagedObject
+                    var managedObject = object as! NSManagedObject
                     var recordIDString = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                    
                     if ckRecordsWithTypeName[recordIDString] != nil
                     {
                         var ckRecord = ckRecordsWithTypeName[recordIDString]!
-                        var keys = managedObject.entity.attributesByName.keys.array
-                        
-                        for key in keys
-                        {
-                            if (ckRecord.objectForKey(key as! String) != nil)
-                            {
-                                managedObject.setValue(ckRecord.objectForKey(key as! String), forKey: key as! String)
-                            }
-                        }
-                        
+                        var keys = ckRecord.allKeys()
+                        var values = ckRecord.dictionaryWithValuesForKeys(keys)
+                        managedObject.setValuesForKeysWithDictionary(values)
                         ckRecordsWithTypeName[recordIDString] = nil
                     }
                 }
-                
-                
+            }
+            
+            for record in ckRecordsWithTypeName.values.array
+            {
+                var managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: self.localStoreMOC!) as! NSManagedObject
+                var keys = record.allKeys()
+                var values = record.dictionaryWithValuesForKeys(keys)
+                managedObject.setValuesForKeysWithDictionary(values)
             }
         }
+        
+        var error:NSErrorPointer = nil
+        self.localStoreMOC?.save(error)
+        if error == nil
+        {
+            return true
+        }
+        
+        return false
     }
     
     func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<AnyObject>)
     {
+        
     }
     
     func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)->Array<AnyObject>

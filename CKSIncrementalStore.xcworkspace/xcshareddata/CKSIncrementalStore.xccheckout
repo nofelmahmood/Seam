@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>33DC94B2-F789-42B8-B22C-11683BF4332F</string>
+	<key>IDESourceControlProjectName</key>
+	<string>CKSIncrementalStore</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>2CCAA9F4A4B8B1404522BCDE42D60CC0827703CC</key>
+		<string>https://github.com/CloudKitSpace/CKSIncrementalStore.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>CKSIncrementalStore.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>2CCAA9F4A4B8B1404522BCDE42D60CC0827703CC</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/CloudKitSpace/CKSIncrementalStore.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>2CCAA9F4A4B8B1404522BCDE42D60CC0827703CC</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>2CCAA9F4A4B8B1404522BCDE42D60CC0827703CC</string>
+			<key>IDESourceControlWCCName</key>
+			<string>CKSIncrementalStore</string>
+		</dict>
+	</array>
+</dict>
+</plist>

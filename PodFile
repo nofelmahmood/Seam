@@ -1,0 +1,4 @@
+platform :ios, '8.0'
+pod 'CKSIncrementalStore'
+workspace 'CKSIncrementalStore'
+end

@@ -98,13 +98,11 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         self.operationQueue?.addOperation(fetchRecordChangesOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
-        print("Changes \(insertedOrUpdatedCKRecords) Deleted \(deletedCKRecordIDs)")
         return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
     }
     
     func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
     {
-        print("Applying Server Changes To Local Database")
         return self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords) && self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
     }
     
@@ -252,8 +250,8 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         {
             return true
         }
-        print("Saving Error \(error!)")
         
+        print("Saving Error \(error!)")
         return false
     }
     

@@ -40,14 +40,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                 moreComing = returnValue.moreComing
             }
             
-            if self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
-             
-            {
-                if self.updateAndFinalizeLocalChanges(localChanges.insertedOrUpdatedManagedObjects, deletedManagedObjects: localChanges.deletedManagedObjects)
-                {
-                    return true
-                }
-            }
+            return self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
         }
         
         return false
@@ -103,9 +96,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     
     func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
     {
-        
-        
-        return true
+        return self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords) && self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
     }
     
     func applyLocalChangesToServer(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
@@ -126,28 +117,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         self.operationQueue?.waitUntilAllOperationsAreFinished()
         
         return wasSuccessful
-    }
-    
-    func updateAndFinalizeLocalChanges(insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>)->Bool
-    {
-        for object in insertedOrUpdatedManagedObjects
-        {
-            var managedObject:NSManagedObject = object as! NSManagedObject
-            managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-        }
-        for object in deletedManagedObjects
-        {
-            var managedObject:NSManagedObject = object as! NSManagedObject
-            self.localStoreMOC?.deleteObject(managedObject)
-        }
-        
-        var error:NSErrorPointer = nil
-        self.localStoreMOC?.save(error)
-        if error == nil
-        {
-            return true
-        }
-        return false
     }
     
     func localChangesInServerRepresentation(#localChanges:(insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>))->(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)

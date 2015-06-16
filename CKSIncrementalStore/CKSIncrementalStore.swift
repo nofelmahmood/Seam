@@ -111,11 +111,13 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         var wasSuccessful = false
         var ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
         ckModifyRecordsOperation.atomic = true
+        ckModifyRecordsOperation.savePolicy = CKRecordSavePolicy.AllKeys
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             
             if operationError == nil
             {
                 wasSuccessful = true
+                println("Applyed local changes To Server")
                 
             }
         })
@@ -367,6 +369,7 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             var managedObject:NSManagedObject = object as! NSManagedObject
             var ckRecordID = CKRecordID(recordName: (managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String), zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
             var ckRecord = CKRecord(recordType: (managedObject.entity.name)!, recordID: ckRecordID)
+        
             var entityProperties = managedObject.entity.properties.filter({(object)->Bool in
                 
                 if object is NSAttributeDescription

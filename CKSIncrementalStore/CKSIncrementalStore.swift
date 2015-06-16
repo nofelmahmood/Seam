@@ -198,6 +198,9 @@ class CKSIncrementalStoreSyncEngine: NSObject {
         
         var types = ckRecordsWithTypeNames.keys.array
         
+        var toUpdateCKRecordsManagedObjects:Array<(ckRecord:CKRecord,managedObject:NSManagedObject)> = Array<(ckRecord:CKRecord,managedObject:NSManagedObject)>()
+        var toInsertCKRecords:Array<CKRecord> = Array<CKRecord>()
+        
         for type in types
         {
             var fetchRequest = NSFetchRequest(entityName: type)
@@ -213,36 +216,126 @@ class CKSIncrementalStoreSyncEngine: NSObject {
                 {
                     var managedObject = object as! NSManagedObject
                     var recordIDString = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
-                    
                     if ckRecordsWithTypeName[recordIDString] != nil
                     {
                         var ckRecord = ckRecordsWithTypeName[recordIDString]!
-                        var keys = ckRecord.allKeys()
-                        var values = ckRecord.dictionaryWithValuesForKeys(keys)
-                        managedObject.setValuesForKeysWithDictionary(values)
-                        ckRecordsWithTypeName[recordIDString] = nil
-                        managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+                        toUpdateCKRecordsManagedObjects += [(ckRecord:ckRecord,managedObject:managedObject)]
                     }
+                    
+//
+//                    if ckRecordsWithTypeName[recordIDString] != nil
+//                    {
+//                        var ckRecord = ckRecordsWithTypeName[recordIDString]!
+//                        var keys = ckRecord.allKeys()
+//                        var values = ckRecord.dictionaryWithValuesForKeys(keys)
+//                        managedObject.setValuesForKeysWithDictionary(values)
+//                        ckRecordsWithTypeName[recordIDString] = nil
+//                        managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+//                    }
                 }
             }
             
             for record in ckRecordsWithTypeName.values.array
             {
-                var managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: self.localStoreMOC!) as! NSManagedObject
-                var keys = record.allKeys().filter({(object)->Bool in
-                    var key:String = object as! String
-                    if record.objectForKey(key) is CKReference
-                    {
-                        return false
-                    }
-                    return true
-                })
-                var values = record.dictionaryWithValuesForKeys(keys)
-                managedObject.setValuesForKeysWithDictionary(values)
-                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-                managedObject.setValue(record.recordID.recordName, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+                var ckRecord:CKRecord = record as CKRecord
+                toInsertCKRecords.append(ckRecord)
             }
+            
+//            for record in ckRecordsWithTypeName.values.array
+//            {
+//                var managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(type, inManagedObjectContext: self.localStoreMOC!) as! NSManagedObject
+//                var keys = record.allKeys().filter({(object)->Bool in
+//                    var key:String = object as! String
+//                    if record.objectForKey(key) is CKReference
+//                    {
+//                        return false
+//                    }
+//                    return true
+//                })
+//                var values = record.dictionaryWithValuesForKeys(keys)
+//                managedObject.setValuesForKeysWithDictionary(values)
+//                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+//                managedObject.setValue(record.recordID.recordName, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+//            }
+            
         }
+        
+        
+        // Insert Records First to handle relationships
+        for object in toInsertCKRecords
+        {
+            var ckRecord:CKRecord = object as CKRecord
+            var managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(ckRecord.recordType, inManagedObjectContext: self.localStoreMOC!) as! NSManagedObject
+            var keys = ckRecord.allKeys().filter({(object)->Bool in
+                
+                var key:String = object as! String
+                if ckRecord.objectForKey(key) is CKReference
+                {
+                    return false
+                }
+                
+                return true
+            })
+            var changedCKReferencesRecordIDs = ckRecord.allKeys().filter({(object)->Bool in
+                
+                var key:String = object as! String
+                if ckRecord.objectForKey(key) is CKReference
+                {
+                    return true
+                }
+                return false
+                
+            }).map({(object)->String in
+                
+                var ckReference:CKReference = object as! CKReference
+                return ckReference.recordID.recordName
+            })
+            
+            var values = ckRecord.dictionaryWithValuesForKeys(keys)
+            managedObject.setValuesForKeysWithDictionary(values)
+            managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+            managedObject.setValue(ckRecord.recordID.recordName, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+            
+            
+            for object in changedCKReferencesRecordIDs
+            {
+                var ckReferenceRecordIDString:String = object as String
+                var referenceManagedObject = Array(self.localStoreMOC!.insertedObjects).filter({(object)->Bool in
+                    
+                    var managedObject:NSManagedObject = object as! NSManagedObject
+                    if (managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String) == ckReferenceRecordIDString
+                    {
+                        return true
+                    }
+                    return false
+                }).first
+                
+                if referenceManagedObject != nil
+                {
+                    managedObject.setValue(referenceManagedObject, forKey: (referenceManagedObject as! NSManagedObject).entity.name!)
+                }
+                else
+                {
+                    var entityNames = self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entitiesByName.keys.array
+                    for name in entityNames!
+                    {
+                        var fetchRequest = NSFetchRequest(entityName: name as! String)
+                        fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,ckReferenceRecordIDString)
+                        fetchRequest.fetchLimit = 1
+                        var error:NSErrorPointer = nil
+                        var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
+                        if error == nil && results?.count > 0
+                        {
+                            managedObject.setValue(results?.first as! NSManagedObject, forKey: name as! String)
+                        }
+                        
+                    }
+                }
+            }
+            
+        }
+        
+        
         
         var error:NSError?
         self.localStoreMOC?.save(&error)

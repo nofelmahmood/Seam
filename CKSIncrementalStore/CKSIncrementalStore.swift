@@ -124,7 +124,8 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var wasSuccessful = false
         var ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
         ckModifyRecordsOperation.atomic = true
-        ckModifyRecordsOperation.savePolicy = CKRecordSavePolicy.AllKeys
+        ckModifyRecordsOperation.savePolicy = CKRecordSavePolicy.IfServerRecordUnchanged
+        var savedRecords:[CKRecord]?
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             
             if operationError == nil
@@ -136,6 +137,53 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         self.operationQueue?.addOperation(ckModifyRecordsOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
         
+        if savedRecords != nil
+        {
+            var savedRecordsIDStrings = savedRecords!.map({(object)->String in
+                
+                var ckRecord:CKRecord = object as CKRecord
+                return ckRecord.recordID.recordName
+            })
+            
+            var savedRecordsWithType:Dictionary<String,Array<CKRecord>> = Dictionary<String,Array<CKRecord>>()
+            
+            for record in savedRecords!
+            {
+                if savedRecordsWithType[record.recordType] != nil
+                {
+                    savedRecordsWithType[record.recordType]!.append(record)
+                    continue
+                }
+                savedRecordsWithType[record.recordType] = [record]
+            }
+            
+            var predicate = NSPredicate(format: "%K IN $recordIDStrings",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+            
+            var types = savedRecordsWithType.keys.array
+            
+            var ckRecordsManagedObjects:Array<(ckRecord:CKRecord,managedObject:NSManagedObject)> = Array<(ckRecord:CKRecord,managedObject:NSManagedObject)>()
+            
+            for type in types
+            {
+                var fetchRequest = NSFetchRequest(entityName: type)
+                var ckRecordsForType = savedRecordsWithType[type]
+                var ckRecordIDStrings = ckRecordsForType!.map({(object)->String in
+                    
+                    var ckRecord:CKRecord = object as CKRecord
+                    return ckRecord.recordID.recordName
+                    
+                })
+                
+                fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["recordIDStrings":ckRecordIDStrings])
+                var error:NSErrorPointer = nil
+                var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
+                if error == nil && results?.count > 0
+                {
+                    
+                }
+                
+            }
+        }
         return wasSuccessful
     }
     

@@ -365,6 +365,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var error:NSErrorPointer = nil
         self.localStoreMOC?.save(error)
         
+        
         if error == nil
         {
             return true
@@ -564,11 +565,6 @@ class CKSIncrementalStore: NSIncrementalStore {
                 continue
             }
             
-            var recordIDAttributeDescription = NSAttributeDescription()
-            recordIDAttributeDescription.name=CKSIncrementalStoreLocalStoreRecordIDAttributeName
-            recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
-            recordIDAttributeDescription.indexed=true
-            
             var recordEncodedValuesAttributeDescription = NSAttributeDescription()
             recordEncodedValuesAttributeDescription.name = CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
             recordEncodedValuesAttributeDescription.attributeType = NSAttributeType.BinaryDataAttributeType
@@ -580,7 +576,6 @@ class CKSIncrementalStore: NSIncrementalStore {
             recordChangeTypeAttributeDescription.indexed = true
             recordChangeTypeAttributeDescription.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue)
             
-            entity.properties.append(recordIDAttributeDescription)
             entity.properties.append(recordEncodedValuesAttributeDescription)
             entity.properties.append(recordChangeTypeAttributeDescription)
             

@@ -587,7 +587,6 @@ class CKSIncrementalStore: NSIncrementalStore {
             return false
         }
         
-        self.syncOperation?.cksIncrementalStore = self
         return true
 
     }

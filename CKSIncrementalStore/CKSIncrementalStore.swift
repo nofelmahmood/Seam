@@ -145,17 +145,17 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 return ckRecord.recordID.recordName
             })
             
-            
-            var savedRecordsWithType:Dictionary<String,Array<CKRecord>> = Dictionary<String,Array<CKRecord>>()
+            var savedRecordsWithType:Dictionary<String,Dictionary<String,CKRecord>> = Dictionary<String,Dictionary<String,CKRecord>>()
             
             for record in savedRecords!
             {
                 if savedRecordsWithType[record.recordType] != nil
                 {
-                    savedRecordsWithType[record.recordType]!.append(record)
+                    savedRecordsWithType[record.recordType]![record.recordID.recordName] = record
                     continue
                 }
-                savedRecordsWithType[record.recordType] = [record]
+                var recordWithRecordIDString:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
+                savedRecordsWithType[record.recordType] = recordWithRecordIDString
             }
             
             var predicate = NSPredicate(format: "%K IN $recordIDStrings",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
@@ -168,21 +168,37 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             {
                 var fetchRequest = NSFetchRequest(entityName: type)
                 var ckRecordsForType = savedRecordsWithType[type]
-                var ckRecordIDStrings = ckRecordsForType!.map({(object)->String in
-                    
-                    var ckRecord:CKRecord = object as CKRecord
-                    return ckRecord.recordID.recordName
-                    
-                })
+                var ckRecordIDStrings = ckRecordsForType!.keys.array
                 
                 fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["recordIDStrings":ckRecordIDStrings])
                 var error:NSErrorPointer = nil
                 var results = self.localStoreMOC?.executeFetchRequest(fetchRequest, error: error)
                 if error == nil && results?.count > 0
                 {
+                    for managedObject in results as! [NSManagedObject]
+                    {
+                        var ckRecord = ckRecordsForType![managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String]
+                        var data = NSMutableData()
+                        var coder = NSKeyedArchiver(forWritingWithMutableData: data)
+                        ckRecord!.encodeSystemFieldsWithCoder(coder)
+                        managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
+                        coder.finishEncoding()
+                    }
                     
                 }
                 
+            }
+            
+            var error:NSErrorPointer = nil
+            self.localStoreMOC!.save(error)
+            
+            if error == nil
+            {
+                return true
+            }
+            else
+            {
+                return false
             }
         }
         return wasSuccessful

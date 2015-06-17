@@ -581,6 +581,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             recordChangeTypeAttributeDescription.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue)
             
             entity.properties.append(recordIDAttributeDescription)
+            entity.properties.append(recordEncodedValuesAttributeDescription)
             entity.properties.append(recordChangeTypeAttributeDescription)
             
         }

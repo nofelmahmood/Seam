@@ -16,6 +16,8 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     var operationQueue:NSOperationQueue?
     var localStoreMOC:NSManagedObjectContext?
     var syncCompletionBlock:((syncError:NSErrorPointer) -> ())?
+    // Return true for serverRecord false for clientRecord
+    var resolveConflictBlock:((serverRecord:CKRecord,clientRecord:CKRecord)->Bool)?
     
     override func main() {
         

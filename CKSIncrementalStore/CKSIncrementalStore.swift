@@ -493,6 +493,7 @@ let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Syn
 
 let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="changeType"
 let CKSIncrementalStoreLocalStoreRecordIDAttributeName="recordID"
+let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "encodedValues"
 
 enum CKSLocalStoreRecordChangeType:Int16
 {
@@ -567,6 +568,11 @@ class CKSIncrementalStore: NSIncrementalStore {
             recordIDAttributeDescription.name=CKSIncrementalStoreLocalStoreRecordIDAttributeName
             recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
             recordIDAttributeDescription.indexed=true
+            
+            var recordEncodedValuesAttributeDescription = NSAttributeDescription()
+            recordEncodedValuesAttributeDescription.name = CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
+            recordEncodedValuesAttributeDescription.attributeType = NSAttributeType.BinaryDataAttributeType
+            recordEncodedValuesAttributeDescription.indexed = true
             
             var recordChangeTypeAttributeDescription = NSAttributeDescription()
             recordChangeTypeAttributeDescription.name = CKSIncrementalStoreLocalStoreChangeTypeAttributeName

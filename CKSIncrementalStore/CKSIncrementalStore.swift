@@ -16,8 +16,8 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     var operationQueue:NSOperationQueue?
     var localStoreMOC:NSManagedObjectContext?
     var syncCompletionBlock:((syncError:NSErrorPointer) -> ())?
-    // Return true for serverRecord false for clientRecord
-    var resolveConflictBlock:((serverRecord:CKRecord,clientRecord:CKRecord)->Bool)?
+    
+    var resolveConflictBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
     override func main() {
         
@@ -35,6 +35,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         }
 
     }
+    
     func performSync()->Bool
     {
         var localChanges = self.localChanges()
@@ -118,6 +119,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     
     func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
     {
+        
         return self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs) && self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
     }
     
@@ -130,11 +132,24 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var savedRecords:[CKRecord]?
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             
-            if operationError == nil
+            var error:NSError? = operationError
+            if error == nil
             {
                 wasSuccessful = true
             }
+            else
+            {
+                var userInfo = error!.userInfo
+                if self.resolveConflictBlock != nil
+                {
+                    if error!.code == CKErrorCode.ServerRecordChanged.rawValue
+                    {
+                        print("Conflict occurred \(userInfo!)")
+                    }
+                }
+            }
         })
+        ckModifyRecordsOperation.description
         
         self.operationQueue?.addOperation(ckModifyRecordsOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
@@ -607,6 +622,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     {
         NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: self.type)
     }
+    
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator, configurationName name: String?, URL url: NSURL, options: [NSObject : AnyObject]?) {
         
         self.database=CKContainer.defaultContainer().privateCloudDatabase
@@ -684,6 +700,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         return true
 
     }
+    
     func createCKSCloudDatabaseCustomZone()
     {
         var zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)
@@ -701,6 +718,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             
         })
     }
+    
     func createCKSCloudDatabaseCustomZoneSubcription()
     {
         var subcription:CKSubscription = CKSubscription(zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName), subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: nil)
@@ -846,6 +864,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
         }
     }
+    
     func setObjectsInBackingStore(objects:Array<AnyObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)
     {
         var objectsByEntityNames:Dictionary<String,Array<AnyObject>> = Dictionary<String,Array<AnyObject>>()

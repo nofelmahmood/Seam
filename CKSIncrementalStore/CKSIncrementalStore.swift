@@ -221,6 +221,12 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 managedObject.setValuesForKeysWithDictionary(values)
                 managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
                 
+                var data = NSMutableData()
+                var coder = NSKeyedArchiver(forWritingWithMutableData: data)
+                ckRecord.encodeSystemFieldsWithCoder(coder)
+                managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
+                coder.finishEncoding()
+                
                 var changedCKReferenceRecordIDStringsWithKeys = ckRecord.allKeys().filter({(obj)->Bool in
                     
                     if ckRecord.objectForKey(obj as! String) is CKReference
@@ -380,7 +386,19 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             
             var managedObject:NSManagedObject = object as! NSManagedObject
             var ckRecordID = CKRecordID(recordName: (managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String), zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
-            var ckRecord = CKRecord(recordType: (managedObject.entity.name)!, recordID: ckRecordID)
+            
+            var ckRecord:CKRecord
+            if managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) != nil
+            {
+                var encodedSystemFields = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as! NSData
+                var coder = NSKeyedUnarchiver(forReadingWithData: encodedSystemFields)
+                ckRecord = CKRecord(coder: coder)
+                coder.finishDecoding()
+            }
+            else
+            {
+                ckRecord = CKRecord(recordType: (managedObject.entity.name)!, recordID: ckRecordID)
+            }
         
             var entityProperties = managedObject.entity.properties.filter({(object)->Bool in
                 
@@ -506,7 +524,7 @@ enum CKSLocalStoreRecordChangeType:Int16
 class CKSIncrementalStore: NSIncrementalStore {
     
     var syncOperation:CKSIncrementalStoreSyncOperation?
-    var pushHander:CKSIncrementalStoreSyncPushNotificationHandler?
+    var pushHandler:CKSIncrementalStoreSyncPushNotificationHandler?
     var database:CKDatabase?
     
     var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
@@ -565,10 +583,16 @@ class CKSIncrementalStore: NSIncrementalStore {
                 continue
             }
             
+            var recordIDAttributeDescription = NSAttributeDescription()
+            recordIDAttributeDescription.name=CKSIncrementalStoreLocalStoreRecordIDAttributeName
+            recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
+            recordIDAttributeDescription.indexed=true
+            
             var recordEncodedValuesAttributeDescription = NSAttributeDescription()
             recordEncodedValuesAttributeDescription.name = CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
             recordEncodedValuesAttributeDescription.attributeType = NSAttributeType.BinaryDataAttributeType
             recordEncodedValuesAttributeDescription.indexed = true
+            recordEncodedValuesAttributeDescription.optional = true
             
             var recordChangeTypeAttributeDescription = NSAttributeDescription()
             recordChangeTypeAttributeDescription.name = CKSIncrementalStoreLocalStoreChangeTypeAttributeName
@@ -576,6 +600,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             recordChangeTypeAttributeDescription.indexed = true
             recordChangeTypeAttributeDescription.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue)
             
+            entity.properties.append(recordIDAttributeDescription)
             entity.properties.append(recordEncodedValuesAttributeDescription)
             entity.properties.append(recordChangeTypeAttributeDescription)
             

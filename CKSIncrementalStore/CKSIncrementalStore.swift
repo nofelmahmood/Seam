@@ -149,6 +149,9 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 }
             }
         })
+        ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,error)->Void in
+            
+        })
         ckModifyRecordsOperation.description
         
         self.operationQueue?.addOperation(ckModifyRecordsOperation)

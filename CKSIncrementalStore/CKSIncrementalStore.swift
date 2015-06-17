@@ -10,18 +10,31 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
-let CKSIncrementalStoreSyncEngineFetchChangeTokenKey = "CKSIncrementalStoreSyncEngineFetchChangeTokenKey"
-class CKSIncrementalStoreSyncEngine: NSObject {
+let CKSIncrementalStoreSyncOperationFetchChangeTokenKey = "CKSIncrementalStoreSyncOperationFetchChangeTokenKey"
+class CKSIncrementalStoreSyncOperation: NSOperation {
     
-    static let defaultEngine=CKSIncrementalStoreSyncEngine()
     var operationQueue:NSOperationQueue?
     var localStoreMOC:NSManagedObjectContext?
+    var syncCompletionBlock:((syncError:NSErrorPointer) -> ())?
     
-    func performSync()->Bool
-    {
+    override func main() {
+        
         self.operationQueue = NSOperationQueue()
         self.operationQueue?.maxConcurrentOperationCount = 1
 
+        if self.syncCompletionBlock != nil
+        {
+            var error:NSErrorPointer = nil
+            if self.performSync() == false
+            {
+                error = NSErrorPointer()
+            }
+            self.syncCompletionBlock!(syncError: error)
+        }
+
+    }
+    func performSync()->Bool
+    {
         var localChanges = self.localChanges()
         var localChangesInServerRepresentation = self.localChangesInServerRepresentation(localChanges: localChanges)
         var insertedOrUpdatedCKRecords = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
@@ -48,9 +61,9 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     
     func savedCKServerChangeToken()->CKServerChangeToken?
     {
-        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey) != nil
+        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncOperationFetchChangeTokenKey) != nil
         {
-            var fetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncEngineFetchChangeTokenKey) as! NSData
+            var fetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncOperationFetchChangeTokenKey) as! NSData
             return NSKeyedUnarchiver.unarchiveObjectWithData(fetchTokenKeyArchived) as? CKServerChangeToken
         }
         
@@ -59,14 +72,14 @@ class CKSIncrementalStoreSyncEngine: NSObject {
     
     func saveServerChangeToken(#serverChangeToken:CKServerChangeToken)
     {
-        NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(serverChangeToken), forKey: CKSIncrementalStoreSyncEngineFetchChangeTokenKey)
+        NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(serverChangeToken), forKey: CKSIncrementalStoreSyncOperationFetchChangeTokenKey)
     }
     
     func deleteSavedServerChangeToken()
     {
         if self.savedCKServerChangeToken() != nil
         {
-            NSUserDefaults.standardUserDefaults().setObject(nil, forKey: CKSIncrementalStoreSyncEngineFetchChangeTokenKey)
+            NSUserDefaults.standardUserDefaults().setObject(nil, forKey: CKSIncrementalStoreSyncOperationFetchChangeTokenKey)
         }
     }
     
@@ -117,8 +130,6 @@ class CKSIncrementalStoreSyncEngine: NSObject {
             if operationError == nil
             {
                 wasSuccessful = true
-                println("Applyed local changes To Server")
-                
             }
         })
         
@@ -463,14 +474,6 @@ class CKSIncrementalStoreSyncPushNotificationHandler
             var recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: userInfo)
             if recordZoneNotification.recordZoneID.zoneName == CKSIncrementalStoreCloudDatabaseCustomZoneName
             {
-                if CKSIncrementalStoreSyncEngine.defaultEngine.performSync()
-                {
-                    print("Performed Sync")
-                }
-                else
-                {
-                    print("Not able to complete sync because of some error")
-                }
             }
             
         }
@@ -500,12 +503,9 @@ enum CKSLocalStoreRecordChangeType:Int16
 
 class CKSIncrementalStore: NSIncrementalStore {
     
-    lazy var cachedValues:NSMutableDictionary={
-        return NSMutableDictionary()
-    }()
-    
+    var syncOperation:CKSIncrementalStoreSyncOperation?
+    var pushHander:CKSIncrementalStoreSyncPushNotificationHandler?
     var database:CKDatabase?
-    var cloudDatabaseCustomZoneID:CKRecordZoneID?
     
     var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
     lazy var backingMOC:NSManagedObjectContext={
@@ -550,7 +550,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             NSStoreTypeKey:self.dynamicType.type
         ]
         var storeURL=self.URL
-//        self.createCKSCloudDatabaseCustomZone()
+        self.createCKSCloudDatabaseCustomZone()
         self.createCKSCloudDatabaseCustomZoneSubcription()
 
         var model:AnyObject=(self.persistentStoreCoordinator?.managedObjectModel.copy())!
@@ -587,9 +587,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             return false
         }
         
-        var syncLocalContext = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
-        syncLocalContext.persistentStoreCoordinator = self.backingPersistentStoreCoordinator
-        CKSIncrementalStoreSyncEngine.defaultEngine.localStoreMOC = syncLocalContext
+        self.syncOperation?.cksIncrementalStore = self
         return true
 
     }
@@ -605,7 +603,6 @@ class CKSIncrementalStore: NSIncrementalStore {
             }
             else
             {
-                self.cloudDatabaseCustomZoneID=zone.zoneID
                 self.createCKSCloudDatabaseCustomZoneSubcription()
             }
             
@@ -800,7 +797,4 @@ class CKSIncrementalStore: NSIncrementalStore {
             }
         }
     }
-
-    
-
 }

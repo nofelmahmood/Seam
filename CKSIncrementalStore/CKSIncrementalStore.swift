@@ -139,11 +139,12 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         
         if savedRecords != nil
         {
-            var savedRecordsIDStrings = savedRecords!.map({(object)->String in
+            var savedRecordsWithIDStrings = savedRecords!.map({(object)->String in
                 
                 var ckRecord:CKRecord = object as CKRecord
                 return ckRecord.recordID.recordName
             })
+            
             
             var savedRecordsWithType:Dictionary<String,Array<CKRecord>> = Dictionary<String,Array<CKRecord>>()
             

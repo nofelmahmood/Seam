@@ -14,15 +14,24 @@ let CKSIncrementalStoreSyncOperationFetchChangeTokenKey = "CKSIncrementalStoreSy
 class CKSIncrementalStoreSyncOperation: NSOperation {
     
     var operationQueue:NSOperationQueue?
-    var localStoreMOC:NSManagedObjectContext?
+    private var localStoreMOC:NSManagedObjectContext?
+    var persistentStoreCoordinator:NSPersistentStoreCoordinator?
     var syncCompletionBlock:((syncError:NSErrorPointer) -> ())?
     
     var resolveConflictBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
+    init(#persistentStoreCoordinator:NSPersistentStoreCoordinator?) {
+        
+        self.persistentStoreCoordinator = persistentStoreCoordinator
+        super.init()
+    }
     override func main() {
         
         self.operationQueue = NSOperationQueue()
         self.operationQueue?.maxConcurrentOperationCount = 1
+        
+        self.localStoreMOC = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
+        self.localStoreMOC?.persistentStoreCoordinator = self.persistentStoreCoordinator
 
         if self.syncCompletionBlock != nil
         {
@@ -594,6 +603,7 @@ class CKSIncrementalStoreSyncPushNotificationHandler
             var recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: userInfo)
             if recordZoneNotification.recordZoneID.zoneName == CKSIncrementalStoreCloudDatabaseCustomZoneName
             {
+                
             }
             
         }
@@ -716,6 +726,9 @@ class CKSIncrementalStore: NSIncrementalStore {
             return false
         }
         
+        self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator)
+        var operationQueue = NSOperationQueue()
+    
         return true
 
     }

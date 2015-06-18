@@ -16,7 +16,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     private var operationQueue:NSOperationQueue?
     private var localStoreMOC:NSManagedObjectContext?
     private var persistentStoreCoordinator:NSPersistentStoreCoordinator?
-    private var syncCompletionBlock:((syncError:NSErrorPointer) -> ())?
+    private var syncCompletionBlock:((syncError:NSError?) -> ())?
     private var syncConflictResolutionBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
     init(persistentStoreCoordinator:NSPersistentStoreCoordinator?) {
@@ -34,10 +34,11 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
 
         if self.syncCompletionBlock != nil
         {
-            var error:NSErrorPointer = nil
+            var error:NSError?
+            
             if self.performSync() == false
             {
-                error = NSErrorPointer()
+                error = NSError()
             }
             self.syncCompletionBlock!(syncError: error)
         }
@@ -729,14 +730,26 @@ class CKSIncrementalStore: NSIncrementalStore {
                 if error == nil
                 {
                     print("Sync Performed Successfully")
+                    dispatch_async(dispatch_get_main_queue(), {
+                        
+                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
+                    })
                 }
                 else
                 {
                     print("Sync unSuccessful")
+                    dispatch_async(dispatch_get_main_queue(), {
+                        
+                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
+                    })
                 }
+
             })
         }
         self.operationQueue?.addOperation(syncOperation!)
+        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidStartSyncOperationNotification, object: self)
+        
+        
     }
     func createCKSCloudDatabaseCustomZone()
     {

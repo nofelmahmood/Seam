@@ -336,8 +336,8 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 var data = NSMutableData()
                 var coder = NSKeyedArchiver(forWritingWithMutableData: data)
                 ckRecord.encodeSystemFieldsWithCoder(coder)
-                managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
                 coder.finishEncoding()
+                managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
                 
                 var changedCKReferenceRecordIDStringsWithKeys = ckRecord.allKeys().filter({(obj)->Bool in
                     
@@ -380,6 +380,11 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     
                     return true
                 })
+                var data = NSMutableData()
+                var coder = NSKeyedArchiver(forWritingWithMutableData: data)
+                ckRecord.encodeSystemFieldsWithCoder(coder)
+                coder.finishEncoding()
+                managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
                 var changedCKReferencesRecordIDsWithKeys = ckRecord.allKeys().filter({(object)->Bool in
                     
                     var key:String = object as! String
@@ -597,7 +602,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
 let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStore_OnlineStoreZone"
 let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
 
-
 let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="changeType"
 let CKSIncrementalStoreLocalStoreRecordIDAttributeName="recordID"
 let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "encodedValues"
@@ -716,6 +720,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             
         }
     }
+    
     func triggerSync()
     {
         if self.operationQueue != nil && self.operationQueue!.operationCount > 0
@@ -754,6 +759,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         
     }
+    
     func createCKSCloudDatabaseCustomZone()
     {
         var zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)
@@ -861,6 +867,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             
         })
     }
+    
     // MARK : Request Methods
     func executeInResponseToFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {

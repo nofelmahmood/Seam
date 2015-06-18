@@ -65,7 +65,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("CKSIncrementalStore_iOSDemo.sqlite")
         var error: NSError? = nil
         var failureReason = "There was an error creating or loading the application's saved data."
-        if coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil, error: &error) == nil {
+        
+        var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil, error: &error)
+        
+        if persistentStore == nil {
             coordinator = nil
             // Report any error we got.
             var dict = [String: AnyObject]()
@@ -77,6 +80,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             NSLog("Unresolved error \(error), \(error!.userInfo)")
             abort()
+        }
+        else
+        {
+            var cksIncrementalStore:CKSIncrementalStore = persistentStore as! CKSIncrementalStore
         }
         
         return coordinator

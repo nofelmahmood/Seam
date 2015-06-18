@@ -13,14 +13,14 @@ import ObjectiveC
 let CKSIncrementalStoreSyncOperationFetchChangeTokenKey = "CKSIncrementalStoreSyncOperationFetchChangeTokenKey"
 class CKSIncrementalStoreSyncOperation: NSOperation {
     
-    var operationQueue:NSOperationQueue?
+    private var operationQueue:NSOperationQueue?
     private var localStoreMOC:NSManagedObjectContext?
-    var persistentStoreCoordinator:NSPersistentStoreCoordinator?
-    var syncCompletionBlock:((syncError:NSErrorPointer) -> ())?
+    private var persistentStoreCoordinator:NSPersistentStoreCoordinator?
+    private var syncCompletionBlock:((syncError:NSErrorPointer) -> ())?
     
     var resolveConflictBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
-    init(#persistentStoreCoordinator:NSPersistentStoreCoordinator?) {
+    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?) {
         
         self.persistentStoreCoordinator = persistentStoreCoordinator
         super.init()
@@ -590,40 +590,18 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         })
     }
 }
-class CKSIncrementalStoreSyncPushNotificationHandler
-{
-    static let defaultHandler=CKSIncrementalStoreSyncPushNotificationHandler()
-    
-    func handlePush(#userInfo:[NSObject : AnyObject])
-    {
-        var ckNotification = CKNotification(fromRemoteNotificationDictionary: userInfo)
-        
-        if ckNotification.notificationType == CKNotificationType.RecordZone
-        {
-            var recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: userInfo)
-            if recordZoneNotification.recordZoneID.zoneName == CKSIncrementalStoreCloudDatabaseCustomZoneName
-            {
-                
-            }
-            
-        }
-    }
-}
 
-let CKSIncrementalStoreDatabaseType="CKSIncrementalStoreDatabaseType"
-let CKSIncrementalStorePrivateDatabaseType="CKSIncrementalStorePrivateDatabaseType"
-let CKSIncrementalStorePublicDatabaseType="CKSIncrementalStorePublicDatabaseType"
 
 let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStore_OnlineStoreZone"
-
-let CKSIncrementalStoreCloudDatabaseCustomZoneIDKey = "CKSIncrementalStoreCloudDatabaseCustomZoneIDKey"
-
 let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
 
 
 let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="changeType"
 let CKSIncrementalStoreLocalStoreRecordIDAttributeName="recordID"
 let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "encodedValues"
+
+let CKSIncrementalStoreDidStartSyncOperationNotification = "CKSIncrementalStoreDidStartSyncOperationNotification"
+let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStoreDidFinishSyncOperationNotification"
 
 enum CKSLocalStoreRecordChangeType:Int16
 {
@@ -635,11 +613,11 @@ enum CKSLocalStoreRecordChangeType:Int16
 class CKSIncrementalStore: NSIncrementalStore {
     
     var syncOperation:CKSIncrementalStoreSyncOperation?
-    var pushHandler:CKSIncrementalStoreSyncPushNotificationHandler?
-    var database:CKDatabase?
+    private var database:CKDatabase?
+    private var operationQueue:NSOperationQueue?
     
-    var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
-    lazy var backingMOC:NSManagedObjectContext={
+    private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
+    private lazy var backingMOC:NSManagedObjectContext={
         
         var moc=NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
         moc.persistentStoreCoordinator=self.backingPersistentStoreCoordinator
@@ -655,18 +633,6 @@ class CKSIncrementalStore: NSIncrementalStore {
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator, configurationName name: String?, URL url: NSURL, options: [NSObject : AnyObject]?) {
         
         self.database=CKContainer.defaultContainer().privateCloudDatabase
-        
-        if options != nil && options![CKSIncrementalStoreDatabaseType] != nil
-        {
-            var optionValue: AnyObject?=options![CKSIncrementalStoreDatabaseType]
-            
-            if optionValue! as! String == CKSIncrementalStorePublicDatabaseType
-            {
-                self.database=CKContainer.defaultContainer().publicCloudDatabase
-            }
-            
-        }
-        
         super.init(persistentStoreCoordinator: root, configurationName: name, URL: url, options: options)
         
     }
@@ -728,11 +694,29 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator)
         var operationQueue = NSOperationQueue()
-    
+        operationQueue.addOperation(self.syncOperation!)
         return true
 
     }
     
+    func handlePush(#userInfo:[NSObject : AnyObject])
+    {
+        var ckNotification = CKNotification(fromRemoteNotificationDictionary: userInfo)
+        
+        if ckNotification.notificationType == CKNotificationType.RecordZone
+        {
+            var recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: userInfo)
+            if recordZoneNotification.recordZoneID.zoneName == CKSIncrementalStoreCloudDatabaseCustomZoneName
+            {
+                
+            }
+            
+        }
+    }
+    func triggerSync()
+    {
+        
+    }
     func createCKSCloudDatabaseCustomZone()
     {
         var zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)

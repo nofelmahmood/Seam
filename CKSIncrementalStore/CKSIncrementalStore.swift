@@ -17,8 +17,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     private var localStoreMOC:NSManagedObjectContext?
     private var persistentStoreCoordinator:NSPersistentStoreCoordinator?
     private var syncCompletionBlock:((syncError:NSErrorPointer) -> ())?
-    
-    var resolveConflictBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
+    private var syncConflictResolutionBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
     init(persistentStoreCoordinator:NSPersistentStoreCoordinator?) {
         
@@ -149,7 +148,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             else
             {
                 var userInfo = error!.userInfo
-                if self.resolveConflictBlock != nil
+                if self.syncConflictResolutionBlock != nil
                 {
                     if error!.code == CKErrorCode.ServerRecordChanged.rawValue
                     {
@@ -167,7 +166,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
             else
             {
-                if self.resolveConflictBlock != nil
+                if self.syncConflictResolutionBlock != nil
                 {
                     if error!.code == CKErrorCode.ServerRecordChanged.rawValue
                     {
@@ -615,7 +614,6 @@ class CKSIncrementalStore: NSIncrementalStore {
     var syncOperation:CKSIncrementalStoreSyncOperation?
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
-    
     private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
     private lazy var backingMOC:NSManagedObjectContext={
         
@@ -624,6 +622,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         moc.retainsRegisteredObjects=true
         return moc
     }()
+    var recordConflictResolutionBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
     override class func initialize()
     {
@@ -692,9 +691,10 @@ class CKSIncrementalStore: NSIncrementalStore {
             return false
         }
         
-        self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator)
-        var operationQueue = NSOperationQueue()
-        operationQueue.addOperation(self.syncOperation!)
+        self.operationQueue = NSOperationQueue()
+        self.operationQueue?.maxConcurrentOperationCount = 1
+        self.triggerSync()
+        
         return true
 
     }
@@ -708,14 +708,35 @@ class CKSIncrementalStore: NSIncrementalStore {
             var recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: userInfo)
             if recordZoneNotification.recordZoneID.zoneName == CKSIncrementalStoreCloudDatabaseCustomZoneName
             {
-                
+                self.triggerSync()
             }
             
         }
     }
     func triggerSync()
     {
+        if self.operationQueue != nil && self.operationQueue!.operationCount > 0
+        {
+            return
+        }
         
+        if self.syncOperation == nil
+        {
+            self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator)
+            self.syncOperation?.syncConflictResolutionBlock = self.recordConflictResolutionBlock
+            self.syncOperation?.syncCompletionBlock =  ({(error) -> Void in
+                
+                if error == nil
+                {
+                    print("Sync Performed Successfully")
+                }
+                else
+                {
+                    print("Sync unSuccessful")
+                }
+            })
+        }
+        self.operationQueue?.addOperation(syncOperation!)
     }
     func createCKSCloudDatabaseCustomZone()
     {

@@ -149,7 +149,23 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 }
             }
         })
-        ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,error)->Void in
+        ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
+            
+            var error:NSError? = operationError
+            
+            if error == nil
+            {
+            }
+            else
+            {
+                if self.resolveConflictBlock != nil
+                {
+                    if error!.code == CKErrorCode.ServerRecordChanged.rawValue
+                    {
+                        print("Conflict Occurred in per record Block \(error!.userInfo!)")
+                    }
+                }
+            }
             
         })
         ckModifyRecordsOperation.description

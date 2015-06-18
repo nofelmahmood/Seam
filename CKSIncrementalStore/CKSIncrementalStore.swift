@@ -142,6 +142,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             
             var error:NSError? = operationError
+            print("Saved Records \(savedRecords!)")
             if error == nil
             {
                 wasSuccessful = true
@@ -184,6 +185,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         
         if savedRecords != nil
         {
+            print("There are saved records")
             var savedRecordsWithIDStrings = savedRecords!.map({(object)->String in
                 
                 var ckRecord:CKRecord = object as CKRecord
@@ -732,7 +734,7 @@ class CKSIncrementalStore: NSIncrementalStore {
                     print("Sync Performed Successfully")
                     dispatch_async(dispatch_get_main_queue(), {
                         
-                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
+                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
                     })
                 }
                 else
@@ -740,7 +742,8 @@ class CKSIncrementalStore: NSIncrementalStore {
                     print("Sync unSuccessful")
                     dispatch_async(dispatch_get_main_queue(), {
                         
-                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
+                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
+
                     })
                 }
 

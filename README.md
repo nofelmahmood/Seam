@@ -1,3 +1,3 @@
-<h2 id="cksincrementalstore"><a name="cksincrementalstore" href="#cksincrementalstore"></a>CKSIncrementalStore</h2>
-<h4 id="coredata-meets-cloudkit."><a name="coredata-meets-cloudkit." href="#coredata-meets-cloudkit."></a>CoreData meets CloudKit.</h4>
-<p>CoreData has been around for alot of time and considering the amount of work it reduces in developing data driven apps, I thought why not pay it a tribute.</p>
+<h1>CKSIncrementalStore</h1>
+<p>CloudKit meets CoreData. CKSIncrementalStore is a subclass of NSIncrementalStore class which automatically maintains a SQLite local cache (using CoreData) of user’s private data on CloudKit Servers and keeps it in sync.</p>
+

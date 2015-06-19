@@ -736,18 +736,19 @@ class CKSIncrementalStore: NSIncrementalStore {
             if error == nil
             {
                 print("Sync Performed Successfully")
-                dispatch_async(dispatch_get_main_queue(), {
+                NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
                     
                     NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
+
                 })
+
             }
             else
             {
                 print("Sync unSuccessful")
-                dispatch_async(dispatch_get_main_queue(), {
+                NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
                     
                     NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
-
                 })
             }
 
@@ -891,7 +892,6 @@ class CKSIncrementalStore: NSIncrementalStore {
                 var managedObject:NSManagedObject = result as! NSManagedObject
                 var objectID = self.newObjectIDForEntity((fetchRequest.entity)!, referenceObject: managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName)!)
                 var object = context.objectWithID(objectID)
-                println(object.dictionaryWithValuesForKeys((self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[(object.entity.name)!]?.attributesByName.keys.array)!))
                 return object
             })
             

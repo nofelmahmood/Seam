@@ -24,6 +24,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         self.persistentStoreCoordinator = persistentStoreCoordinator
         super.init()
     }
+    
     override func main() {
         
         self.operationQueue = NSOperationQueue()
@@ -137,7 +138,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var wasSuccessful = false
         var ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
         ckModifyRecordsOperation.atomic = true
-        ckModifyRecordsOperation.savePolicy = CKRecordSavePolicy.IfServerRecordUnchanged
         var savedRecords:[CKRecord]?
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             
@@ -150,6 +150,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             else
             {
                 var userInfo = error!.userInfo
+                print("Conflict occurred \(userInfo!)")
                 if self.syncConflictResolutionBlock != nil
                 {
                     if error!.code == CKErrorCode.ServerRecordChanged.rawValue
@@ -168,6 +169,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
             else
             {
+                print("Conflict occurred \(error!.userInfo!)")
                 if self.syncConflictResolutionBlock != nil
                 {
                     if error!.code == CKErrorCode.ServerRecordChanged.rawValue
@@ -185,7 +187,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         
         if savedRecords != nil
         {
-            print("There are saved records")
             var savedRecordsWithIDStrings = savedRecords!.map({(object)->String in
                 
                 var ckRecord:CKRecord = object as CKRecord
@@ -524,7 +525,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     var attributeDescription:NSAttributeDescription = object as! NSAttributeDescription
                     switch attributeDescription.name
                     {
-                        case CKSIncrementalStoreLocalStoreRecordIDAttributeName,CKSIncrementalStoreLocalStoreChangeTypeAttributeName:
+                        case CKSIncrementalStoreLocalStoreRecordIDAttributeName,CKSIncrementalStoreLocalStoreChangeTypeAttributeName,CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName:
                             return false
                         default:
                             break
@@ -602,9 +603,9 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
 let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStore_OnlineStoreZone"
 let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
 
-let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="changeType"
-let CKSIncrementalStoreLocalStoreRecordIDAttributeName="recordID"
-let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "encodedValues"
+let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="cks_LocalStore_Attribute_ChangeType"
+let CKSIncrementalStoreLocalStoreRecordIDAttributeName="cks_LocalStore_Attribute_RecordID"
+let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "cks_LocalStore_Attribute_EncodedValues"
 
 let CKSIncrementalStoreDidStartSyncOperationNotification = "CKSIncrementalStoreDidStartSyncOperationNotification"
 let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStoreDidFinishSyncOperationNotification"
@@ -728,32 +729,29 @@ class CKSIncrementalStore: NSIncrementalStore {
             return
         }
         
-        if self.syncOperation == nil
-        {
-            self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator)
-            self.syncOperation?.syncConflictResolutionBlock = self.recordConflictResolutionBlock
-            self.syncOperation?.syncCompletionBlock =  ({(error) -> Void in
-                
-                if error == nil
-                {
-                    print("Sync Performed Successfully")
-                    dispatch_async(dispatch_get_main_queue(), {
-                        
-                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
-                    })
-                }
-                else
-                {
-                    print("Sync unSuccessful")
-                    dispatch_async(dispatch_get_main_queue(), {
-                        
-                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
+        self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator)
+        self.syncOperation?.syncConflictResolutionBlock = self.recordConflictResolutionBlock
+        self.syncOperation?.syncCompletionBlock =  ({(error) -> Void in
+            
+            if error == nil
+            {
+                print("Sync Performed Successfully")
+                dispatch_async(dispatch_get_main_queue(), {
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
+                })
+            }
+            else
+            {
+                print("Sync unSuccessful")
+                dispatch_async(dispatch_get_main_queue(), {
+                    
+                    NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
 
-                    })
-                }
+                })
+            }
 
-            })
-        }
+        })
         self.operationQueue?.addOperation(syncOperation!)
         NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidStartSyncOperationNotification, object: self)
         
@@ -783,10 +781,10 @@ class CKSIncrementalStore: NSIncrementalStore {
         var subcription:CKSubscription = CKSubscription(zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName), subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: nil)
         
         var subcriptionNotificationInfo = CKNotificationInfo()
-        subcriptionNotificationInfo.alertBody=""
+        subcriptionNotificationInfo.alertBody = ""
         subcriptionNotificationInfo.shouldSendContentAvailable = true
-        subcription.notificationInfo=subcriptionNotificationInfo
-        subcriptionNotificationInfo.shouldBadge=false
+        subcription.notificationInfo = subcriptionNotificationInfo
+        subcriptionNotificationInfo.shouldBadge = false
         
         var subcriptionsOperation=CKModifySubscriptionsOperation(subscriptionsToSave: [subcription], subscriptionIDsToDelete: nil)
         subcriptionsOperation.database=self.database
@@ -810,14 +808,14 @@ class CKSIncrementalStore: NSIncrementalStore {
     override func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> AnyObject? {
         
         
-        if request.requestType==NSPersistentStoreRequestType.FetchRequestType
+        if request.requestType == NSPersistentStoreRequestType.FetchRequestType
         {
-            var fetchRequest:NSFetchRequest=request as! NSFetchRequest
+            var fetchRequest:NSFetchRequest = request as! NSFetchRequest
             return self.executeInResponseToFetchRequest(fetchRequest, context: context, error: error)
         }
         else if request.requestType==NSPersistentStoreRequestType.SaveRequestType
         {
-            var saveChangesRequest:NSSaveChangesRequest=request as! NSSaveChangesRequest
+            var saveChangesRequest:NSSaveChangesRequest = request as! NSSaveChangesRequest
             return self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context, error: error)
         }
         else
@@ -841,14 +839,16 @@ class CKSIncrementalStore: NSIncrementalStore {
         if error == nil && results?.count > 0
         {
             var managedObject:NSManagedObject = results?.first as! NSManagedObject
+            self.backingMOC.refreshObject(managedObject, mergeChanges: false)
             var keys = managedObject.entity.attributesByName.keys.array.filter({(key)->Bool in
                 
-                if (key as! String) == CKSIncrementalStoreLocalStoreRecordIDAttributeName || (key as! String) == CKSIncrementalStoreLocalStoreChangeTypeAttributeName
+                if (key as! String) == CKSIncrementalStoreLocalStoreRecordIDAttributeName || (key as! String) == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || (key as! String) == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
                 {
                     return false
                 }
                 return true
             })
+            
             var values = managedObject.dictionaryWithValuesForKeys(keys)
             var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: values, version: 1)
             
@@ -965,6 +965,32 @@ class CKSIncrementalStore: NSIncrementalStore {
                     var dictionary = updatedObject.dictionaryWithValuesForKeys(keys!)
                     managedObject.setValuesForKeysWithDictionary(dictionary)
                     managedObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+                    
+//                    if changeType == CKSLocalStoreRecordChangeType.RecordUpdated
+//                    {
+//                        var encodedSystemFields = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as! NSData
+//                        var coder = NSKeyedUnarchiver(forReadingWithData: encodedSystemFields)
+//                        var ckRecord = CKRecord(coder: coder)
+//                        println("Change Tag before \(ckRecord.recordChangeTag)")
+//                        coder.finishDecoding()
+//                        
+//                        var keysToUpdate = keys?.filter({(object)->Bool in
+//                            
+//                            if object == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || object == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName || object == CKSIncrementalStoreLocalStoreRecordIDAttributeName
+//                            {
+//                                return false
+//                            }
+//                            return true
+//                        })
+//                        
+//                        ckRecord.setValuesForKeysWithDictionary(managedObject.dictionaryWithValuesForKeys(keysToUpdate!))
+//                        println("Change Tag after \(ckRecord.recordChangeTag)")
+//                        var data = NSMutableData()
+//                        var coderForArchiving = NSKeyedArchiver(forWritingWithMutableData: data)
+//                        ckRecord.encodeSystemFieldsWithCoder(coderForArchiving)
+//                        managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
+//                        coderForArchiving.finishEncoding()
+//                    }
                 }
             }
         }

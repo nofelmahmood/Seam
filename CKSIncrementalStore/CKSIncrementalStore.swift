@@ -149,15 +149,28 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
             else
             {
-                var userInfo = error!.userInfo
-                print("Conflict occurred \(userInfo!)")
+                println("Conflict occurred in main block")
                 if self.syncConflictResolutionBlock != nil
                 {
-                    if error!.code == CKErrorCode.ServerRecordChanged.rawValue
+                    if error!.code == CKErrorCode.PartialFailure.rawValue
                     {
-                        print("Conflict occurred \(userInfo!)")
+                        let errorDict = error!.userInfo?[CKPartialErrorsByItemIDKey] as? [CKRecordID:NSError]
+                        if errorDict != nil
+                        {
+                            for (recordID, partialError) in errorDict!
+                            {
+                                if partialError.code == CKErrorCode.ServerRecordChanged.rawValue
+                                {
+                                    let userInfo = partialError.userInfo
+                                    println("Conflict For Record \(partialError.userInfo)")
+                                }
+                            }
+                            
+                            print("Conflict Occurred in per record Block \(error!.userInfo!)")
+                        }
                     }
                 }
+
             }
         })
         ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
@@ -169,12 +182,25 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
             else
             {
-                print("Conflict occurred \(error!.userInfo!)")
+                print("Conflict occurred per record Completion \(error!.userInfo!)")
                 if self.syncConflictResolutionBlock != nil
                 {
-                    if error!.code == CKErrorCode.ServerRecordChanged.rawValue
+                    if error!.code == CKErrorCode.PartialFailure.rawValue
                     {
-                        print("Conflict Occurred in per record Block \(error!.userInfo!)")
+                        let errorDict = error!.userInfo?[CKPartialErrorsByItemIDKey] as? [CKRecordID:NSError]
+                        if errorDict != nil
+                        {
+                            for (recordID, partialError) in errorDict!
+                            {
+                                if partialError.code == CKErrorCode.ServerRecordChanged.rawValue
+                                {
+                                    let userInfo = partialError.userInfo
+                                    println("Conflict For Record \(partialError.userInfo)")
+                                }
+                            }
+                            
+                            print("Conflict Occurred in per record Block \(error!.userInfo!)")
+                        }
                     }
                 }
             }

@@ -600,7 +600,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
 }
 
 
-let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStore_OnlineStoreZone"
+let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStoreZone"
 let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
 
 let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="cks_LocalStore_Attribute_ChangeType"

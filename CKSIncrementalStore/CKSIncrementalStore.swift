@@ -934,6 +934,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         var error:NSErrorPointer = nil
         self.backingMOC.save(error)
+        self.triggerSync()
         
         return NSArray()
     }
@@ -991,32 +992,6 @@ class CKSIncrementalStore: NSIncrementalStore {
                     var dictionary = updatedObject.dictionaryWithValuesForKeys(keys!)
                     managedObject.setValuesForKeysWithDictionary(dictionary)
                     managedObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-                    
-//                    if changeType == CKSLocalStoreRecordChangeType.RecordUpdated
-//                    {
-//                        var encodedSystemFields = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as! NSData
-//                        var coder = NSKeyedUnarchiver(forReadingWithData: encodedSystemFields)
-//                        var ckRecord = CKRecord(coder: coder)
-//                        println("Change Tag before \(ckRecord.recordChangeTag)")
-//                        coder.finishDecoding()
-//                        
-//                        var keysToUpdate = keys?.filter({(object)->Bool in
-//                            
-//                            if object == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || object == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName || object == CKSIncrementalStoreLocalStoreRecordIDAttributeName
-//                            {
-//                                return false
-//                            }
-//                            return true
-//                        })
-//                        
-//                        ckRecord.setValuesForKeysWithDictionary(managedObject.dictionaryWithValuesForKeys(keysToUpdate!))
-//                        println("Change Tag after \(ckRecord.recordChangeTag)")
-//                        var data = NSMutableData()
-//                        var coderForArchiving = NSKeyedArchiver(forWritingWithMutableData: data)
-//                        ckRecord.encodeSystemFieldsWithCoder(coderForArchiving)
-//                        managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
-//                        coderForArchiving.finishEncoding()
-//                    }
                 }
             }
         }

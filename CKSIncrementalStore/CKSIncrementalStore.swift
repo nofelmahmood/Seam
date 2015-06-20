@@ -62,7 +62,14 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
         if !wasSuccessful && error.memory != nil
         {
-//            var conflictedRecords = error.memory?.userInfo[CKSSyncConflictedResolvedRecordsKey]
+            var insertedOrUpdatedCKRecordsWithRecordIDStrings:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
+            for record in insertedOrUpdatedCKRecords
+            {
+                var ckRecord:CKRecord = record as! CKRecord
+                insertedOrUpdatedCKRecordsWithRecordIDStrings[ckRecord.recordID.recordName] = ckRecord
+            }
+            var conflictedRecords = error.memory?.userInfo![CKSSyncConflictedResolvedRecordsKey] as! Array<CKRecord>
+            
         }
         
         if self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)

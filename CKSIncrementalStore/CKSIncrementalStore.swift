@@ -16,12 +16,15 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     private var operationQueue:NSOperationQueue?
     private var localStoreMOC:NSManagedObjectContext?
     private var persistentStoreCoordinator:NSPersistentStoreCoordinator?
+    private var syncConflictPolicy:CKSStoresSyncConflictPolicy?
     private var syncCompletionBlock:((syncError:NSError?) -> ())?
-    private var syncConflictResolutionBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
+    private var syncConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
-    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?) {
+    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,conflictPolicy:CKSStoresSyncConflictPolicy?) {
         
         self.persistentStoreCoordinator = persistentStoreCoordinator
+        self.syncConflictPolicy = conflictPolicy
+        
         super.init()
     }
     
@@ -139,6 +142,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
         ckModifyRecordsOperation.atomic = true
         var savedRecords:[CKRecord]?
+        var conflictedRecords:[CKRecord] = [CKRecord]()
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             
             var error:NSError? = operationError
@@ -149,28 +153,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
             else
             {
-                println("Conflict occurred in main block")
-                if self.syncConflictResolutionBlock != nil
-                {
-                    if error!.code == CKErrorCode.PartialFailure.rawValue
-                    {
-                        let errorDict = error!.userInfo?[CKPartialErrorsByItemIDKey] as? [CKRecordID:NSError]
-                        if errorDict != nil
-                        {
-                            for (recordID, partialError) in errorDict!
-                            {
-                                if partialError.code == CKErrorCode.ServerRecordChanged.rawValue
-                                {
-                                    let userInfo = partialError.userInfo
-                                    println("Conflict For Record \(partialError.userInfo)")
-                                }
-                            }
-                            
-                            print("Conflict Occurred in per record Block \(error!.userInfo!)")
-                        }
-                    }
-                }
-
+                wasSuccessful = false
             }
         })
         ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
@@ -182,26 +165,9 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
             else
             {
-                print("Conflict occurred per record Completion \(error!.userInfo!)")
-                if self.syncConflictResolutionBlock != nil
+                if error!.code == CKErrorCode.ServerRecordChanged.rawValue
                 {
-                    if error!.code == CKErrorCode.PartialFailure.rawValue
-                    {
-                        let errorDict = error!.userInfo?[CKPartialErrorsByItemIDKey] as? [CKRecordID:NSError]
-                        if errorDict != nil
-                        {
-                            for (recordID, partialError) in errorDict!
-                            {
-                                if partialError.code == CKErrorCode.ServerRecordChanged.rawValue
-                                {
-                                    let userInfo = partialError.userInfo
-                                    println("Conflict For Record \(partialError.userInfo)")
-                                }
-                            }
-                            
-                            print("Conflict Occurred in per record Block \(error!.userInfo!)")
-                        }
-                    }
+                    conflictedRecords.append(ckRecord)
                 }
             }
             
@@ -210,6 +176,78 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         
         self.operationQueue?.addOperation(ckModifyRecordsOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
+        
+        
+        if conflictedRecords.count > 0
+        {
+            var conflictedRecordsWithStringRecordIDs:Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)> = Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)>()
+            
+            for record in conflictedRecords
+            {
+                conflictedRecordsWithStringRecordIDs[record.recordID.recordName] = (record,nil)
+            }
+            
+            var ckFetchRecordsOperation:CKFetchRecordsOperation = CKFetchRecordsOperation(recordIDs: conflictedRecords.map({(object)-> CKRecordID in
+                
+                var ckRecord:CKRecord = object as CKRecord
+                return ckRecord.recordID
+            }))
+
+            ckFetchRecordsOperation.perRecordCompletionBlock = ({(record,recordID,error)->Void in
+                
+                if error == nil
+                {
+                    var ckRecord:CKRecord = record as CKRecord
+                    var ckRecordID:CKRecordID = recordID as CKRecordID
+                    if conflictedRecordsWithStringRecordIDs[ckRecordID.recordName] != nil
+                    {
+                        conflictedRecordsWithStringRecordIDs[ckRecordID.recordName] = (conflictedRecordsWithStringRecordIDs[ckRecordID.recordName]!.clientRecord,ckRecord)
+                    }
+                }
+            })
+            self.operationQueue?.addOperation(ckFetchRecordsOperation)
+            self.operationQueue?.waitUntilAllOperationsAreFinished()
+            
+            var finalCKRecords:[CKRecord] = [CKRecord]()
+            
+            for key in conflictedRecordsWithStringRecordIDs.keys.array
+            {
+                var clientServerCKRecord = conflictedRecordsWithStringRecordIDs[key] as! (clientRecord:CKRecord,serverRecord:CKRecord)
+                if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.UserTellsWhichWins
+                {
+                    if self.syncConflictResolutionBlock != nil
+                    {
+                        finalCKRecords.append(self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord,serverRecord: clientServerCKRecord.serverRecord))
+                    }
+                }
+                else if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientRecordWins
+                {
+                    var keys = clientServerCKRecord.serverRecord.allKeys()
+                    var values = clientServerCKRecord.serverRecord.dictionaryWithValuesForKeys(keys)
+                    clientServerCKRecord.serverRecord.setValuesForKeysWithDictionary(values)
+                }
+                else if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
+                {
+                    if clientServerCKRecord.clientRecord.modificationDate.compare(clientServerCKRecord.serverRecord.modificationDate) == NSComparisonResult.OrderedAscending
+                    {
+                        
+                    }
+                    else if clientServerCKRecord.clientRecord.modificationDate.compare(clientServerCKRecord.serverRecord.modificationDate) == NSComparisonResult.OrderedDescending
+                    {
+                        
+                    }
+                    else
+                    {
+                        
+                    }
+                }
+                else if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ServerRecordWins
+                {
+                    
+                }
+            }
+            
+        }
         
         if savedRecords != nil
         {
@@ -636,6 +674,8 @@ let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "cks_LocalSt
 let CKSIncrementalStoreDidStartSyncOperationNotification = "CKSIncrementalStoreDidStartSyncOperationNotification"
 let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStoreDidFinishSyncOperationNotification"
 
+let CKSIncrementalStoreSyncConflictPolicyOption = "CKSIncrementalStoreSyncConflictPolicyOption"
+
 enum CKSLocalStoreRecordChangeType:Int16
 {
     case RecordNoChange = 0
@@ -643,9 +683,18 @@ enum CKSLocalStoreRecordChangeType:Int16
     case RecordDeleted  = 2
 }
 
+enum CKSStoresSyncConflictPolicy:Int16
+{
+    case UserTellsWhichWins = 0
+    case ServerRecordWins = 1
+    case ClientRecordWins = 2
+    case GreaterModifiedDateWins = 3
+}
+
 class CKSIncrementalStore: NSIncrementalStore {
     
     var syncOperation:CKSIncrementalStoreSyncOperation?
+    var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.UserTellsWhichWins
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
     private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
@@ -656,7 +705,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         moc.retainsRegisteredObjects=true
         return moc
     }()
-    var recordConflictResolutionBlock:((attemptedRecord:CKRecord,originalRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
+    var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
     override class func initialize()
     {
@@ -755,7 +804,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             return
         }
         
-        self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator)
+        self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, conflictPolicy: self.cksStoresSyncConflictPolicy)
         self.syncOperation?.syncConflictResolutionBlock = self.recordConflictResolutionBlock
         self.syncOperation?.syncCompletionBlock =  ({(error) -> Void in
             

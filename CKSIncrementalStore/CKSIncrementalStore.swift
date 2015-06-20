@@ -10,6 +10,8 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
+let CKSIncrementalStoreSyncOperationErrorDomain = "CKSIncrementalStoreSyncOperationErrorDomain"
+let CKSSyncConflictedResolvedRecordsKey = "CKSSyncConflictedResolvedRecordsKey"
 let CKSIncrementalStoreSyncOperationFetchChangeTokenKey = "CKSIncrementalStoreSyncOperationFetchChangeTokenKey"
 class CKSIncrementalStoreSyncOperation: NSOperation {
     
@@ -56,7 +58,8 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var insertedOrUpdatedCKRecords = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
         var deletedCKRecordIDs = localChangesInServerRepresentation.deletedCKRecordIDs
         
-        if self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
+        var error:NSErrorPointer = nil
+        if self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
         {
             var moreComing = true
             var insertedOrUpdatedCKRecords = Array<CKRecord>()
@@ -136,7 +139,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         return self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs) && self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
     }
     
-    func applyLocalChangesToServer(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
+    func applyLocalChangesToServer(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>,error:NSErrorPointer)->Bool
     {
         var wasSuccessful = false
         var ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
@@ -221,7 +224,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 {
                     if self.syncConflictResolutionBlock != nil
                     {
-                        finalCKRecords.append(self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord,serverRecord: clientServerCKRecord.serverRecord))
+                        clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord,serverRecord: clientServerCKRecord.serverRecord)
                     }
                 }
                 else if (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientRecordWins || (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.GreaterModifiedDateWins && clientServerCKRecord.clientRecord.modificationDate.compare(clientServerCKRecord.serverRecord.modificationDate) == NSComparisonResult.OrderedDescending))
@@ -233,9 +236,14 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
              
                 finalCKRecords.append(clientServerCKRecord.serverRecord)
             }
+            
+            var userInfo:Dictionary<String,Array<CKRecord>> = [CKSSyncConflictedResolvedRecordsKey:finalCKRecords]
+            error.memory = NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: 1, userInfo: userInfo)
+            wasSuccessful = false
+            return false
         }
         
-        if savedRecords != nil && conflictedRecords.count == 0
+        if savedRecords != nil
         {
             var savedRecordsWithIDStrings = savedRecords!.map({(object)->String in
                 

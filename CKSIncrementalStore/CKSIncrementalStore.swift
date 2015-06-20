@@ -172,7 +172,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
             
         })
-        ckModifyRecordsOperation.description
         
         self.operationQueue?.addOperation(ckModifyRecordsOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
@@ -203,6 +202,11 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     {
                         conflictedRecordsWithStringRecordIDs[ckRecordID.recordName] = (conflictedRecordsWithStringRecordIDs[ckRecordID.recordName]!.clientRecord,ckRecord)
                     }
+                    wasSuccessful = true
+                }
+                else
+                {
+                    wasSuccessful = false
                 }
             })
             self.operationQueue?.addOperation(ckFetchRecordsOperation)
@@ -220,36 +224,18 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                         finalCKRecords.append(self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord,serverRecord: clientServerCKRecord.serverRecord))
                     }
                 }
-                else if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientRecordWins
+                else if (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientRecordWins || (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.GreaterModifiedDateWins && clientServerCKRecord.clientRecord.modificationDate.compare(clientServerCKRecord.serverRecord.modificationDate) == NSComparisonResult.OrderedDescending))
                 {
                     var keys = clientServerCKRecord.serverRecord.allKeys()
-                    var values = clientServerCKRecord.serverRecord.dictionaryWithValuesForKeys(keys)
+                    var values = clientServerCKRecord.clientRecord.dictionaryWithValuesForKeys(keys)
                     clientServerCKRecord.serverRecord.setValuesForKeysWithDictionary(values)
                 }
-                else if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
-                {
-                    if clientServerCKRecord.clientRecord.modificationDate.compare(clientServerCKRecord.serverRecord.modificationDate) == NSComparisonResult.OrderedAscending
-                    {
-                        
-                    }
-                    else if clientServerCKRecord.clientRecord.modificationDate.compare(clientServerCKRecord.serverRecord.modificationDate) == NSComparisonResult.OrderedDescending
-                    {
-                        
-                    }
-                    else
-                    {
-                        
-                    }
-                }
-                else if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ServerRecordWins
-                {
-                    
-                }
+             
+                finalCKRecords.append(clientServerCKRecord.serverRecord)
             }
-            
         }
         
-        if savedRecords != nil
+        if savedRecords != nil && conflictedRecords.count == 0
         {
             var savedRecordsWithIDStrings = savedRecords!.map({(object)->String in
                 

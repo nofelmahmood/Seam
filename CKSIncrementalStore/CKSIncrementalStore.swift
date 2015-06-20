@@ -58,7 +58,13 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var insertedOrUpdatedCKRecords = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
         var deletedCKRecordIDs = localChangesInServerRepresentation.deletedCKRecordIDs
         
-        var error:NSErrorPointer = nil
+        var error:NSErrorPointer = NSErrorPointer()
+        var wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
+        if !wasSuccessful && error.memory != nil
+        {
+//            var conflictedRecords = error.memory?.userInfo[CKSSyncConflictedResolvedRecordsKey]
+        }
+        
         if self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
         {
             var moreComing = true

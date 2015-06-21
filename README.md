@@ -71,7 +71,7 @@ It simply considers the Server record as the true record.
 
 It simply considers the Client record as the true record.
 
-You can set any policy by passing it as an option while adding `CKSIncrementalStore' to NSPersistentStoreCoordinator.
+You can set any policy by passing it as an option while adding `CKSIncrementalStore` to `NSPersistentStoreCoordinator`.
 
 ```swift
 var options:Dictionary<NSObject,AnyObject> = Dictionary<NSObject,AnyObject>()

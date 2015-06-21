@@ -48,7 +48,7 @@ func application(application: UIApplication, didReceiveRemoteNotification userIn
 
 We all have conflicts in our lives and so does data. Sometimes we don't have answers to the ones in life but we do have for the ones here :P
 
-> CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.
+`CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.`
 
 * <b>GreaterModifiedDateWins</b>
 
@@ -71,8 +71,16 @@ It simply considers the Server record as the true record.
 
 It simply considers the Client record as the true record.
 
+You can set any policy by setting the `cksStoresSyncConflictPolicy` property of an instance of `CKSIncrementalStore`
+```swift
+self.cksIncrementalStore.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.ClientRecordWins
+```
+
+## Getting Started 
+See the sample demos. Run the iOS App on two devices and start adding, removing and modifying records and experience the magic.
+
 ## Installation
-CocoaPods is the recommended way of adding CKSIncrementalStore to your project.
+`CocoaPods` is the recommended way of adding CKSIncrementalStore to your project.
 
 ```
 platform :ios, '8.0'
@@ -84,7 +92,7 @@ pod 'CKSIncrementalStore'
 CKSIncrementalStore was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)
 
 ## Contact 
-Follow [Nofel Mahmood](http://twitter.com/NofelMahmood) on twitter or email me at nofelmehmood@gmail.com
+Follow `Nofel Mahmood` on [Twitter](http://twitter.com/NofelMahmood) or on [GitHub](http://github.com/nofelmahmood) or email me at nofelmehmood@gmail.com
 
 ## License
 CKSIncrementalStore is available under the MIT license. See the LICENSE file for more info.

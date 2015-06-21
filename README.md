@@ -71,13 +71,16 @@ It simply considers the Server record as the true record.
 
 It simply considers the Client record as the true record.
 
-You can set any policy by setting the `cksStoresSyncConflictPolicy` property of an instance of `CKSIncrementalStore`
+You can set any policy by passing it as an option while adding `CKSIncrementalStore' to NSPersistentStoreCoordinator.
+
 ```swift
-self.cksIncrementalStore.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.ClientRecordWins
+var options:Dictionary<NSObject,AnyObject> = Dictionary<NSObject,AnyObject>()
+options[CKSIncrementalStoreSyncConflictPolicyOption] = NSNumber(short: CKSStoresSyncConflictPolicy.ClientRecordWins.rawValue)
+var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType(CKSIncrementalStore.type, configuration: nil, URL: url, options: options, error: &error)
 ```
 
 ## Getting Started 
-See the sample demos. Run the iOS App on two devices and start adding, removing and modifying records and experience the magic.
+See the sample demos. Run the iOS or OSX App on two devices and start adding, removing and modifying records and experience the magic.
 
 ## Installation
 `CocoaPods` is the recommended way of adding CKSIncrementalStore to your project.

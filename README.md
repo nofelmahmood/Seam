@@ -18,3 +18,27 @@ if persistentStore != nil
     // Its best to have a property for the IncrementalStore
 }
 
+```
+#### Did I mentioned Sync earlier !
+
+Yes! CKSIncrementalStore automatically keeps the data in sync with the CloudKit servers. There are two ways to do that.
+
+* Manual Sync
+
+Anytime call triggerSync() on an instance of CKSIncrementalStore.
+
+```swift
+self.cksIncrementalStore.triggerSync()
+```
+* Automatic Sync
+
+Well anytime you call save on an instance of NSManagedObjectContext, CKSIncrementalStore calls triggerSync() automatically. But what if some other device changes some records on the server. Don't worry we have you covered but we need some of your help too.
+First enable Push Notifications for your app. Then in your AppDelegate's method
+
+```swift
+func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) 
+{
+    self.cksIncrementalStore?.handlePush(userInfo: userInfo)
+}
+```
+

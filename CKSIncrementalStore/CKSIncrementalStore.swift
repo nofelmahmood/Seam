@@ -59,9 +59,9 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         var deletedCKRecordIDs:Array<CKRecordID> = localChangesInServerRepresentation.deletedCKRecordIDs
         
         
-        var error:NSErrorPointer = NSErrorPointer()
-        var wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
-        if !wasSuccessful && error.memory != nil
+        var error:NSError?
+        var wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: &error)
+        if !wasSuccessful && error != nil
         {
             var insertedOrUpdatedCKRecordsWithRecordIDStrings:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
             for record in insertedOrUpdatedCKRecords
@@ -69,7 +69,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 var ckRecord:CKRecord = record as CKRecord
                 insertedOrUpdatedCKRecordsWithRecordIDStrings[ckRecord.recordID.recordName] = ckRecord
             }
-            var conflictedRecords = error.memory?.userInfo![CKSSyncConflictedResolvedRecordsKey] as! Array<CKRecord>
+            var conflictedRecords = error!.userInfo![CKSSyncConflictedResolvedRecordsKey] as! Array<CKRecord>
             
             for record in conflictedRecords
             {
@@ -78,9 +78,9 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             
             insertedOrUpdatedCKRecords = insertedOrUpdatedCKRecordsWithRecordIDStrings.values.array
             error = nil
-            wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
+            wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: &error)
             
-            if !wasSuccessful && error.memory != nil
+            if !wasSuccessful && error != nil
             {
                 return false
             }
@@ -172,7 +172,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
             
             var error:NSError? = operationError
-            print("Saved Records \(savedRecords!)")
             if error == nil
             {
                 wasSuccessful = true
@@ -202,7 +201,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         self.operationQueue?.addOperation(ckModifyRecordsOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
         
-        
+        println("Conflicted Records \(conflictedRecords)")
         if conflictedRecords.count > 0
         {
             var conflictedRecordsWithStringRecordIDs:Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)> = Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)>()
@@ -242,25 +241,28 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             
             for key in conflictedRecordsWithStringRecordIDs.keys.array
             {
-                var clientServerCKRecord = conflictedRecordsWithStringRecordIDs[key] as! (clientRecord:CKRecord,serverRecord:CKRecord)
+                var value = conflictedRecordsWithStringRecordIDs[key]!
+                var clientServerCKRecord = value as (clientRecord:CKRecord?,serverRecord:CKRecord?)
+                
                 if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.UserTellsWhichWins
                 {
                     if self.syncConflictResolutionBlock != nil
                     {
-                        clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord,serverRecord: clientServerCKRecord.serverRecord)
+                        clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord!,serverRecord: clientServerCKRecord.serverRecord!)
                     }
                 }
-                else if (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientRecordWins || (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.GreaterModifiedDateWins && clientServerCKRecord.clientRecord.modificationDate.compare(clientServerCKRecord.serverRecord.modificationDate) == NSComparisonResult.OrderedDescending))
+                else if (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientRecordWins || (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.GreaterModifiedDateWins && clientServerCKRecord.clientRecord!.modificationDate.compare(clientServerCKRecord.serverRecord!.modificationDate) == NSComparisonResult.OrderedDescending))
                 {
-                    var keys = clientServerCKRecord.serverRecord.allKeys()
-                    var values = clientServerCKRecord.clientRecord.dictionaryWithValuesForKeys(keys)
-                    clientServerCKRecord.serverRecord.setValuesForKeysWithDictionary(values)
+                    var keys = clientServerCKRecord.serverRecord!.allKeys()
+                    var values = clientServerCKRecord.clientRecord!.dictionaryWithValuesForKeys(keys)
+                    clientServerCKRecord.serverRecord!.setValuesForKeysWithDictionary(values)
                 }
              
-                finalCKRecords.append(clientServerCKRecord.serverRecord)
+                finalCKRecords.append(clientServerCKRecord.serverRecord!)
             }
             
             var userInfo:Dictionary<String,Array<CKRecord>> = [CKSSyncConflictedResolvedRecordsKey:finalCKRecords]
+            
             error.memory = NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: 1, userInfo: userInfo)
             wasSuccessful = false
             return false
@@ -711,7 +713,7 @@ enum CKSStoresSyncConflictPolicy:Int16
 class CKSIncrementalStore: NSIncrementalStore {
     
     var syncOperation:CKSIncrementalStoreSyncOperation?
-    var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.UserTellsWhichWins
+    var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
     private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?

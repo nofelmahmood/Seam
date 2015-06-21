@@ -9,9 +9,6 @@
       </FileRef>
    </Group>
    <FileRef
-      location = "group:CKSIncrementalStore-OSXDemo/CKSIncrementalStore-OSXDemo/CKSIncrementalStore-OSXDemo.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:CKSIncrementalStore-iOSDemo/CKSIncrementalStore-iOSDemo.xcodeproj">
    </FileRef>
    <FileRef

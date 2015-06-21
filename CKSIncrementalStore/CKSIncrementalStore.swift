@@ -738,8 +738,22 @@ class CKSIncrementalStore: NSIncrementalStore {
         {
             if options![CKSIncrementalStoreSyncConflictPolicyOption] != nil
             {
-                var syncConflictPolicy = options![CKSIncrementalStoreSyncConflictPolicyOption] as! CKSStoresSyncConflictPolicy
-                self.cksStoresSyncConflictPolicy = syncConflictPolicy
+                var syncConflictPolicy = options![CKSIncrementalStoreSyncConflictPolicyOption] as! NSNumber
+                
+                switch(syncConflictPolicy.shortValue)
+                {
+                case CKSStoresSyncConflictPolicy.ClientRecordWins.rawValue:
+                    self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.ClientRecordWins
+                case CKSStoresSyncConflictPolicy.ServerRecordWins.rawValue:
+                    self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.ServerRecordWins
+                case CKSStoresSyncConflictPolicy.UserTellsWhichWins.rawValue:
+                    self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.UserTellsWhichWins
+                case CKSStoresSyncConflictPolicy.GreaterModifiedDateWins.rawValue:
+                    self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
+                default:
+                    break
+                }
+
             }
         }
 

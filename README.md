@@ -2,7 +2,7 @@
 CloudKit meets CoreData. 
 CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html) subclass which automatically maintains a SQLite local cache (using CoreData) of user’s private data on CloudKit Servers and keeps it in sync.</p>
 
-####Let the code do the talking !
+####Seeing is believing !
 
 ```swift
 var coordinator: NSPersistentStoreCoordinator? = NSPersistentStoreCoordinator(managedObjectModel:self.managedObjectModel)
@@ -41,7 +41,30 @@ func application(application: UIApplication, didReceiveRemoteNotification userIn
     self.cksIncrementalStore?.handlePush(userInfo: userInfo)
 }
 ```
-** <b>Sync Conflicts</b>
+#### Sync Conflicts
 
-CKSIncrementalStore supports 4 sync conflict policies.
+Still we all have conflicts in our lives and so does data. Sometimes we don't have answers to the ones in life but we do have for the ones here :P
+
+CKSIncrementalStore supports 4 conflict resolution policies out of the box
+
+* GreaterModifiedDateWins
+
+This is the default. Record with the greater modified date is considered to the true record.
+
+* UserTellsWhichWins
+
+Setting this sync policy requires that you set the recordConflictResolutionBlock closure which is an instance of CKSIncrementalStore.
+
+```swift
+var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
+```
+It gives you two records. Client record and Server record. You do what ever changes you want on the server record and return it.
+
+* ServerRecordWins
+
+It simply considers the Server record as the true record.
+
+* ClientRecordWins
+
+It simply considers the Client record as the true record.
 

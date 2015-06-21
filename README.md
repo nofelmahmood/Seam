@@ -92,7 +92,7 @@ pod 'CKSIncrementalStore'
 CKSIncrementalStore was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)
 
 ## Contact 
-Follow Nofel Mahmood on [Twitter](http://twitter.com/NofelMahmood) or on [GitHub](http://github.com/nofelmahmood) or email me at nofelmehmood@gmail.com
+Follow Nofel Mahmood on [Twitter](http://twitter.com/NofelMahmood) and [GitHub](http://github.com/nofelmahmood) or email me at nofelmehmood@gmail.com
 
 ## License
 CKSIncrementalStore is available under the MIT license. See the LICENSE file for more info.

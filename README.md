@@ -52,7 +52,7 @@ We all have conflicts in our lives and so does data. Sometimes we don't have ans
 
 * <b>GreaterModifiedDateWins</b>
 
-This is the default. Record with the greater modified date is considered to the true record.
+This is the default. Record with the greater modified date is considered to be the true record.
 
 * <b>UserTellsWhichWins</b>
 
@@ -61,7 +61,7 @@ Setting this sync policy requires that you set the `recordConflictResolutionBloc
 ```swift
 var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
 ```
-It gives you two records. Client record and Server record. You do what ever changes you want on the server record and return it.
+It gives you two versions of the record. Client record and Server record. You do what ever changes you want on the server record and return it.
 
 * <b>ServerRecordWins</b>
 

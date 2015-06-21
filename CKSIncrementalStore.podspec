@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version  = '0.1'
   s.license  = 'MIT'
   s.homepage =  'https://github.com/CloudKitSpace/CKSIncrementalStore'
-  s.summary  = "CoreData Backend For CloudKit."
+  s.summary  = "CloudKit spreading awesomeness through CoreData."
   s.authors  = { 'Nofel Mahmood' =>
                  'nofelmehmood@gmail.com' }
   s.social_media_url = "https://twitter.com/NofelMahmood"

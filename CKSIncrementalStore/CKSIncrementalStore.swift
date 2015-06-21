@@ -713,7 +713,7 @@ enum CKSStoresSyncConflictPolicy:Int16
 class CKSIncrementalStore: NSIncrementalStore {
     
     private var syncOperation:CKSIncrementalStoreSyncOperation?
-    var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
+    private var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
     private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
@@ -734,6 +734,15 @@ class CKSIncrementalStore: NSIncrementalStore {
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator, configurationName name: String?, URL url: NSURL, options: [NSObject : AnyObject]?) {
         
         self.database=CKContainer.defaultContainer().privateCloudDatabase
+        if options != nil
+        {
+            var syncPolicyOption: AnyObject? = options![CKSIncrementalStoreSyncConflictPolicyOption]
+            if syncPolicyOption != nil
+            {
+                self.cksStoresSyncConflictPolicy = syncPolicyOption as! CKSStoresSyncConflictPolicy
+            }
+        }
+
         super.init(persistentStoreCoordinator: root, configurationName: name, URL: url, options: options)
         
     }

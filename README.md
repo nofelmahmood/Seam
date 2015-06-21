@@ -106,12 +106,15 @@ See the sample iOS demo app. Run it on two devices and start adding, removing an
 ## Installation
 `CocoaPods` is the recommended way of adding CKSIncrementalStore to your project.
 
+You want to to add pod `'CKSIncrementalStore', '~> 0.1'` similar to the following to your Podfile:
 ```
 target 'MyApp' do
   pod 'CKSIncrementalStore', '~> 0.5'
 end
-Then run a [sudo] pod install inside your terminal, or from CocoaPods.app.
 ```
+
+Then run a `[sudo] pod install` inside your terminal, or from CocoaPods.app.
+
 
 ## Credits
 CKSIncrementalStore was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)

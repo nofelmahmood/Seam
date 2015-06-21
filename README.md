@@ -41,7 +41,7 @@ Notification is posted when the sync operation finishes.
 `Example`
 
 ```swift
-NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncFinished:", name: CKSIncrementalStoreDidFinishSyncOperationNotification, object: CoreDataStack.sharedStack.cksIncrementalStore)
+NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncFinished:", name: CKSIncrementalStoreDidFinishSyncOperationNotification, object: self.cksIncrementalStore)
 ```
 
 * <b>Manual Sync</b>

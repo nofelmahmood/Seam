@@ -101,7 +101,7 @@ var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType
 ```
 
 ## Getting Started 
-See the sample demos. Run the iOS or OSX App on two devices and start adding, removing and modifying records and experience the magic.
+See the sample iOS demo app. Run it on two devices and start adding, removing and modifying records and experience the magic.
 
 ## Installation
 `CocoaPods` is the recommended way of adding CKSIncrementalStore to your project.

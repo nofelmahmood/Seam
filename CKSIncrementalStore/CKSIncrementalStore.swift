@@ -55,8 +55,9 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     {
         var localChanges = self.localChanges()
         var localChangesInServerRepresentation = self.localChangesInServerRepresentation(localChanges: localChanges)
-        var insertedOrUpdatedCKRecords = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
-        var deletedCKRecordIDs = localChangesInServerRepresentation.deletedCKRecordIDs
+        var insertedOrUpdatedCKRecords:Array<CKRecord> = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
+        var deletedCKRecordIDs:Array<CKRecordID> = localChangesInServerRepresentation.deletedCKRecordIDs
+        
         
         var error:NSErrorPointer = NSErrorPointer()
         var wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
@@ -65,30 +66,39 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             var insertedOrUpdatedCKRecordsWithRecordIDStrings:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
             for record in insertedOrUpdatedCKRecords
             {
-                var ckRecord:CKRecord = record as! CKRecord
+                var ckRecord:CKRecord = record as CKRecord
                 insertedOrUpdatedCKRecordsWithRecordIDStrings[ckRecord.recordID.recordName] = ckRecord
             }
             var conflictedRecords = error.memory?.userInfo![CKSSyncConflictedResolvedRecordsKey] as! Array<CKRecord>
             
-        }
-        
-        if self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
-        {
-            var moreComing = true
-            var insertedOrUpdatedCKRecords = Array<CKRecord>()
-            var deletedCKRecordIDs = Array<CKRecordID>()
-            while moreComing
+            for record in conflictedRecords
             {
-                var returnValue = self.fetchRecordChangesFromServer()
-                insertedOrUpdatedCKRecords += returnValue.insertedOrUpdatedCKRecords
-                deletedCKRecordIDs += returnValue.deletedRecordIDs
-                moreComing = returnValue.moreComing
+                insertedOrUpdatedCKRecordsWithRecordIDStrings[record.recordID.recordName] = record
             }
             
-            return self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
+            insertedOrUpdatedCKRecords = insertedOrUpdatedCKRecordsWithRecordIDStrings.values.array
+            error = nil
+            wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: error)
+            
+            if !wasSuccessful && error.memory != nil
+            {
+                return false
+            }
+        }
+
+        var moreComing = true
+        var insertedOrUpdatedCKRecordsFromServer = Array<CKRecord>()
+        var deletedCKRecordIDsFromServer = Array<CKRecordID>()
+        while moreComing
+        {
+            var returnValue = self.fetchRecordChangesFromServer()
+            insertedOrUpdatedCKRecordsFromServer += returnValue.insertedOrUpdatedCKRecords
+            deletedCKRecordIDsFromServer += returnValue.deletedRecordIDs
+            moreComing = returnValue.moreComing
         }
         
-        return false
+        return self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecordsFromServer, deletedCKRecordIDs: deletedCKRecordIDsFromServer)
+        
     }
     
     func savedCKServerChangeToken()->CKServerChangeToken?
@@ -323,7 +333,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         return wasSuccessful
     }
     
-    func localChangesInServerRepresentation(#localChanges:(insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>))->(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)
+    func localChangesInServerRepresentation(#localChanges:(insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>))->(insertedOrUpdatedCKRecords:Array<CKRecord>,deletedCKRecordIDs:Array<CKRecordID>)
     {
         return (self.insertedOrUpdatedCKRecords(fromManagedObjects: localChanges.insertedOrUpdatedManagedObjects),self.deletedCKRecordIDs(fromManagedObjects: localChanges.deletedManagedObjects))
     }
@@ -569,7 +579,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         return false
     }
     
-    func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)->Array<AnyObject>
+    func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)->Array<CKRecord>
     {
          return managedObjects.map({(object)->CKRecord in
             
@@ -658,7 +668,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         })
     }
     
-    func deletedCKRecordIDs(fromManagedObjects managedObjects:Array<AnyObject>)->Array<AnyObject>
+    func deletedCKRecordIDs(fromManagedObjects managedObjects:Array<AnyObject>)->Array<CKRecordID>
     {
         return managedObjects.map({(object)->CKRecordID in
             

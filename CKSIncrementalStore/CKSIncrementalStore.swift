@@ -736,10 +736,10 @@ class CKSIncrementalStore: NSIncrementalStore {
         self.database=CKContainer.defaultContainer().privateCloudDatabase
         if options != nil
         {
-            var syncPolicyOption: AnyObject? = options![CKSIncrementalStoreSyncConflictPolicyOption]
-            if syncPolicyOption != nil
+            if options![CKSIncrementalStoreSyncConflictPolicyOption] != nil
             {
-                self.cksStoresSyncConflictPolicy = syncPolicyOption as! CKSStoresSyncConflictPolicy
+                var syncConflictPolicy = options![CKSIncrementalStoreSyncConflictPolicyOption] as! CKSStoresSyncConflictPolicy
+                self.cksStoresSyncConflictPolicy = syncConflictPolicy
             }
         }
 

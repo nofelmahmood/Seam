@@ -67,7 +67,8 @@ func application(application: UIApplication, didReceiveRemoteNotification userIn
 ```
 #### Sync Conflicts
 
-Life is filled up conflicts and so is data. The good thing about data is we can resolve conflicts (using this library ofcourse :P)
+Life is usually filled up with conflicts and so is data. The good thing about "data" is that we can resolve conflicts using libraries like the one I wrote.
+
 
 `CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.`
 

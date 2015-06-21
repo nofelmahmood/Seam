@@ -23,7 +23,7 @@ if persistentStore != nil
 
 Yes! CKSIncrementalStore automatically keeps the data in sync with the CloudKit servers. There are two ways to do that.
 But first if you want to know when the sync operation starts and finishes subcribe to these two notifications
-
+##### Notifications
 * <b>CKSIncrementalStoreDidStartSyncOperationNotification</b>
 
 Notification is posted when the sync operation starts.
@@ -43,7 +43,7 @@ Notification is posted when the sync operation finishes.
 ```swift
 NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncFinished:", name: CKSIncrementalStoreDidFinishSyncOperationNotification, object: self.cksIncrementalStore)
 ```
-
+##### Ways to Sync
 * <b>Manual Sync</b>
 
 Anytime call triggerSync() on an instance of CKSIncrementalStore.

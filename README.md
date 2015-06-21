@@ -32,7 +32,7 @@ self.cksIncrementalStore.triggerSync()
 ```
 * <b>Automatic Sync</b>
 
-Well anytime you call save on an instance of NSManagedObjectContext, CKSIncrementalStore calls triggerSync() automatically. 
+Well anytime you call save on an instance of `NSManagedObjectContext`, CKSIncrementalStore calls `triggerSync()` automatically. 
 
 But what if some other device changes some records on the server. Don't worry we have you covered but we need some of your help too.
 

@@ -712,7 +712,7 @@ enum CKSStoresSyncConflictPolicy:Int16
 
 class CKSIncrementalStore: NSIncrementalStore {
     
-    var syncOperation:CKSIncrementalStoreSyncOperation?
+    private var syncOperation:CKSIncrementalStoreSyncOperation?
     var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
@@ -801,7 +801,7 @@ class CKSIncrementalStore: NSIncrementalStore {
 
     }
     
-    func handlePush(#userInfo:[NSObject : AnyObject])
+    internal func handlePush(#userInfo:[NSObject : AnyObject])
     {
         var ckNotification = CKNotification(fromRemoteNotificationDictionary: userInfo)
         
@@ -816,7 +816,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
     }
     
-    func triggerSync()
+    internal func triggerSync()
     {
         if self.operationQueue != nil && self.operationQueue!.operationCount > 0
         {

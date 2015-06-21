@@ -8,11 +8,13 @@
 
 import UIKit
 import CoreData
+import CloudKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var cksIncrementalStore:CKSIncrementalStore?
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
@@ -43,7 +45,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Saves changes in the application's managed object context before the application terminates.
         self.saveContext()
     }
-
+    
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+        
+        self.cksIncrementalStore?.handlePush(userInfo: userInfo)
+    }
     // MARK: - Core Data stack
 
     lazy var applicationDocumentsDirectory: NSURL = {
@@ -66,9 +72,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         var error: NSError? = nil
         var failureReason = "There was an error creating or loading the application's saved data."
         
-        var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil, error: &error)
+        var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType(CKSIncrementalStore.type, configuration: nil, URL: url, options: nil, error: &error)
         
-        if persistentStore == nil {
+        if persistentStore != nil
+        {
+            self.cksIncrementalStore = persistentStore as? CKSIncrementalStore
+        }
+        else
+        {
             coordinator = nil
             // Report any error we got.
             var dict = [String: AnyObject]()
@@ -80,10 +91,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             NSLog("Unresolved error \(error), \(error!.userInfo)")
             abort()
-        }
-        else
-        {
-            var cksIncrementalStore:CKSIncrementalStore = persistentStore as! CKSIncrementalStore
         }
         
         return coordinator

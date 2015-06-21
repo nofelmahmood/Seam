@@ -45,13 +45,13 @@ func application(application: UIApplication, didReceiveRemoteNotification userIn
 
 Still we all have conflicts in our lives and so does data. Sometimes we don't have answers to the ones in life but we do have for the ones here :P
 
-CKSIncrementalStore supports 4 conflict resolution policies out of the box
+CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.
 
-* GreaterModifiedDateWins
+* <b>GreaterModifiedDateWins</b>
 
 This is the default. Record with the greater modified date is considered to the true record.
 
-* UserTellsWhichWins
+* <b>UserTellsWhichWins</b>
 
 Setting this sync policy requires that you set the recordConflictResolutionBlock closure which is an instance of CKSIncrementalStore.
 
@@ -60,11 +60,11 @@ var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)
 ```
 It gives you two records. Client record and Server record. You do what ever changes you want on the server record and return it.
 
-* ServerRecordWins
+* <b>ServerRecordWins</b>
 
 It simply considers the Server record as the true record.
 
-* ClientRecordWins
+* <b>ClientRecordWins</b>
 
 It simply considers the Client record as the true record.
 

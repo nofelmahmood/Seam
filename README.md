@@ -32,8 +32,11 @@ self.cksIncrementalStore.triggerSync()
 ```
 * <b>Automatic Sync</b>
 
-Well anytime you call save on an instance of NSManagedObjectContext, CKSIncrementalStore calls triggerSync() automatically. But what if some other device changes some records on the server. Don't worry we have you covered but we need some of your help too.
-First enable [Push Notifications](http://code.tutsplus.com/tutorials/setting-up-push-notifications-on-ios--cms-21925) for your app. Then in your AppDelegate's method
+Well anytime you call save on an instance of NSManagedObjectContext, CKSIncrementalStore calls triggerSync() automatically. 
+
+But what if some other device changes some records on the server. Don't worry we have you covered but we need some of your help too.
+
+Enable [Push Notifications](http://code.tutsplus.com/tutorials/setting-up-push-notifications-on-ios--cms-21925) for your app. Then in your AppDelegate's method
 
 ```swift
 func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) 
@@ -43,9 +46,9 @@ func application(application: UIApplication, didReceiveRemoteNotification userIn
 ```
 #### Sync Conflicts
 
-Still we all have conflicts in our lives and so does data. Sometimes we don't have answers to the ones in life but we do have for the ones here :P
+We all have conflicts in our lives and so does data. Sometimes we don't have answers to the ones in life but we do have for the ones here :P
 
-CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.
+`CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.`
 
 * <b>GreaterModifiedDateWins</b>
 

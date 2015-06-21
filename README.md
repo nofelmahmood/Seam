@@ -1,6 +1,6 @@
 #CKSIncrementalStore
 CloudKit meets CoreData. 
-CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html) subclass which automatically maintains a SQLite local cache (using CoreData) of user’s private data on CloudKit Servers and keeps it in sync.</p>
+CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html)which automatically maintains a SQLite local cache (using CoreData) of user’s private data on CloudKit Servers and keeps it in sync.</p>
 
 ####Seeing is believing !
 
@@ -48,7 +48,7 @@ func application(application: UIApplication, didReceiveRemoteNotification userIn
 
 We all have conflicts in our lives and so does data. Sometimes we don't have answers to the ones in life but we do have for the ones here :P
 
-`CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.`
+> CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.
 
 * <b>GreaterModifiedDateWins</b>
 
@@ -56,7 +56,7 @@ This is the default. Record with the greater modified date is considered to the 
 
 * <b>UserTellsWhichWins</b>
 
-Setting this sync policy requires that you set the recordConflictResolutionBlock closure which is an instance of CKSIncrementalStore.
+Setting this sync policy requires that you set the `recordConflictResolutionBlock` instance of `CKSIncrementalStore`.
 
 ```swift
 var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
@@ -71,3 +71,20 @@ It simply considers the Server record as the true record.
 
 It simply considers the Client record as the true record.
 
+## Installation
+CocoaPods is the recommended way of adding CKSIncrementalStore to your project.
+
+```
+platform :ios, '8.0'
+
+pod 'CKSIncrementalStore'
+```
+
+## Credits
+CKSIncrementalStore was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)
+
+## Contact 
+Follow [Nofel Mahmood](http://twitter.com/NofelMahmood) on twitter or email me at nofelmehmood@gmail.com
+
+## License
+CKSIncrementalStore is available under the MIT license. See the LICENSE file for more info.

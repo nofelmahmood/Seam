@@ -1,22 +1,20 @@
 //
-//  ViewController.swift
-//  CKSIncrementalStore-iOSDemo
+//  TasksViewController.swift
+//  Pomodoro
 //
-//  Created by Nofel Mahmood on 04/05/2015.
-//  Copyright (c) 2015 CloudKitSpace. All rights reserved.
+//  Created by Nofel Mahmood on 18/06/2015.
+//  Copyright (c) 2015 Ninish. All rights reserved.
 //
 
 import UIKit
 import CoreData
 
-class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate {
-
+class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate {
+    
     @IBOutlet var tasksTableView:UITableView!
     @IBOutlet var newTaskTextField:UITextField!
     
     var tasks:Array<Task> = Array<Task>()
-
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -26,10 +24,25 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         
         self.loadTasks()
         self.tasksTableView.reloadData()
-
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        // Do any additional setup after loading the view.
     }
-
+    
+    func textFieldShouldReturn(textField: UITextField) -> Bool {
+        
+        textField.resignFirstResponder()
+        return true
+    }
+    func textFieldDidEndEditing(textField: UITextField) {
+        
+        var newTask:Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: CoreDataStack.sharedStack.managedObjectContext!) as! Task
+        newTask.name = textField.text
+        CoreDataStack.sharedStack.managedObjectContext?.save(nil)
+        
+        textField.resignFirstResponder()
+        self.loadTasks()
+        self.tasksTableView.reloadData()
+    }
     func loadTasks()
     {
         CoreDataStack.sharedStack.managedObjectContext?.reset()
@@ -47,24 +60,19 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
             }
         }
     }
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    // MARK : UITextFieldDelegate
-    func textFieldDidEndEditing(textField: UITextField) {
-        
-        var newTask:Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: CoreDataStack.sharedStack.managedObjectContext!) as! Task
-        newTask.name = textField.text
-        CoreDataStack.sharedStack.managedObjectContext?.save(nil)
-        
-        textField.resignFirstResponder()
+    func syncFinished(notification:NSNotification)
+    {
+        println("Tasks - > Sync Finished")
         self.loadTasks()
         self.tasksTableView.reloadData()
     }
     
-    // MARK : UITableViewDataSource
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        
+        // Dispose of any resources that can be recreated.
+    }
+    
     func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         
         if editingStyle == UITableViewCellEditingStyle.Delete
@@ -85,6 +93,7 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         }
         var doneAction = UIAlertAction(title: "Done", style: UIAlertActionStyle.Default) { (alertAction) -> Void in
             
+            println("Done did press")
             var taskName = (alertViewController.textFields?.first as! UITextField).text
             NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
                 
@@ -110,7 +119,14 @@ class ViewController: UIViewController,UITableViewDelegate,UITableViewDataSource
         cell.textLabel?.text = (self.tasks[indexPath.row] as Task).name
         return cell
     }
-
-
+    /*
+    // MARK: - Navigation
+    
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    // Get the new view controller using segue.destinationViewController.
+    // Pass the selected object to the new view controller.
+    }
+    */
+    
 }
-

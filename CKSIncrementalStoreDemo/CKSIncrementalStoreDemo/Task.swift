@@ -1,8 +1,8 @@
 //
 //  Task.swift
-//  CKSIncrementalStore-iOSDemo
+//  CKSIncrementalStoreDemo
 //
-//  Created by Nofel Mahmood on 22/06/2015.
+//  Created by Nofel Mahmood on 23/06/2015.
 //  Copyright (c) 2015 CloudKitSpace. All rights reserved.
 //
 

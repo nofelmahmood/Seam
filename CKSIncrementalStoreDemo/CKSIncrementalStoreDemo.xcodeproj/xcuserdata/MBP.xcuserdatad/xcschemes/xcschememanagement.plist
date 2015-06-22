@@ -4,7 +4,7 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>CKSIncrementalStore-iOSDemo.xcscheme</key>
+		<key>CKSIncrementalStoreDemo.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>0</integer>
@@ -12,12 +12,12 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
-		<key>101AD12A1AF7828C0022D0F0</key>
+		<key>10471BF21B389CF8007AA343</key>
 		<dict>
 			<key>primary</key>
 			<true/>
 		</dict>
-		<key>101AD1421AF7828D0022D0F0</key>
+		<key>10471C0A1B389CFA007AA343</key>
 		<dict>
 			<key>primary</key>
 			<true/>

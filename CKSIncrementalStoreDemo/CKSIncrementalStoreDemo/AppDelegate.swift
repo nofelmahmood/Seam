@@ -1,14 +1,13 @@
 //
 //  AppDelegate.swift
-//  CKSIncrementalStore-iOSDemo
+//  CKSIncrementalStoreDemo
 //
-//  Created by Nofel Mahmood on 04/05/2015.
+//  Created by Nofel Mahmood on 23/06/2015.
 //  Copyright (c) 2015 CloudKitSpace. All rights reserved.
 //
 
 import UIKit
 import CoreData
-import CloudKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -43,11 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
     }
-    
-    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
-        
-        CoreDataStack.sharedStack.cksIncrementalStore?.handlePush(userInfo: userInfo) 
-    }
- 
+
+
 }
 

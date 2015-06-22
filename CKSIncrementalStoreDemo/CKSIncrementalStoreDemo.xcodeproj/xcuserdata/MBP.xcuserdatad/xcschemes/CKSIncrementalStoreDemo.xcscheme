@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "101AD12A1AF7828C0022D0F0"
-               BuildableName = "CKSIncrementalStore-iOSDemo.app"
-               BlueprintName = "CKSIncrementalStore-iOSDemo"
-               ReferencedContainer = "container:CKSIncrementalStore-iOSDemo.xcodeproj">
+               BlueprintIdentifier = "10471BF21B389CF8007AA343"
+               BuildableName = "CKSIncrementalStoreDemo.app"
+               BlueprintName = "CKSIncrementalStoreDemo"
+               ReferencedContainer = "container:CKSIncrementalStoreDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -28,10 +28,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "101AD1421AF7828D0022D0F0"
-               BuildableName = "CKSIncrementalStore-iOSDemoTests.xctest"
-               BlueprintName = "CKSIncrementalStore-iOSDemoTests"
-               ReferencedContainer = "container:CKSIncrementalStore-iOSDemo.xcodeproj">
+               BlueprintIdentifier = "10471C0A1B389CFA007AA343"
+               BuildableName = "CKSIncrementalStoreDemoTests.xctest"
+               BlueprintName = "CKSIncrementalStoreDemoTests"
+               ReferencedContainer = "container:CKSIncrementalStoreDemo.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -46,20 +46,20 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "101AD1421AF7828D0022D0F0"
-               BuildableName = "CKSIncrementalStore-iOSDemoTests.xctest"
-               BlueprintName = "CKSIncrementalStore-iOSDemoTests"
-               ReferencedContainer = "container:CKSIncrementalStore-iOSDemo.xcodeproj">
+               BlueprintIdentifier = "10471C0A1B389CFA007AA343"
+               BuildableName = "CKSIncrementalStoreDemoTests.xctest"
+               BlueprintName = "CKSIncrementalStoreDemoTests"
+               ReferencedContainer = "container:CKSIncrementalStoreDemo.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "101AD12A1AF7828C0022D0F0"
-            BuildableName = "CKSIncrementalStore-iOSDemo.app"
-            BlueprintName = "CKSIncrementalStore-iOSDemo"
-            ReferencedContainer = "container:CKSIncrementalStore-iOSDemo.xcodeproj">
+            BlueprintIdentifier = "10471BF21B389CF8007AA343"
+            BuildableName = "CKSIncrementalStoreDemo.app"
+            BlueprintName = "CKSIncrementalStoreDemo"
+            ReferencedContainer = "container:CKSIncrementalStoreDemo.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -76,10 +76,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "101AD12A1AF7828C0022D0F0"
-            BuildableName = "CKSIncrementalStore-iOSDemo.app"
-            BlueprintName = "CKSIncrementalStore-iOSDemo"
-            ReferencedContainer = "container:CKSIncrementalStore-iOSDemo.xcodeproj">
+            BlueprintIdentifier = "10471BF21B389CF8007AA343"
+            BuildableName = "CKSIncrementalStoreDemo.app"
+            BlueprintName = "CKSIncrementalStoreDemo"
+            ReferencedContainer = "container:CKSIncrementalStoreDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -95,10 +95,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "101AD12A1AF7828C0022D0F0"
-            BuildableName = "CKSIncrementalStore-iOSDemo.app"
-            BlueprintName = "CKSIncrementalStore-iOSDemo"
-            ReferencedContainer = "container:CKSIncrementalStore-iOSDemo.xcodeproj">
+            BlueprintIdentifier = "10471BF21B389CF8007AA343"
+            BuildableName = "CKSIncrementalStoreDemo.app"
+            BlueprintName = "CKSIncrementalStoreDemo"
+            ReferencedContainer = "container:CKSIncrementalStoreDemo.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

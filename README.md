@@ -67,7 +67,8 @@ func application(application: UIApplication, didReceiveRemoteNotification userIn
 ```
 #### Sync Conflicts
 
-We all have conflicts in our lives and so does data. Sometimes we don't have answers to the ones in life but we do have for the ones here :P
+Life is usually filled up with conflicts and so is data. The good thing about "data" is that we can easily resolve conflicts using libraries like this one.
+
 
 `CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.`
 
@@ -106,17 +107,21 @@ See the sample iOS demo app. Run it on two devices and start adding, removing an
 ## Installation
 `CocoaPods` is the recommended way of adding CKSIncrementalStore to your project.
 
+You want to to add pod `'CKSIncrementalStore', '~> 0.5'` similar to the following to your Podfile:
 ```
-platform :ios, '8.0'
+target 'MyApp' do
+  pod 'CKSIncrementalStore', '~> 0.5'
+end
+```
 
-pod 'CKSIncrementalStore'
-```
+Then run a `[sudo] pod install` inside your terminal, or from CocoaPods.app.
+
 
 ## Credits
 CKSIncrementalStore was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)
 
 ## Contact 
-Follow Nofel Mahmood on [Twitter](http://twitter.com/NofelMahmood) and [GitHub](http://github.com/nofelmahmood) or email me at nofelmehmood@gmail.com
+Follow Nofel Mahmood on [Twitter](http://twitter.com/NofelMahmood) and [GitHub](http://github.com/nofelmahmood) or email him at nofelmehmood@gmail.com
 
 ## License
 CKSIncrementalStore is available under the MIT license. See the LICENSE file for more info.

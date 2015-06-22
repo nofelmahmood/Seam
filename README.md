@@ -100,6 +100,13 @@ var options:Dictionary<NSObject,AnyObject> = Dictionary<NSObject,AnyObject>()
 options[CKSIncrementalStoreSyncConflictPolicyOption] = NSNumber(short: CKSStoresSyncConflictPolicy.ClientRecordWins.rawValue)
 var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType(CKSIncrementalStore.type, configuration: nil, URL: url, options: options, error: &error)
 ```
+### What it does support
+
+CKSIncrementalStore supports only user's `Private Database` at this time. It creates and uses a custom zone to store data.
+
+### What it does not support
+
+`Inverse relationships` in CoreData Data Model. Do not create them.
 
 ## Getting Started 
 See the sample iOS demo app. Run it on two devices and start adding, removing and modifying records and experience the magic.

@@ -42,7 +42,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
         // Saves changes in the application's managed object context before the application terminates.
     }
-
+    
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+        
+        CoreDataStack.sharedStack.cksIncrementalStore?.handlePush(userInfo: userInfo)
+    }
 
 }
 

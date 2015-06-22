@@ -62,7 +62,6 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
     }
     func syncFinished(notification:NSNotification)
     {
-        println("Tasks - > Sync Finished")
         self.loadTasks()
         self.tasksTableView.reloadData()
     }

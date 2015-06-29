@@ -201,7 +201,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         self.operationQueue?.addOperation(ckModifyRecordsOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
         
-        println("Conflicted Records \(conflictedRecords)")
         if conflictedRecords.count > 0
         {
             var conflictedRecordsWithStringRecordIDs:Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)> = Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)>()
@@ -967,9 +966,21 @@ class CKSIncrementalStore: NSIncrementalStore {
                 return true
             })
             
-            var values = managedObject.dictionaryWithValuesForKeys(keys)
-            var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: values, version: 1)
+            var relationships = managedObject.entity.relationshipsByName.values.filter({(object)->Bool in
+                
+                var relationship:NSRelationshipDescription = object as! NSRelationshipDescription
+                return !relationship.toMany
+            })
             
+            keys.extend(managedObject.entity.relationshipsByName.keys.array)
+            var values = managedObject.dictionaryWithValuesForKeys(keys)
+            for key in managedObject.entity.relationshipsByName.keys.array
+            {
+                var relationshipManagedObjectContext:NSManagedObject = values[(key as! String)] as! NSManagedObject
+                values[key as! String] = relationshipManagedObjectContext.objectID
+                
+            }
+            var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: values, version: 1)
             return incrementalStoreNode
         }
         

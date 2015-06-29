@@ -3,6 +3,9 @@ CloudKit meets CoreData.
 CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html) which automatically maintains a SQLite local cache (using CoreData) of user’s private data on CloudKit Servers and keeps it in sync.</p>
 
 ####Seeing is believing !
+![](https://cdn.pbrd.co/images/1ueV7gsM.gif)
+
+### Let's add it
 
 ```swift
 var coordinator: NSPersistentStoreCoordinator? = NSPersistentStoreCoordinator(managedObjectModel:self.managedObjectModel)
@@ -100,6 +103,15 @@ var options:Dictionary<NSObject,AnyObject> = Dictionary<NSObject,AnyObject>()
 options[CKSIncrementalStoreSyncConflictPolicyOption] = NSNumber(short: CKSStoresSyncConflictPolicy.ClientRecordWins.rawValue)
 var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType(CKSIncrementalStore.type, configuration: nil, URL: url, options: options, error: &error)
 ```
+### What it does support
+
+CKSIncrementalStore supports only user's CloudKit `Private Database` at this time. It creates and uses a custom zone to store data.
+
+### What it does not support
+
+CloudKit `Public Databases`
+
+`Inverse relationships` in CoreData Data Model. Do not create them.
 
 ## Getting Started 
 See the sample iOS demo app. Run it on two devices and start adding, removing and modifying records and experience the magic.

@@ -109,7 +109,13 @@ CKSIncrementalStore supports only user's CloudKit `Private Database` at this tim
 
 ### What it does not support
 
-CloudKit `Public Databases` (I am heavily working to support this)
+CloudKit `Public Database` and here's the two reasons why, straight from the docs.
+
+1. [The disadvantage of using the default zone for storing records is that it does not have any special capabilities. You cannot save a group of records to iCloud atomically in the default zone. Similarly, you cannot use a CKFetchRecordChangesOperation object on records in the default zone.
+Public Database do not support Custom Zones.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/occ/clm/CKRecordZone/defaultRecordZone)
+
+2. [ You cannot create custom zones in a public database.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/c/tdef/CKRecordZoneCapabilities)
+
 
 `Inverse relationships` in CoreData Data Model. Do not create them.
 

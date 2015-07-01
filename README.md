@@ -109,7 +109,7 @@ CKSIncrementalStore supports only user's CloudKit `Private Database` at this tim
 
 ### What it does not support
 
-CloudKit `Public Databases`
+CloudKit `Public Databases` (I am heavily working to support this)
 
 `Inverse relationships` in CoreData Data Model. Do not create them.
 

@@ -105,7 +105,7 @@ var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType
 ```
 ### What it does support
 
-CKSIncrementalStore supports only user's CloudKit `Private Database` at this time. It creates and uses a custom zone to store data.
+CKSIncrementalStore supports only user's CloudKit `Private Database` at this time. It creates and uses a custom zone to store data and fetch changes from the server.
 
 ### What it does not support
 

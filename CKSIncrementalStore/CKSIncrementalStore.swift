@@ -682,6 +682,87 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
 }
 
 
+let CKSIncrementalStoreCloudStoreCustomZoneKey = "CKSIncrementalStoreCloudStoreCustomZoneKey"
+let CKSIncrementalStoreCloudStoreZoneSubcriptionKey = "CKSIncrementalStoreCloudStoreZoneSubcriptionKey"
+
+
+class CKSIncrementalStoreCloudStoreSetupOperation:NSOperation {
+    
+    var database:CKDatabase?
+    var setupOperationCompletionBlock:((customZoneCreated:Bool,customZoneSubscriptionCreated:Bool,error:NSError?)->Void)?
+    
+    
+    init(cloudDatabase:CKDatabase?) {
+        
+        self.database = cloudDatabase
+        super.init()
+    }
+    
+    override func main() {
+        
+        var error:NSError?
+        
+        var operationQueue = NSOperationQueue()
+        var zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)
+        
+        var modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
+        modifyRecordZonesOperation.database = self.database
+        modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones,deletedRecordZonesIDs , operationError) -> Void in
+            
+            error = operationError
+            var customZoneWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey)
+            var customZoneSubscriptionWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreZoneSubcriptionKey)
+            
+            if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil)
+            {
+                NSUserDefaults.standardUserDefaults().setBool(true, forKey: CKSIncrementalStoreCloudStoreCustomZoneKey)
+                var subcription:CKSubscription = CKSubscription(zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName), subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: nil)
+                
+                var subcriptionNotificationInfo = CKNotificationInfo()
+                subcriptionNotificationInfo.alertBody = ""
+                subcriptionNotificationInfo.shouldSendContentAvailable = true
+                subcription.notificationInfo = subcriptionNotificationInfo
+                subcriptionNotificationInfo.shouldBadge = false
+                
+                var subcriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subcription], subscriptionIDsToDelete: nil)
+                subcriptionsOperation.database=self.database
+                subcriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
+                    
+                    error = operationError
+                    if operationError == nil
+                    {
+                        NSUserDefaults.standardUserDefaults().setBool(true, forKey: CKSIncrementalStoreCloudStoreZoneSubcriptionKey)
+                    }
+                })
+                
+                operationQueue.addOperation(subcriptionsOperation)
+            }
+        })
+        
+        operationQueue.addOperation(modifyRecordZonesOperation)
+        operationQueue.waitUntilAllOperationsAreFinished()
+        
+        if self.setupOperationCompletionBlock != nil
+        {
+            if error == nil
+            {
+                self.setupOperationCompletionBlock!(customZoneCreated: true,customZoneSubscriptionCreated: true,error: error)
+            }
+            else
+            {
+                if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey) == nil
+                {
+                    self.setupOperationCompletionBlock!(customZoneCreated: false, customZoneSubscriptionCreated: false, error: error)
+                }
+                else
+                {
+                    self.setupOperationCompletionBlock!(customZoneCreated: true, customZoneSubscriptionCreated: false, error: error)
+                }
+            }
+        }
+    }
+}
+
 let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStoreZone"
 let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
 
@@ -712,6 +793,7 @@ enum CKSStoresSyncConflictPolicy:Int16
 class CKSIncrementalStore: NSIncrementalStore {
     
     private var syncOperation:CKSIncrementalStoreSyncOperation?
+    private var cloudStoreSetupOperation:CKSIncrementalStoreCloudStoreSetupOperation?
     private var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
@@ -771,9 +853,6 @@ class CKSIncrementalStore: NSIncrementalStore {
             NSStoreTypeKey:self.dynamicType.type
         ]
         var storeURL=self.URL
-        self.createCKSCloudDatabaseCustomZone()
-        self.createCKSCloudDatabaseCustomZoneSubcription()
-
         var model:AnyObject=(self.persistentStoreCoordinator?.managedObjectModel.copy())!
         for e in model.entities
         {
@@ -806,6 +885,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             entity.properties.append(recordChangeTypeAttributeDescription)
             
         }
+        
         self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
         
         var error: NSError? = nil
@@ -817,6 +897,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         self.operationQueue = NSOperationQueue()
         self.operationQueue?.maxConcurrentOperationCount = 1
+
         self.triggerSync()
         
         return true
@@ -845,31 +926,54 @@ class CKSIncrementalStore: NSIncrementalStore {
             return
         }
         
-        self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, conflictPolicy: self.cksStoresSyncConflictPolicy)
-        self.syncOperation?.syncConflictResolutionBlock = self.recordConflictResolutionBlock
-        self.syncOperation?.syncCompletionBlock =  ({(error) -> Void in
+        var syncOperationBlock = ({()->Void in
             
-            if error == nil
-            {
-                print("Sync Performed Successfully")
-                NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+            self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, conflictPolicy: self.cksStoresSyncConflictPolicy)
+            self.syncOperation?.syncConflictResolutionBlock = self.recordConflictResolutionBlock
+            self.syncOperation?.syncCompletionBlock =  ({(error) -> Void in
+                
+                if error == nil
+                {
+                    print("Sync Performed Successfully")
+                    NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+                        
+                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
+                        
+                    })
                     
-                    NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
-
-                })
-
-            }
-            else
-            {
-                print("Sync unSuccessful")
-                NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
-                    
-                    NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
-                })
-            }
-
+                }
+                else
+                {
+                    print("Sync unSuccessful")
+                    NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+                        
+                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
+                    })
+                }
+                
+            })
+            self.operationQueue?.addOperation(self.syncOperation!)
         })
-        self.operationQueue?.addOperation(syncOperation!)
+
+        
+        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey) == nil || NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreZoneSubcriptionKey) == nil
+        {
+            self.cloudStoreSetupOperation = CKSIncrementalStoreCloudStoreSetupOperation(cloudDatabase: self.database)
+            self.cloudStoreSetupOperation?.setupOperationCompletionBlock = ({(customZoneWasCreated,customZoneSubscriptionWasCreated,error)->Void in
+                
+                if error == nil
+                {
+                    syncOperationBlock()
+                }
+            })
+            self.operationQueue?.addOperation(self.cloudStoreSetupOperation!)
+        }
+        else
+        {
+            syncOperationBlock()
+        }
+        
+
         NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidStartSyncOperationNotification, object: self)
         
         

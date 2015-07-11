@@ -896,10 +896,6 @@ class CKSIncrementalStore: NSIncrementalStore {
             entity.properties.append(recordEncodedValuesAttributeDescription)
             entity.properties.append(recordChangeTypeAttributeDescription)
             
-            print("Entity \(e.name!)")
-            println()
-            print("Relationships \(e.relationshipsByName)")
-            
         }
         
         
@@ -1202,7 +1198,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         return NSArray()
     }
 
-    func relationshipValuesForBackingObject(backingobject:NSManagedObject,sourceObject:NSManagedObject)
+    func relationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject)
     {
         for relationship in sourceObject.entity.relationshipsByName.values.array as! [NSRelationshipDescription]
         {
@@ -1229,26 +1225,20 @@ class CKSIncrementalStore: NSIncrementalStore {
                 
                 if error == nil && result?.count > 0
                 {
-//                    var backingRelationshipValue: Set<NSObject> = Set<NSObject>()
-//                    
-//                    for object
-                }
-                var backingRelationshipValue: Set<NSObject> = Set<NSObject>()
-                for value in relationshipValue
-                {
-                    var managedObject: NSManagedObject = value as! NSManagedObject
-                    var referenceObject: String = self.referenceObjectForObjectID(managedObject.objectID) as! String
-                    var backingObjectID = self.newObjectIDForEntity(managedObject.entity, referenceObject: referenceObject)
-                    var error:NSError?
-                    var backingManagedObject = self.backingMOC.existingObjectWithID(backingObjectID, error: &error)
+                    var backingRelationshipValue: Set<NSObject> = Set<NSObject>()
                     
-                    if backingManagedObject != nil
+                    for object in result as! [NSManagedObjectID]
                     {
-                        backingRelationshipValue.insert(backingManagedObject!)
+                        var error: NSError?
+                        var backingManagedObject = self.backingMOC.existingObjectWithID(object, error: &error)
+                        if backingManagedObject != nil
+                        {
+                            backingRelationshipValue.insert(backingManagedObject!)
+                        }
                     }
+                    
+                    backingObject.setValue(backingRelationshipValue, forKey: relationship.name)
                 }
-                
-                backingobject.setValue(backingRelationshipValue, forKey: relationship.name)
             }
             
             else
@@ -1271,7 +1261,7 @@ class CKSIncrementalStore: NSIncrementalStore {
                         
                         if backingRelationshipObject != nil
                         {
-                            backingobject.setValue(backingRelationshipObject!, forKey: relationship.name)
+                            backingObject.setValue(backingRelationshipObject!, forKey: relationship.name)
                         }
                     }
                 }
@@ -1295,15 +1285,11 @@ class CKSIncrementalStore: NSIncrementalStore {
             objectsToBackingObjects[(object as! NSManagedObject)] = managedObject
         }
         
-//        var error: NSError?
-//        self.backingMOC.save(&error)
-        
         for (object,backingObject) in objectsToBackingObjects
         {
             self.relationshipValuesForBackingObject(backingObject, sourceObject: object)
         }
 
-        
     }
     
     func setObjectsInBackingStore(objects:Array<AnyObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)
@@ -1346,6 +1332,7 @@ class CKSIncrementalStore: NSIncrementalStore {
                     var dictionary = updatedObject.dictionaryWithValuesForKeys(keys!)
                     managedObject.setValuesForKeysWithDictionary(dictionary)
                     managedObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+                    self.relationshipValuesForBackingObject(managedObject, sourceObject: updatedObject)
                 }
             }
         }

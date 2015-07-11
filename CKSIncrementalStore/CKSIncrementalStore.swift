@@ -10,6 +10,7 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
+
 let CKSIncrementalStoreSyncOperationErrorDomain = "CKSIncrementalStoreSyncOperationErrorDomain"
 let CKSSyncConflictedResolvedRecordsKey = "CKSSyncConflictedResolvedRecordsKey"
 let CKSIncrementalStoreSyncOperationFetchChangeTokenKey = "CKSIncrementalStoreSyncOperationFetchChangeTokenKey"
@@ -618,51 +619,61 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             
             for property in entityProperties
             {
-                if property is NSAttributeDescription
+                var propertyDescription: NSPropertyDescription = property as! NSPropertyDescription
+                
+                if managedObject.valueForKey(propertyDescription.name) != nil
                 {
-                    var attributeDescription:NSAttributeDescription = property as! NSAttributeDescription
-                    switch attributeDescription.attributeType
+                    if property is NSAttributeDescription
                     {
-                        case .StringAttributeType:
-                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! String, forKey: attributeDescription.name)
-                            
-                        case .DateAttributeType:
-                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSDate, forKey: attributeDescription.name)
-                            
-                        case .BinaryDataAttributeType:
-                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
-                            
-                        case .BooleanAttributeType, .DecimalAttributeType, .DoubleAttributeType, .FloatAttributeType, .Integer16AttributeType, .Integer32AttributeType, .Integer32AttributeType, .Integer64AttributeType:
-                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-                            
-                        default:
-                            break
+                        var attributeDescription:NSAttributeDescription = property as! NSAttributeDescription
+                        switch attributeDescription.attributeType
+                        {
+                            case .StringAttributeType:
+                                ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! String, forKey: attributeDescription.name)
+                                
+                            case .DateAttributeType:
+                                ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSDate, forKey: attributeDescription.name)
+                                
+                            case .BinaryDataAttributeType:
+                                ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
+                                
+                            case .BooleanAttributeType, .DecimalAttributeType, .DoubleAttributeType, .FloatAttributeType, .Integer16AttributeType, .Integer32AttributeType, .Integer32AttributeType, .Integer64AttributeType:
+                                ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
+                                
+                            default:
+                                break
+                        }
                     }
-                }
-                else if property is NSRelationshipDescription
-                {
-                    var relationshipDescription:NSRelationshipDescription = property as! NSRelationshipDescription
-                    if relationshipDescription.toMany == false
+                    else if property is NSRelationshipDescription
                     {
-                        var relationshipManagedObject:NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
-                        var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
+                        var relationshipDescription:NSRelationshipDescription = property as! NSRelationshipDescription
+                        if managedObject.valueForKey(relationshipDescription.name) != nil
+                        {
+                            if relationshipDescription.toMany == false
+                            {
+                                var relationshipManagedObject:NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
+                                var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
+                                
+                                var ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
+                                ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
+                            }
+                        }
                         
-                        var ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
-                        ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
-                    }
-                    else
-                    {
-                        var relationshipManagedObjects:Array<AnyObject> = managedObject.valueForKey(relationshipDescription.name) as! Array<AnyObject>
-                        var ckReferences = relationshipManagedObjects.map({(object)->CKReference in
-                            
-                            var managedObject:NSManagedObject = object as! NSManagedObject
-                            var ckRecordID = CKRecordID(recordName: managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
-                            var ckReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
-                            return ckReference
-                        })
-                        ckRecord.setObject(ckReferences, forKey: relationshipDescription.name)
+    //                    else
+    //                    {
+    //                        var relationshipManagedObjects:Array<AnyObject> = managedObject.valueForKey(relationshipDescription.name) as! Array<AnyObject>
+    //                        var ckReferences = relationshipManagedObjects.map({(object)->CKReference in
+    //                            
+    //                            var managedObject:NSManagedObject = object as! NSManagedObject
+    //                            var ckRecordID = CKRecordID(recordName: managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
+    //                            var ckReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
+    //                            return ckReference
+    //                        })
+    //                        ckRecord.setObject(ckReferences, forKey: relationshipDescription.name)
+    //                    }
                     }
                 }
+                
             }
             
             return ckRecord
@@ -798,6 +809,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
     private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
+    private var backingPersistentStore:NSPersistentStore?
     private lazy var backingMOC:NSManagedObjectContext={
         
         var moc=NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
@@ -884,12 +896,19 @@ class CKSIncrementalStore: NSIncrementalStore {
             entity.properties.append(recordEncodedValuesAttributeDescription)
             entity.properties.append(recordChangeTypeAttributeDescription)
             
+            print("Entity \(e.name!)")
+            println()
+            print("Relationships \(e.relationshipsByName)")
+            
         }
+        
         
         self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
         
         var error: NSError? = nil
-        if self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil, error: &error)! == nil
+        self.backingPersistentStore = self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil, error: &error)
+        
+        if self.backingPersistentStore == nil
         {
             print("Backing Store Error \(error)")
             return false
@@ -1061,28 +1080,43 @@ class CKSIncrementalStore: NSIncrementalStore {
         {
             var managedObject:NSManagedObject = results?.first as! NSManagedObject
             self.backingMOC.refreshObject(managedObject, mergeChanges: false)
-            var keys = managedObject.entity.attributesByName.keys.array.filter({(key)->Bool in
+            var keys = managedObject.entity.propertiesByName.values.array.filter({(property)->Bool in
                 
-                if (key as! String) == CKSIncrementalStoreLocalStoreRecordIDAttributeName || (key as! String) == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || (key as! String) == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
+                if property is NSAttributeDescription
                 {
-                    return false
+                    var attributeDescription: NSAttributeDescription = property as! NSAttributeDescription
+                    if attributeDescription.name == CKSIncrementalStoreLocalStoreRecordIDAttributeName || attributeDescription.name == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || attributeDescription.name == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
+                    {
+                        return false
+                    }
+                    else
+                    {
+                        return true
+                    }
                 }
-                return true
-            })
-            
-            var relationships = managedObject.entity.relationshipsByName.values.filter({(object)->Bool in
+                else if property is NSRelationshipDescription
+                {
+                    var relationshipDescription: NSRelationshipDescription = property as! NSRelationshipDescription
+                    
+                    return relationshipDescription.toMany == false
+                }
                 
-                var relationship:NSRelationshipDescription = object as! NSRelationshipDescription
-                return !relationship.toMany
+                return false
+            }).map({(object)->String in
+                
+                var propertyDescription: NSPropertyDescription = object as! NSPropertyDescription
+                
+                return propertyDescription.name
             })
             
-            keys.extend(managedObject.entity.relationshipsByName.keys.array)
+            
             var values = managedObject.dictionaryWithValuesForKeys(keys)
-            for key in managedObject.entity.relationshipsByName.keys.array
+            for (key,value) in values
             {
-                var relationshipManagedObjectContext:NSManagedObject = values[(key as! String)] as! NSManagedObject
-                values[key as! String] = relationshipManagedObjectContext.objectID
-                
+                if value is NSManagedObject
+                {
+                    values[key] = (value as! NSManagedObject).objectID
+                }
             }
             var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: values, version: 1)
             return incrementalStoreNode
@@ -1091,12 +1125,35 @@ class CKSIncrementalStore: NSIncrementalStore {
         return nil
     }
     
+    override func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?, error: NSErrorPointer) -> AnyObject? {
+        
+        var recordID: String = self.referenceObjectForObjectID(objectID) as! String
+        var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
+        var predicate: NSPredicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,recordID)
+        fetchRequest.predicate = predicate
+        var results = self.backingMOC.executeFetchRequest(fetchRequest, error: error)
+        
+        if error == nil && results?.count > 0
+        {
+            var managedObject: NSManagedObject = results?.first as! NSManagedObject
+            var relationshipValues: Set<NSObject> = managedObject.valueForKey(relationship.name) as! Set<NSObject>
+            return Array(relationshipValues).map({(object)->NSManagedObjectID in
+                
+                var value: NSManagedObject = object as! NSManagedObject
+                return value.objectID
+            })
+        }
+        
+        return []
+    }
+    
     override func obtainPermanentIDsForObjects(array: [AnyObject], error: NSErrorPointer) -> [AnyObject]? {
         
         return array.map({ (object)->NSManagedObjectID in
             
             var insertedObject:NSManagedObject = object as! NSManagedObject
-            return self.newObjectIDForEntity(insertedObject.entity, referenceObject: NSUUID().UUIDString)
+            var newRecordID: String = NSUUID().UUIDString
+            return self.newObjectIDForEntity(insertedObject.entity, referenceObject: newRecordID)
             
         })
     }
@@ -1134,7 +1191,7 @@ class CKSIncrementalStore: NSIncrementalStore {
 
     func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
-        self.insertObjectsInBackingStore(Array(context.insertedObjects))
+        self.insertObjectsInBackingStore(context.insertedObjects)
         self.setObjectsInBackingStore(Array(context.updatedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordUpdated)
         self.setObjectsInBackingStore(Array(context.deletedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordDeleted)
         
@@ -1145,17 +1202,108 @@ class CKSIncrementalStore: NSIncrementalStore {
         return NSArray()
     }
 
-    func insertObjectsInBackingStore(objects:Array<AnyObject>)
+    func relationshipValuesForBackingObject(backingobject:NSManagedObject,sourceObject:NSManagedObject)
     {
+        for relationship in sourceObject.entity.relationshipsByName.values.array as! [NSRelationshipDescription]
+        {
+            if sourceObject.valueForKey(relationship.name) == nil
+            {
+                continue
+            }
+            
+            if relationship.toMany == true
+            {
+                var relationshipValue: Set<NSObject> = sourceObject.valueForKey(relationship.name) as! Set<NSObject>
+                var referenceObjects = Array(relationshipValue).map({(object)-> String in
+                    
+                    var managedObject: NSManagedObject = object as! NSManagedObject
+                    var referenceObject: String = self.referenceObjectForObjectID(managedObject.objectID) as! String
+                    return referenceObject
+                })
+                
+                var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: relationship.entity.name!)
+                fetchRequest.predicate = NSPredicate(format: "%K IN %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,referenceObjects)
+                fetchRequest.resultType = NSFetchRequestResultType.ManagedObjectIDResultType
+                var error: NSError?
+                var result = self.backingMOC.executeFetchRequest(fetchRequest, error: &error)
+                
+                if error == nil && result?.count > 0
+                {
+//                    var backingRelationshipValue: Set<NSObject> = Set<NSObject>()
+//                    
+//                    for object
+                }
+                var backingRelationshipValue: Set<NSObject> = Set<NSObject>()
+                for value in relationshipValue
+                {
+                    var managedObject: NSManagedObject = value as! NSManagedObject
+                    var referenceObject: String = self.referenceObjectForObjectID(managedObject.objectID) as! String
+                    var backingObjectID = self.newObjectIDForEntity(managedObject.entity, referenceObject: referenceObject)
+                    var error:NSError?
+                    var backingManagedObject = self.backingMOC.existingObjectWithID(backingObjectID, error: &error)
+                    
+                    if backingManagedObject != nil
+                    {
+                        backingRelationshipValue.insert(backingManagedObject!)
+                    }
+                }
+                
+                backingobject.setValue(backingRelationshipValue, forKey: relationship.name)
+            }
+            
+            else
+            {
+                var relationshipValue: NSManagedObject = sourceObject.valueForKey(relationship.name) as! NSManagedObject
+                var referenceObject: String = self.referenceObjectForObjectID(relationshipValue.objectID) as! String
+
+                var error: NSError?
+                var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: relationshipValue.entity.name!)
+                fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,referenceObject)
+                fetchRequest.resultType = NSFetchRequestResultType.ManagedObjectIDResultType
+                var result = self.backingMOC.executeFetchRequest(fetchRequest, error: &error)
+                var backingRelationshipObjectID: NSManagedObjectID?
+                if error == nil && result?.count > 0
+                {
+                    backingRelationshipObjectID = result?.last as? NSManagedObjectID
+                    if backingRelationshipObjectID != nil
+                    {
+                        var backingRelationshipObject = self.backingMOC.existingObjectWithID(backingRelationshipObjectID!, error: &error)
+                        
+                        if backingRelationshipObject != nil
+                        {
+                            backingobject.setValue(backingRelationshipObject!, forKey: relationship.name)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    func insertObjectsInBackingStore(objects:Set<NSObject>)
+    {
+        var objectsToBackingObjects: Dictionary<NSManagedObject,NSManagedObject> = Dictionary<NSManagedObject,NSManagedObject>()
+        
         for object in objects
         {
             var managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(((object as! NSManagedObject).entity.name)!, inManagedObjectContext: self.backingMOC) as! NSManagedObject
+            var values = object.dictionaryWithValuesForKeys((object as! NSManagedObject).entity.propertiesByName.keys.array)
             var keys = (object as! NSManagedObject).entity.attributesByName.keys.array
             var dictionary = object.dictionaryWithValuesForKeys(keys)
             managedObject.setValuesForKeysWithDictionary(dictionary)
             managedObject.setValue(self.referenceObjectForObjectID((object as! NSManagedObject).objectID), forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
             managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+            objectsToBackingObjects[(object as! NSManagedObject)] = managedObject
         }
+        
+//        var error: NSError?
+//        self.backingMOC.save(&error)
+        
+        for (object,backingObject) in objectsToBackingObjects
+        {
+            self.relationshipValuesForBackingObject(backingObject, sourceObject: object)
+        }
+
+        
     }
     
     func setObjectsInBackingStore(objects:Array<AnyObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)

@@ -115,9 +115,6 @@ CloudKit `Public Database` and here's the two reasons why, straight from the doc
 
 2. [ You cannot create custom zones in a public database.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/c/tdef/CKRecordZoneCapabilities)
 
-
-`Inverse relationships` in CoreData Data Model. Do not create them.
-
 ## Getting Started 
 See the sample iOS demo app. Run it on two devices and start adding, removing and modifying records and experience the magic.
 

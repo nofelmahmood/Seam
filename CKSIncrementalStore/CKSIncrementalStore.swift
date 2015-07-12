@@ -1129,7 +1129,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         fetchRequest.predicate = predicate
         var results = self.backingMOC.executeFetchRequest(fetchRequest, error: error)
         
-        if error == nil && results?.count > 0
+        if error.memory == nil && results?.count > 0
         {
             var managedObject: NSManagedObject = results?.first as! NSManagedObject
             var relationshipValues: Set<NSObject> = managedObject.valueForKey(relationship.name) as! Set<NSObject>

@@ -24,8 +24,8 @@ if persistentStore != nil
 ```
 #### How Sync Works
 
-Sync works in two ways. One is manual and the other is automatic.
-But first if you want to know when the sync operation starts and finishes subcribe to these two notifications
+Sync operation uses a private instance of NSManagedObjectContext to perform and throws two notifications to notify when the operation starts and finishes.
+
 ##### Notifications
 * <b>CKSIncrementalStoreDidStartSyncOperationNotification</b>
 
@@ -46,6 +46,9 @@ Notification is posted when the sync operation finishes.
 ```swift
 NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncFinished:", name: CKSIncrementalStoreDidFinishSyncOperationNotification, object: self.cksIncrementalStore)
 ```
+
+Sync works in two ways. One is manual and the other is automatic.
+
 ##### Ways to Sync
 * <b>Manual Sync</b>
 

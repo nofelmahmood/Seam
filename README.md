@@ -1,4 +1,6 @@
 #CKSIncrementalStore
+
+[![Join the chat at https://gitter.im/nofelmahmood/CKSIncrementalStore](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/nofelmahmood/CKSIncrementalStore?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 CloudKit meets CoreData. 
 CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html) which automatically maintains a SQLite local cache (using CoreData) of user’s private data on CloudKit Servers and keeps it in sync.</p>
 

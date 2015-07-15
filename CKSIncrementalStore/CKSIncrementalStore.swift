@@ -1108,7 +1108,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         })
     }
     
-    // MARK : Request Methods
+    // MARK : Fetch Request
     func executeInResponseToFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
         var predicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName,NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue))
@@ -1139,7 +1139,8 @@ class CKSIncrementalStore: NSIncrementalStore {
         return []
     }
 
-    func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
+    // MARK : SaveChanges Request
+    private func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
         self.insertObjectsInBackingStore(context.insertedObjects)
         self.setObjectsInBackingStore(Array(context.updatedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordUpdated)
@@ -1152,7 +1153,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         return NSArray()
     }
 
-    func setRelationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject)
+    private func setRelationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject)
     {
         for relationship in sourceObject.entity.relationshipsByName.values.array as! [NSRelationshipDescription]
         {

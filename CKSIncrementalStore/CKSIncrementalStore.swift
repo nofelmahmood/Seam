@@ -995,53 +995,6 @@ class CKSIncrementalStore: NSIncrementalStore {
         
     }
     
-    func createCKSCloudDatabaseCustomZone()
-    {
-        var zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)
-        
-        self.database?.saveRecordZone(zone, completionHandler: { (zoneFromServer, error) -> Void in
-            
-            if error != nil
-            {
-                println("CKSIncrementalStore Custom Zone creation failed")
-            }
-            else
-            {
-                self.createCKSCloudDatabaseCustomZoneSubcription()
-            }
-            
-        })
-    }
-    
-    func createCKSCloudDatabaseCustomZoneSubcription()
-    {
-        var subcription:CKSubscription = CKSubscription(zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName), subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: nil)
-        
-        var subcriptionNotificationInfo = CKNotificationInfo()
-        subcriptionNotificationInfo.alertBody = ""
-        subcriptionNotificationInfo.shouldSendContentAvailable = true
-        subcription.notificationInfo = subcriptionNotificationInfo
-        subcriptionNotificationInfo.shouldBadge = false
-        
-        var subcriptionsOperation=CKModifySubscriptionsOperation(subscriptionsToSave: [subcription], subscriptionIDsToDelete: nil)
-        subcriptionsOperation.database=self.database
-        subcriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,error) -> Void in
-            
-            if error != nil
-            {
-                println("Error \(error.localizedDescription)")
-            }
-            else
-            {
-                println("Successfull")
-            }
-            
-        })
-        
-        var operationQueue = NSOperationQueue()
-        operationQueue.addOperation(subcriptionsOperation)
-    }
-    
     override func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> AnyObject? {
         
         

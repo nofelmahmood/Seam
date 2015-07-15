@@ -799,6 +799,7 @@ enum CKSStoresSyncConflictPolicy:Int16
     case ServerRecordWins = 1
     case ClientRecordWins = 2
     case GreaterModifiedDateWins = 3
+    case KeepBoth = 4
 }
 
 class CKSIncrementalStore: NSIncrementalStore {
@@ -1198,7 +1199,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         return NSArray()
     }
 
-    func relationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject)
+    func setRelationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject)
     {
         for relationship in sourceObject.entity.relationshipsByName.values.array as! [NSRelationshipDescription]
         {
@@ -1269,6 +1270,14 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
     }
     
+    func setRelationshipValuesForBackingObjects(sourceObjectsToBackingObjects:Dictionary<NSManagedObject,NSManagedObject>)
+    {
+        for (object,backingObject) in sourceObjectsToBackingObjects
+        {
+            self.setRelationshipValuesForBackingObject(backingObject, sourceObject: object)
+        }
+    }
+    
     func insertObjectsInBackingStore(objects:Set<NSObject>)
     {
         var objectsToBackingObjects: Dictionary<NSManagedObject,NSManagedObject> = Dictionary<NSManagedObject,NSManagedObject>()
@@ -1285,11 +1294,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             objectsToBackingObjects[(object as! NSManagedObject)] = managedObject
         }
         
-        for (object,backingObject) in objectsToBackingObjects
-        {
-            self.relationshipValuesForBackingObject(backingObject, sourceObject: object)
-        }
-
+        self.setRelationshipValuesForBackingObjects(objectsToBackingObjects)
     }
     
     func setObjectsInBackingStore(objects:Array<AnyObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)
@@ -1324,6 +1329,8 @@ class CKSIncrementalStore: NSIncrementalStore {
             
             if error == nil && results?.count > 0
             {
+                var objectsToBackingObjects: Dictionary<NSManagedObject,NSManagedObject> = Dictionary<NSManagedObject,NSManagedObject>()
+                
                 for var i=0; i<results?.count; i++
                 {
                     var managedObject:NSManagedObject = results![i] as! NSManagedObject
@@ -1332,8 +1339,10 @@ class CKSIncrementalStore: NSIncrementalStore {
                     var dictionary = updatedObject.dictionaryWithValuesForKeys(keys!)
                     managedObject.setValuesForKeysWithDictionary(dictionary)
                     managedObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-                    self.relationshipValuesForBackingObject(managedObject, sourceObject: updatedObject)
+                    objectsToBackingObjects[updatedObject] = managedObject
                 }
+                
+                self.setRelationshipValuesForBackingObjects(objectsToBackingObjects)
             }
         }
     }

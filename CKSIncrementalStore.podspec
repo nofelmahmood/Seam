@@ -1,18 +1,16 @@
-Pod::Spec.new do |s|
-  s.name     = 'CKSIncrementalStore'
-  s.version  = '0.5.2'
-  s.license  = 'MIT'
-  s.homepage =  'https://github.com/nofelmahmood/CKSIncrementalStore'
-  s.summary  = "CloudKit spreading awesomeness through CoreData."
-  s.authors  = { 'Nofel Mahmood' =>
-                 'nofelmehmood@gmail.com' }
-  s.social_media_url = "https://twitter.com/NofelMahmood"
-  s.source   = { :git => 'https://github.com/nofelmahmood/CKSIncrementalStore.git', :tag => ‘0.5.2’ }
-  s.source_files = 'CKSIncrementalStore.swift'
-  s.source_files = 'CKSIncrementalStore/CKSIncrementalStore.swift'
-  s.ios.deployment_target = '8.0'
-  s.osx.deployment_target = '10.10'
-  s.framework  = 'CoreData'
-  s.framework  = 'CloudKit'
-
+Pod::Spec.new do |spec|
+  spec.name         = 'CKSIncrementalStore'
+  spec.version      = '0.5.2'
+  spec.license      = { :type => 'MIT' }
+  spec.homepage     = 'https://github.com/nofelmahmood/CKSIncrementalStore'
+  spec.authors      = { 'Nofel Mahmood' => 'nofelmehmood@gmail.com' }
+  spec.social_media_url = "https://twitter.com/NofelMahmood"
+  spec.summary      = 'CloudKit spreading awesomeness through CoreData.'
+  spec.source       = { :git => 'https://github.com/nofelmahmood/CKSIncrementalStore.git', :tag => '0.5.2' }
+  spec.source_files = 'CKSIncrementalStore.swift'
+  spec.source_files = 'CKSIncrementalStore/CKSIncrementalStore.swift'
+  spec.ios.deployment_target = '8.0'
+  spec.osx.deployment_target = '10.10'
+  spec.framework    = 'CoreData'
+  spec.framework    = 'CloudKit'
 end

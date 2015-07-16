@@ -1,6 +1,8 @@
 #CKSIncrementalStore
 
-CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html) which automatically maintains a SQLite local cache (using CoreData) of user’s private data on CloudKit Servers and keeps it in sync.</p>
+CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html). It automatically creates and manages a SQLite store using CoreData to store and sync with user's private database on CloudKit Servers.
+
+It helps you to reuse your CoreData knowledge to power your apps with CloudKit. It handles almost all the CloudKit hassle.
 
 ####Seeing is believing !
 ![](https://cdn.pbrd.co/images/1ueV7gsM.gif)
@@ -18,13 +20,13 @@ var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType
 if persistentStore != nil
 {
     self.cksIncrementalStore = persistentStore as? CKSIncrementalStore
-    // Its best to have a property for the IncrementalStore
+    // Store it in a property.
 }
 
 ```
 #### How Sync Works
 
-Sync operation uses a private instance of NSManagedObjectContext to perform and throws two notifications to notify when the operation starts and finishes.
+Sync operation uses a private instance of NSManagedObjectContext to perform the operation and throws two notifications to notify when the operation starts and finishes.
 
 ##### Notifications
 * <b>CKSIncrementalStoreDidStartSyncOperationNotification</b>

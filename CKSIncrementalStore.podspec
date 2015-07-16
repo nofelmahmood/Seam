@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   s.authors  = { 'Nofel Mahmood' =>
                  'nofelmehmood@gmail.com' }
   s.social_media_url = "https://twitter.com/NofelMahmood"
-  s.source   = { :git => 'https://github.com/CloudKitSpace/CKSIncrementalStore.git', :tag => '0.5.1' }
+  s.source   = { :git => 'https://github.com/nofelmahmood/CKSIncrementalStore', :tag => '0.5.1' }
   s.source_files = 'CKSIncrementalStore.swift'
   s.source_files = 'CKSIncrementalStore/CKSIncrementalStore.swift'
   s.ios.deployment_target = '8.0'

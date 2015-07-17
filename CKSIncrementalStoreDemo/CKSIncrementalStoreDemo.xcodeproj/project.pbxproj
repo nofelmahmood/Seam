@@ -182,6 +182,7 @@
 		10471BEB1B389CF7007AA343 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = CloudKitSpace;
 				TargetAttributes = {
@@ -455,6 +456,7 @@
 				10471C171B389CFA007AA343 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		10471C181B389CFA007AA343 /* Build configuration list for PBXNativeTarget "CKSIncrementalStoreDemoTests" */ = {
 			isa = XCConfigurationList;
@@ -463,6 +465,7 @@
 				10471C1A1B389CFA007AA343 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

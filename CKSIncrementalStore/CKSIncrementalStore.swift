@@ -30,6 +30,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         
         super.init()
     }
+    
     // MARK: Sync
     override func main() {
         
@@ -323,7 +324,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     
     func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>)->Bool
     {
-        
         return self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs) && self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
     }
     
@@ -1197,7 +1197,6 @@ class CKSIncrementalStore: NSIncrementalStore {
                     backingObject.setValue(backingRelationshipValue, forKey: relationship.name)
                 }
             }
-            
             else
             {
                 var relationshipValue: NSManagedObject = sourceObject.valueForKey(relationship.name) as! NSManagedObject
@@ -1256,6 +1255,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     func setObjectsInBackingStore(objects:Array<AnyObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)
     {
         var objectsByEntityNames:Dictionary<String,Array<AnyObject>> = Dictionary<String,Array<AnyObject>>()
+        
         for object in objects
         {
             var managedObject = object as! NSManagedObject

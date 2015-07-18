@@ -1092,7 +1092,9 @@ class CKSIncrementalStore: NSIncrementalStore {
             return Array(relationshipValues).map({(object)->NSManagedObjectID in
                 
                 var value: NSManagedObject = object as! NSManagedObject
-                return value.objectID
+                var recordID: String = value.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                var objectID: NSManagedObjectID = self.newObjectIDForEntity(value.entity, referenceObject: recordID)
+                return objectID
             })
         }
         

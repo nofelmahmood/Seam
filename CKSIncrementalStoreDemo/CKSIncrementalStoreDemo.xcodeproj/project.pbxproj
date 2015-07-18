@@ -15,9 +15,9 @@
 		10471C061B389CFA007AA343 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10471C041B389CFA007AA343 /* LaunchScreen.xib */; };
 		10471C121B389CFA007AA343 /* CKSIncrementalStoreDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C111B389CFA007AA343 /* CKSIncrementalStoreDemoTests.swift */; };
 		10471C1D1B389D3B007AA343 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C1C1B389D3B007AA343 /* CoreDataStack.swift */; };
-		10471C201B389D7B007AA343 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C1F1B389D7B007AA343 /* Task.swift */; };
 		10471C221B389DD9007AA343 /* CKSIncrementalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C211B389DD9007AA343 /* CKSIncrementalStore.swift */; };
 		10471C241B389E60007AA343 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10471C231B389E60007AA343 /* CloudKit.framework */; };
+		3E6DBE531B5B11C900E332B3 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6DBE521B5B11C900E332B3 /* Task.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,9 +44,9 @@
 		10471C111B389CFA007AA343 /* CKSIncrementalStoreDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKSIncrementalStoreDemoTests.swift; sourceTree = "<group>"; };
 		10471C1B1B389D0B007AA343 /* CKSIncrementalStoreDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = CKSIncrementalStoreDemo.entitlements; sourceTree = "<group>"; };
 		10471C1C1B389D3B007AA343 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
-		10471C1F1B389D7B007AA343 /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		10471C211B389DD9007AA343 /* CKSIncrementalStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKSIncrementalStore.swift; path = ../../CKSIncrementalStore/CKSIncrementalStore.swift; sourceTree = "<group>"; };
 		10471C231B389E60007AA343 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		3E6DBE521B5B11C900E332B3 /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -133,7 +133,7 @@
 		10471C1E1B389D64007AA343 /* CoreDataModels */ = {
 			isa = PBXGroup;
 			children = (
-				10471C1F1B389D7B007AA343 /* Task.swift */,
+				3E6DBE521B5B11C900E332B3 /* Task.swift */,
 			);
 			name = CoreDataModels;
 			sourceTree = "<group>";
@@ -248,8 +248,8 @@
 				10471BFE1B389CFA007AA343 /* ViewController.swift in Sources */,
 				10471BF91B389CFA007AA343 /* AppDelegate.swift in Sources */,
 				10471C221B389DD9007AA343 /* CKSIncrementalStore.swift in Sources */,
-				10471C201B389D7B007AA343 /* Task.swift in Sources */,
 				10471BFC1B389CFA007AA343 /* CKSIncrementalStoreDemo.xcdatamodeld in Sources */,
+				3E6DBE531B5B11C900E332B3 /* Task.swift in Sources */,
 				10471C1D1B389D3B007AA343 /* CoreDataStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

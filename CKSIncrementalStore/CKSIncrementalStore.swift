@@ -1067,7 +1067,10 @@ class CKSIncrementalStore: NSIncrementalStore {
             {
                 if value is NSManagedObject
                 {
-                    values[key] = (value as! NSManagedObject).objectID
+                    var managedObject: NSManagedObject = value as! NSManagedObject
+                    var recordID: String = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                    var objectID = self.newObjectIDForEntity(managedObject.entity, referenceObject: recordID)
+                    values[key] = objectID
                 }
             }
             var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: values, version: 1)

@@ -19,6 +19,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         application.registerUserNotificationSettings(UIUserNotificationSettings(forTypes: .Alert | .Badge | .Sound, categories: nil))
         application.registerForRemoteNotifications()
+        
+//        var task: Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: CoreDataStack.sharedStack.managedObjectContext!) as! Task
+//        task.name = "My Task"
+//        
+//        var tag: Tag = NSEntityDescription.insertNewObjectForEntityForName("Tag", inManagedObjectContext: CoreDataStack.sharedStack.managedObjectContext!) as! Tag
+//        
+//        tag.tagName = "New Tag"
+//        tag.task = task
+//        
+        var error: NSError?
+        CoreDataStack.sharedStack.managedObjectContext?.save(&error)
+        var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: "Tag")
+        error = nil
+        var results = CoreDataStack.sharedStack.managedObjectContext?.executeFetchRequest(fetchRequest, error: &error)
+        
+        var task: Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: CoreDataStack.sharedStack.managedObjectContext!) as! Task
+        task.name = "NewTask"
+        if error == nil && results?.count > 0
+        {
+            var result: Tag? = results?.first as? Tag
+            result?.task = task
+            print(result!)
+        }
+        
+        var saveError: NSError?
+        CoreDataStack.sharedStack.managedObjectContext?.save(&saveError)
+        
         return true
     }
 

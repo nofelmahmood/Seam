@@ -1040,10 +1040,7 @@ class CKSIncrementalStore: NSIncrementalStore {
                     {
                         return false
                     }
-                    else
-                    {
-                        return true
-                    }
+                    return true
                 }
                 else if property is NSRelationshipDescription
                 {
@@ -1177,7 +1174,7 @@ class CKSIncrementalStore: NSIncrementalStore {
                 var referenceObjects = Array(relationshipValue).map({(object)-> String in
                     
                     var managedObject: NSManagedObject = object as! NSManagedObject
-                    var referenceObject: String = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                    var referenceObject: String = self.referenceObjectForObjectID(managedObject.objectID) as! String
                     return referenceObject
                 })
                 
@@ -1207,7 +1204,8 @@ class CKSIncrementalStore: NSIncrementalStore {
             else
             {
                 var relationshipValue: NSManagedObject = sourceObject.valueForKey(relationship.name) as! NSManagedObject
-                var referenceObject: String = relationshipValue.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                
+                var referenceObject: String = self.referenceObjectForObjectID(relationshipValue.objectID) as! String
 
                 var error: NSError?
                 var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: relationshipValue.entity.name!)
@@ -1253,7 +1251,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             var dictionary = object.dictionaryWithValuesForKeys(keys)
             managedObject.setValuesForKeysWithDictionary(dictionary)
             managedObject.setValue(self.referenceObjectForObjectID((object as! NSManagedObject).objectID), forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
-            managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+            managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
             objectsToBackingObjects[(object as! NSManagedObject)] = managedObject
         }
         

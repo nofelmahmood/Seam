@@ -1,5 +1,5 @@
 //
-//  Task.swift
+//  Tag.swift
 //  CKSIncrementalStoreDemo
 //
 //  Created by Nofel Mahmood on 19/07/2015.
@@ -9,9 +9,9 @@
 import Foundation
 import CoreData
 
-class Task: NSManagedObject {
+class Tag: NSManagedObject {
 
-    @NSManaged var name: String
-    @NSManaged var tags: NSSet
+    @NSManaged var tagName: String
+    @NSManaged var task: Task
 
 }

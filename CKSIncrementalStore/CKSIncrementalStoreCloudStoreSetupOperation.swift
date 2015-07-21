@@ -15,7 +15,7 @@ let CKSIncrementalStoreCloudStoreZoneSubcriptionKey = "CKSIncrementalStoreCloudS
 class CKSIncrementalStoreCloudStoreSetupOperation:NSOperation {
     
     var database:CKDatabase?
-    var setupOperationCompletionBlock:((customZoneCreated:Bool,customZoneSubscriptionCreated:Bool,error:NSError?)->Void)?
+    var setupOperationCompletionBlock:((customZoneCreated: Bool,customZoneSubscriptionCreated: Bool,error: NSError?)->Void)?
     
     
     init(cloudDatabase:CKDatabase?) {

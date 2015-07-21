@@ -136,7 +136,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
         
         
-        self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
+        self.backingPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
         
         var error: NSError? = nil
         self.backingPersistentStore = self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil, error: &error)
@@ -265,32 +265,22 @@ class CKSIncrementalStore: NSIncrementalStore {
         if error == nil && results?.count > 0
         {
             var managedObject:NSManagedObject = results?.first as! NSManagedObject
-            var keys = managedObject.entity.propertiesByName.values.array.filter({(property)->Bool in
+            var entity: NSEntityDescription = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[managedObject.entity.name!] as! NSEntityDescription
+            var keys = entity.propertiesByName.values.array.filter({(property) -> Bool in
                 
-                if property is NSAttributeDescription
-                {
-                    var attributeDescription: NSAttributeDescription = property as! NSAttributeDescription
-                    if attributeDescription.name == CKSIncrementalStoreLocalStoreRecordIDAttributeName || attributeDescription.name == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || attributeDescription.name == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
-                    {
-                        return false
-                    }
-                    return true
-                }
-                else if property is NSRelationshipDescription
+                if property is NSRelationshipDescription
                 {
                     var relationshipDescription: NSRelationshipDescription = property as! NSRelationshipDescription
                     
                     return relationshipDescription.toMany == false
                 }
-                
-                return false
-            }).map({(object)->String in
+                return true
+            }).map({(object) -> String in
                 
                 var propertyDescription: NSPropertyDescription = object as! NSPropertyDescription
                 
                 return propertyDescription.name
             })
-            
             
             var values = managedObject.dictionaryWithValuesForKeys(keys)
             for (key,value) in values
@@ -320,7 +310,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         fetchRequest.predicate = predicate
         var results = self.backingMOC.executeFetchRequest(fetchRequest, error: error)
         
-        if error.memory == nil && results?.count > 0
+        if error == nil && results?.count > 0
         {
             var managedObject: NSManagedObject = results?.first as! NSManagedObject
             var relationshipValues: Set<NSObject> = managedObject.valueForKey(relationship.name) as! Set<NSObject>
@@ -414,6 +404,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         return nil
     }
+    
     private func setRelationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject)
     {
         for relationship in sourceObject.entity.relationshipsByName.values.array as! [NSRelationshipDescription]

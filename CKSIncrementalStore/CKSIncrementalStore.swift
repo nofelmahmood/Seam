@@ -22,16 +22,16 @@ let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStore
 
 let CKSIncrementalStoreSyncConflictPolicyOption = "CKSIncrementalStoreSyncConflictPolicyOption"
 
-enum CKSLocalStoreRecordChangeType:Int16
+enum CKSLocalStoreRecordChangeType: Int16
 {
     case RecordNoChange = 0
     case RecordUpdated  = 1
     case RecordDeleted  = 2
 }
 
-enum CKSStoresSyncConflictPolicy:Int16
+enum CKSStoresSyncConflictPolicy: Int16
 {
-    case UserTellsWhichWins = 0
+    case ClientTellsWhichWins = 0
     case ServerRecordWins = 1
     case ClientRecordWins = 2
     case GreaterModifiedDateWins = 3
@@ -76,8 +76,8 @@ class CKSIncrementalStore: NSIncrementalStore {
                     self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.ClientRecordWins
                 case CKSStoresSyncConflictPolicy.ServerRecordWins.rawValue:
                     self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.ServerRecordWins
-                case CKSStoresSyncConflictPolicy.UserTellsWhichWins.rawValue:
-                    self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.UserTellsWhichWins
+                case CKSStoresSyncConflictPolicy.ClientTellsWhichWins.rawValue:
+                    self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.ClientTellsWhichWins
                 case CKSStoresSyncConflictPolicy.GreaterModifiedDateWins.rawValue:
                     self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
                 default:
@@ -393,11 +393,32 @@ class CKSIncrementalStore: NSIncrementalStore {
         return NSArray()
     }
 
+    func objectIDForBackingObjectForEntity(entityName: String, withReferenceObject referenceObject: String?) -> NSManagedObjectID?
+    {
+        if referenceObject == nil
+        {
+            return nil
+        }
+        
+        var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entityName)
+        fetchRequest.resultType = NSFetchRequestResultType.ManagedObjectIDResultType
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,referenceObject!)
+        var error: NSError?
+        var results = self.backingMOC.executeFetchRequest(fetchRequest, error: &error)
+        
+        if error == nil && results!.count > 0
+        {
+            return results!.last as? NSManagedObjectID
+        }
+        
+        return nil
+    }
     private func setRelationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject)
     {
         for relationship in sourceObject.entity.relationshipsByName.values.array as! [NSRelationshipDescription]
         {
-            if sourceObject.valueForKey(relationship.name) == nil
+            if sourceObject.hasFaultForRelationshipNamed(relationship.name) || sourceObject.valueForKey(relationship.name) == nil
             {
                 continue
             }
@@ -405,59 +426,42 @@ class CKSIncrementalStore: NSIncrementalStore {
             if relationship.toMany == true
             {
                 var relationshipValue: Set<NSObject> = sourceObject.valueForKey(relationship.name) as! Set<NSObject>
-                var referenceObjects = Array(relationshipValue).map({(object)-> String in
-                    
-                    var managedObject: NSManagedObject = object as! NSManagedObject
-                    var referenceObject: String = self.referenceObjectForObjectID(managedObject.objectID) as! String
-                    return referenceObject
-                })
+                var backingRelationshipValue: Set<NSObject> = Set<NSObject>()
                 
-                var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: relationship.entity.name!)
-                fetchRequest.predicate = NSPredicate(format: "%K IN %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,referenceObjects)
-                fetchRequest.resultType = NSFetchRequestResultType.ManagedObjectIDResultType
-                var error: NSError?
-                var result = self.backingMOC.executeFetchRequest(fetchRequest, error: &error)
-                
-                if error == nil && result?.count > 0
+                for relationshipObject in relationshipValue
                 {
-                    var backingRelationshipValue: Set<NSObject> = Set<NSObject>()
-                    
-                    for object in result as! [NSManagedObjectID]
+                    var relationshipManagedObject: NSManagedObject = relationshipObject as! NSManagedObject
+                    if !relationshipManagedObject.objectID.temporaryID
                     {
-                        var error: NSError?
-                        var backingManagedObject = self.backingMOC.existingObjectWithID(object, error: &error)
-                        if backingManagedObject != nil
+                        var referenceObject: String = self.referenceObjectForObjectID(relationshipManagedObject.objectID) as! String
+                        var backingRelationshipObjectID = self.objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject)
+                        if backingRelationshipObjectID != nil
                         {
-                            backingRelationshipValue.insert(backingManagedObject!)
+                            var backingRelationshipObject = backingObject.managedObjectContext?.existingObjectWithID(backingRelationshipObjectID!, error: nil)
+                            if backingRelationshipObject != nil
+                            {
+                                backingRelationshipValue.insert(backingRelationshipObject!)
+                            }
                         }
                     }
-                    
-                    backingObject.setValue(backingRelationshipValue, forKey: relationship.name)
                 }
+                backingObject.setValue(backingRelationshipValue, forKey: relationship.name)
             }
             else
             {
                 var relationshipValue: NSManagedObject = sourceObject.valueForKey(relationship.name) as! NSManagedObject
                 
-                var referenceObject: String = self.referenceObjectForObjectID(relationshipValue.objectID) as! String
-
-                var error: NSError?
-                var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: relationshipValue.entity.name!)
-                fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,referenceObject)
-                fetchRequest.resultType = NSFetchRequestResultType.ManagedObjectIDResultType
-                var result = self.backingMOC.executeFetchRequest(fetchRequest, error: &error)
-                var backingRelationshipObjectID: NSManagedObjectID?
-                
-                if error == nil && result?.count > 0
+                if !relationshipValue.objectID.temporaryID
                 {
-                    backingRelationshipObjectID = result?.last as? NSManagedObjectID
+                    var referenceObject: String = self.referenceObjectForObjectID(relationshipValue.objectID) as! String
+                    var backingRelationshipObjectID = self.objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject)
+                    
                     if backingRelationshipObjectID != nil
                     {
-                        var backingRelationshipObject = self.backingMOC.existingObjectWithID(backingRelationshipObjectID!, error: &error)
-                        
+                        var backingRelationshipObject = backingObject.managedObjectContext?.existingObjectWithID(backingRelationshipObjectID, error: nil)
                         if backingRelationshipObject != nil
                         {
-                            backingObject.setValue(backingRelationshipObject!, forKey: relationship.name)
+                            backingObject.setValue(backingRelationshipObject, forKey: relationship.name)
                         }
                     }
                 }

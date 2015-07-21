@@ -408,7 +408,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 var value = conflictedRecordsWithStringRecordIDs[key]!
                 var clientServerCKRecord = value as (clientRecord:CKRecord?,serverRecord:CKRecord?)
                 
-                if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.UserTellsWhichWins
+                if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientTellsWhichWins
                 {
                     if self.syncConflictResolutionBlock != nil
                     {

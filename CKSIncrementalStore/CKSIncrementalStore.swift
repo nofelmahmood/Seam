@@ -458,7 +458,7 @@ class CKSIncrementalStore: NSIncrementalStore {
                     
                     if backingRelationshipObjectID != nil
                     {
-                        var backingRelationshipObject = backingObject.managedObjectContext?.existingObjectWithID(backingRelationshipObjectID, error: nil)
+                        var backingRelationshipObject = backingObject.managedObjectContext?.existingObjectWithID(backingRelationshipObjectID!, error: nil)
                         if backingRelationshipObject != nil
                         {
                             backingObject.setValue(backingRelationshipObject, forKey: relationship.name)

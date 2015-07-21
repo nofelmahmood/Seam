@@ -39,8 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if error == nil && results?.count > 0
         {
             var result: Tag? = results?.first as? Tag
-            result?.task = task
-            print(result!)
+            
+            var set: Set<NSObject> = Set<NSObject>()
+            set.insert(result!)
+            result?.task.tags = set
         }
         
         var saveError: NSError?

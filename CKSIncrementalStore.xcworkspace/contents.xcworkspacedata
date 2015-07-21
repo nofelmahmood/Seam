@@ -10,6 +10,12 @@
       <FileRef
          location = "group:CKSIncrementalStore/CKSIncrementalStore.swift">
       </FileRef>
+      <FileRef
+         location = "group:CKSIncrementalStore/CKSIncrementalStoreSyncOperation.swift">
+      </FileRef>
+      <FileRef
+         location = "group:CKSIncrementalStore/CKSIncrementalStoreCloudStoreSetupOperation.swift">
+      </FileRef>
    </Group>
    <FileRef
       location = "group:LICENSE">

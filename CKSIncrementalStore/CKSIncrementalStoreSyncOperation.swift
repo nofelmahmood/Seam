@@ -247,7 +247,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     else if property is NSRelationshipDescription
                     {
                         var relationshipDescription:NSRelationshipDescription = property as! NSRelationshipDescription
-                        if managedObject.valueForKey(relationshipDescription.name) != nil
+                        if managedObject.valueForKey(relationshipDescription.name) != nil // TODO: what if the relationship is changed to nil locally?
                         {
                             if relationshipDescription.toMany == false
                             {
@@ -302,7 +302,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             
             if operationError == nil
             {
-                self.saveServerChangeToken(serverChangeToken: serverChangeToken)
+                self.saveServerChangeToken(serverChangeToken: serverChangeToken) // TODO: saving this here means that if the local save fails or is interrupted then this whole change set will be lost. Would be better to do this after saving locally.
             }
         })
         
@@ -524,7 +524,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     return true
                 })
                 var values = ckRecord.dictionaryWithValuesForKeys(keys)
-                managedObject.setValuesForKeysWithDictionary(values)
+                managedObject.setValuesForKeysWithDictionary(values) // TODO: it would be safer to filter the keys first to ensure they exist in managedObject. Over time schema changes could result in fields that only on the server - this was covered in one of the videos from WWDC 2014.
                 managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
                 
                 var data = NSMutableData()
@@ -639,7 +639,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         if self.localStoreMOC!.hasChanges
         {
             var error:NSErrorPointer = nil
-            self.localStoreMOC!.save(error)
+            self.localStoreMOC!.save(error) // TODO: saving one object at a time (or recovering and saving as much as possible) would be more robust (and catching exceptions during all the above). Otherwise a failure will result in the entire change set being lost. Also, it probably should revert/rollback on failure also.
             if error == nil
             {
                 return true

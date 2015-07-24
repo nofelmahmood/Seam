@@ -63,6 +63,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         
         var error:NSError?
         var wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: &error)
+        
         if !wasSuccessful && error != nil
         {
             var insertedOrUpdatedCKRecordsWithRecordIDStrings:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
@@ -181,6 +182,24 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         return (self.insertedOrUpdatedCKRecords(fromManagedObjects: localChanges.insertedOrUpdatedManagedObjects),self.deletedCKRecordIDs(fromManagedObjects: localChanges.deletedManagedObjects))
     }
     
+    func ckRecord(fromEncodedSystemFields encodedFields: NSData) -> CKRecord
+    {
+        var coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)
+        var ckRecord = CKRecord(coder: coder)
+        coder.finishDecoding()
+        return ckRecord
+    }
+    
+    func encodedSystemFields(fromCkRecord ckRecord: CKRecord) -> NSData
+    {
+        var data = NSMutableData()
+        var coder = NSKeyedArchiver(forWritingWithMutableData: data)
+        ckRecord.encodeSystemFieldsWithCoder(coder)
+        coder.finishEncoding()
+        
+        return data
+    }
+    
     func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)->Array<CKRecord>
     {
         return managedObjects.map({(object)->CKRecord in
@@ -192,10 +211,9 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             if managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) != nil
             {
                 var encodedSystemFields = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as! NSData
-                var coder = NSKeyedUnarchiver(forReadingWithData: encodedSystemFields)
-                ckRecord = CKRecord(coder: coder)
-                coder.finishDecoding()
+                ckRecord = self.ckRecord(fromEncodedSystemFields: encodedSystemFields)
             }
+                
             else
             {
                 ckRecord = CKRecord(recordType: (managedObject.entity.name)!, recordID: ckRecordID)
@@ -206,12 +224,10 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 if object is NSAttributeDescription
                 {
                     var attributeDescription:NSAttributeDescription = object as! NSAttributeDescription
-                    switch attributeDescription.name
+                    
+                    if attributeDescription.name == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || attributeDescription.name == CKSIncrementalStoreLocalStoreRecordIDAttributeName || attributeDescription.name == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
                     {
-                    case CKSIncrementalStoreLocalStoreRecordIDAttributeName,CKSIncrementalStoreLocalStoreChangeTypeAttributeName,CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName:
                         return false
-                    default:
-                        break
                     }
                 }
                 return true
@@ -244,36 +260,28 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                             break
                         }
                     }
+                        
                     else if property is NSRelationshipDescription
                     {
                         var relationshipDescription:NSRelationshipDescription = property as! NSRelationshipDescription
+                        
                         if managedObject.valueForKey(relationshipDescription.name) != nil
                         {
                             if relationshipDescription.toMany == false
                             {
                                 var relationshipManagedObject:NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
-                                var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
+                                
+                                var ckRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+
+                                var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: ckRecordZoneID)
                                 
                                 var ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
+                                
                                 ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
                             }
                         }
-                        
-                        //                    else
-                        //                    {
-                        //                        var relationshipManagedObjects:Array<AnyObject> = managedObject.valueForKey(relationshipDescription.name) as! Array<AnyObject>
-                        //                        var ckReferences = relationshipManagedObjects.map({(object)->CKReference in
-                        //
-                        //                            var managedObject:NSManagedObject = object as! NSManagedObject
-                        //                            var ckRecordID = CKRecordID(recordName: managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
-                        //                            var ckReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
-                        //                            return ckReference
-                        //                        })
-                        //                        ckRecord.setObject(ckReferences, forKey: relationshipDescription.name)
-                        //                    }
                     }
                 }
-                
             }
             
             return ckRecord
@@ -473,11 +481,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     for managedObject in results as! [NSManagedObject]
                     {
                         var ckRecord = ckRecordsForType![managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String]
-                        var data = NSMutableData()
-                        var coder = NSKeyedArchiver(forWritingWithMutableData: data)
-                        ckRecord!.encodeSystemFieldsWithCoder(coder)
-                        managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
-                        coder.finishEncoding()
+                       managedObject.setValue(self.encodedSystemFields(fromCkRecord: ckRecord!), forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
                     }
                 }
             }
@@ -523,6 +527,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     }
                     return true
                 })
+                
                 var values = ckRecord.dictionaryWithValuesForKeys(keys)
                 managedObject.setValuesForKeysWithDictionary(values)
                 managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
@@ -540,6 +545,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                         return true
                     }
                     return false
+                    
                 }).map({(obj)->(key:String,recordIDString:String) in
                     
                     var key:String = obj as! String
@@ -574,11 +580,8 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     
                     return true
                 })
-                var data = NSMutableData()
-                var coder = NSKeyedArchiver(forWritingWithMutableData: data)
-                ckRecord.encodeSystemFieldsWithCoder(coder)
-                coder.finishEncoding()
-                managedObject.setValue(data, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
+
+                managedObject.setValue(self.encodedSystemFields(fromCkRecord: ckRecord), forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
                 var changedCKReferencesRecordIDsWithKeys = ckRecord.allKeys().filter({(object)->Bool in
                     
                     var key:String = object as! String
@@ -661,6 +664,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             var ckRecordID:CKRecordID = object as! CKRecordID
             return ckRecordID.recordName
         })
+        
         var entityNames = self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entitiesByName.keys.array
         
         for name in entityNames!

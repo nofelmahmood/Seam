@@ -42,6 +42,7 @@ class CKSIncrementalStoreCloudStoreSetupOperation:NSOperation {
             if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil)
             {
                 NSUserDefaults.standardUserDefaults().setBool(true, forKey: CKSIncrementalStoreCloudStoreCustomZoneKey)
+                
                 var subcription:CKSubscription = CKSubscription(zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName), subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: nil)
                 
                 var subcriptionNotificationInfo = CKNotificationInfo()

@@ -488,11 +488,11 @@ class CKSIncrementalStore: NSIncrementalStore {
             managedObject.setValuesForKeysWithDictionary(dictionary)
             managedObject.setValue(self.referenceObjectForObjectID((object as! NSManagedObject).objectID), forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
             managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-            self.setRelationshipValuesForBackingObject(managedObject, sourceObject: (object as! NSManagedObject))
             self.backingMOC.save(nil)
             mainContext.willChangeValueForKey("objectID")
             mainContext.obtainPermanentIDsForObjects([(object as! NSManagedObject)], error: nil)
             mainContext.didChangeValueForKey("objectID")
+            self.setRelationshipValuesForBackingObject(managedObject, sourceObject: (object as! NSManagedObject))
         }
     }
     

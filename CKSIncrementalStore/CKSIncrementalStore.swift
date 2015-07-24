@@ -382,7 +382,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     // MARK : SaveChanges Request
     private func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
-        self.insertObjectsInBackingStore(context.insertedObjects)
+        self.insertObjectsInBackingStore(context.insertedObjects, mainContext: context)
         self.setObjectsInBackingStore(Array(context.updatedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordUpdated)
         self.setObjectsInBackingStore(Array(context.deletedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordDeleted)
         
@@ -477,10 +477,8 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
     }
     
-    func insertObjectsInBackingStore(objects:Set<NSObject>)
+    func insertObjectsInBackingStore(objects:Set<NSObject>, mainContext: NSManagedObjectContext)
     {
-        var objectsToBackingObjects: Dictionary<NSManagedObject,NSManagedObject> = Dictionary<NSManagedObject,NSManagedObject>()
-        
         for object in objects
         {
             var managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(((object as! NSManagedObject).entity.name)!, inManagedObjectContext: self.backingMOC) as! NSManagedObject
@@ -490,10 +488,10 @@ class CKSIncrementalStore: NSIncrementalStore {
             managedObject.setValuesForKeysWithDictionary(dictionary)
             managedObject.setValue(self.referenceObjectForObjectID((object as! NSManagedObject).objectID), forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
             managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-            objectsToBackingObjects[(object as! NSManagedObject)] = managedObject
+            self.setRelationshipValuesForBackingObject(managedObject, sourceObject: (object as! NSManagedObject))
+            self.backingMOC.save(nil)
+            mainContext.obtainPermanentIDsForObjects([(object as! NSManagedObject)], error: nil)
         }
-        
-        self.setRelationshipValuesForBackingObjects(objectsToBackingObjects)
     }
     
     func setObjectsInBackingStore(objects:Array<AnyObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)

@@ -506,7 +506,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         {
             var sourceObject: NSManagedObject = object as! NSManagedObject
             var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: sourceObject.entity.name!)
-            var recordID: String = sourceObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+            var recordID: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([predicateObjectRecordIDKey:recordID])
             fetchRequest.fetchLimit = 1
             var requestError: NSError?
@@ -517,7 +517,7 @@ class CKSIncrementalStore: NSIncrementalStore {
                 var keys = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys.array
                 var sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
                 backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
-                backingMOC.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+                backingObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
                 self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
                 self.backingMOC.save(nil)
             }

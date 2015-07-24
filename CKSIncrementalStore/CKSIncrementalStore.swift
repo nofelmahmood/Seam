@@ -383,8 +383,8 @@ class CKSIncrementalStore: NSIncrementalStore {
     private func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
         self.insertObjectsInBackingStore(context.insertedObjects, mainContext: context)
-        self.setObjectsInBackingStore(Array(context.updatedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordUpdated)
-        self.setObjectsInBackingStore(Array(context.deletedObjects), toChangeType: CKSLocalStoreRecordChangeType.RecordDeleted)
+        self.setObjectsInBackingStore(context.updatedObjects, toChangeType: CKSLocalStoreRecordChangeType.RecordUpdated)
+        self.setObjectsInBackingStore(context.deletedObjects, toChangeType: CKSLocalStoreRecordChangeType.RecordDeleted)
         
         var error:NSErrorPointer = nil
         self.backingMOC.save(error)

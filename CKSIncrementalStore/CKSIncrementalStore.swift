@@ -490,57 +490,36 @@ class CKSIncrementalStore: NSIncrementalStore {
             managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
             self.setRelationshipValuesForBackingObject(managedObject, sourceObject: (object as! NSManagedObject))
             self.backingMOC.save(nil)
+            mainContext.willChangeValueForKey("objectID")
             mainContext.obtainPermanentIDsForObjects([(object as! NSManagedObject)], error: nil)
+            mainContext.didChangeValueForKey("objectID")
         }
     }
     
-    func setObjectsInBackingStore(objects:Array<AnyObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)
+    func setObjectsInBackingStore(objects:Set<NSObject>,toChangeType changeType:CKSLocalStoreRecordChangeType)
     {
         var objectsByEntityNames:Dictionary<String,Array<AnyObject>> = Dictionary<String,Array<AnyObject>>()
+        let predicateObjectRecordIDKey = "objectRecordID"
+        var predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", CKSIncrementalStoreLocalStoreRecordIDAttributeName)
         
         for object in objects
         {
-            var managedObject = object as! NSManagedObject
-            if objectsByEntityNames[(managedObject.entity.name)!] == nil
+            var sourceObject: NSManagedObject = object as! NSManagedObject
+            var fetchRequest: NSFetchRequest = NSFetchRequest(entityName: sourceObject.entity.name!)
+            var recordID: String = sourceObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([predicateObjectRecordIDKey:recordID])
+            fetchRequest.fetchLimit = 1
+            var requestError: NSError?
+            var results = self.backingMOC.executeFetchRequest(fetchRequest, error: &requestError)
+            if requestError == nil && results!.count > 0
             {
-                objectsByEntityNames[(managedObject.entity.name)!] = [managedObject]
-            }
-            else
-            {
-                objectsByEntityNames[(managedObject.entity.name)!]?.append(managedObject)
-            }
-        }
-        
-        var objectEntityNames = objectsByEntityNames.keys.array
-        for key in objectEntityNames
-        {
-            var objectsInEntity:Array<AnyObject> = objectsByEntityNames[key]!
-            var fetchRequestForBackingObjects = NSFetchRequest(entityName: key)
-            var cksRecordIDs = Array(objectsInEntity).map({(object)->String in
-                
-                var managedObject:NSManagedObject = object as! NSManagedObject
-                return self.referenceObjectForObjectID(managedObject.objectID) as! String
-            })
-            fetchRequestForBackingObjects.predicate = NSPredicate(format: "%K IN %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,cksRecordIDs)
-            var error:NSErrorPointer = nil
-            var results = self.backingMOC.executeFetchRequest(fetchRequestForBackingObjects, error: error)
-            
-            if error == nil && results?.count > 0
-            {
-                var objectsToBackingObjects: Dictionary<NSManagedObject,NSManagedObject> = Dictionary<NSManagedObject,NSManagedObject>()
-                
-                for var i=0; i<results?.count; i++
-                {
-                    var managedObject:NSManagedObject = results![i] as! NSManagedObject
-                    var updatedObject:NSManagedObject = objectsInEntity[i as Int] as! NSManagedObject
-                    var keys = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[(managedObject.entity.name)!]?.attributesByName.keys.array
-                    var dictionary = updatedObject.dictionaryWithValuesForKeys(keys!)
-                    managedObject.setValuesForKeysWithDictionary(dictionary)
-                    managedObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-                    objectsToBackingObjects[updatedObject] = managedObject
-                }
-                
-                self.setRelationshipValuesForBackingObjects(objectsToBackingObjects)
+                var backingObject: NSManagedObject = results!.last as! NSManagedObject
+                var keys = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys.array
+                var sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
+                backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
+                backingMOC.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+                self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
+                self.backingMOC.save(nil)
             }
         }
     }

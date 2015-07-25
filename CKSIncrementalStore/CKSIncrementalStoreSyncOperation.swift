@@ -276,21 +276,16 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             
             for relationshipDescription in entityRelationships as! [NSRelationshipDescription]
             {
-                if managedObject.valueForKey(relationshipDescription.name) != nil
+                if managedObject.valueForKey(relationshipDescription.name) == nil
                 {
-                    if relationshipDescription.toMany == false
-                    {
-                        var relationshipManagedObject:NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
-                        
-                        var ckRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
-                        
-                        var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: ckRecordZoneID)
-                        
-                        var ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
-                        
-                        ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
-                    }
+                    continue
                 }
+                
+                var relationshipManagedObject: NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
+                var ckRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+                var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: ckRecordZoneID)
+                var ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
+                ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
             }
             
             return ckRecord

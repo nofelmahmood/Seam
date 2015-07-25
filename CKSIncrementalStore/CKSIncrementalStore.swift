@@ -256,44 +256,32 @@ class CKSIncrementalStore: NSIncrementalStore {
     override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> NSIncrementalStoreNode? {
         
         var recordID:String = self.referenceObjectForObjectID(objectID) as! String
+        var propertiesToFetch = objectID.entity.propertiesByName.values.array.filter({(object) -> Bool in
+            
+            if object is NSRelationshipDescription
+            {
+                var relationshipDescription: NSRelationshipDescription = object as! NSRelationshipDescription
+                return relationshipDescription.toMany == false
+            }
+            return true
+        }).map({(object) -> String in
+            
+            var propertyDescription: NSPropertyDescription = object as! NSPropertyDescription
+            return propertyDescription.name
+        })
+        
         var fetchRequest = NSFetchRequest(entityName: (objectID.entity.name)!)
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,recordID)
+        fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
+        fetchRequest.propertiesToFetch = propertiesToFetch
         var error:NSErrorPointer = nil
         var results = self.backingMOC.executeFetchRequest(fetchRequest, error: error)
         
         if error == nil && results?.count > 0
         {
-            var managedObject:NSManagedObject = results?.first as! NSManagedObject
-            var keys = managedObject.entity.propertiesByName.values.array.filter({(property)->Bool in
-                
-                if property is NSAttributeDescription
-                {
-                    var attributeDescription: NSAttributeDescription = property as! NSAttributeDescription
-                    if attributeDescription.name == CKSIncrementalStoreLocalStoreRecordIDAttributeName || attributeDescription.name == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || attributeDescription.name == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
-                    {
-                        return false
-                    }
-                    return true
-                }
-                else if property is NSRelationshipDescription
-                {
-                    var relationshipDescription: NSRelationshipDescription = property as! NSRelationshipDescription
-                    
-                    return relationshipDescription.toMany == false
-                }
-                
-                return false
-            }).map({(object)->String in
-                
-                var propertyDescription: NSPropertyDescription = object as! NSPropertyDescription
-                
-                return propertyDescription.name
-            })
-            
-            
-            var values = managedObject.dictionaryWithValuesForKeys(keys)
-            for (key,value) in values
+            var backingObjectValues = results?.first as! Dictionary<String,NSObject>
+            for (key,value) in backingObjectValues
             {
                 if value is NSManagedObject
                 {
@@ -302,10 +290,11 @@ class CKSIncrementalStore: NSIncrementalStore {
                     var entity: NSEntityDescription = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[managedObject.entity.name!] as! NSEntityDescription
                     
                     var objectID = self.newObjectIDForEntity(entity, referenceObject: recordID)
-                    values[key] = objectID
+                    backingObjectValues[key] = objectID
                 }
             }
-            var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: values, version: 1)
+            
+            var incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: backingObjectValues, version: 1)
             return incrementalStoreNode
         }
         
@@ -490,7 +479,6 @@ class CKSIncrementalStore: NSIncrementalStore {
             mainContext.obtainPermanentIDsForObjects([(object as! NSManagedObject)], error: nil)
             mainContext.didChangeValueForKey("objectID")
             self.backingMOC.save(nil)
-
         }
     }
     

@@ -233,53 +233,62 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 return true
             })
             
-            for property in entityProperties
-            {
-                var propertyDescription: NSPropertyDescription = property as! NSPropertyDescription
+            var entityAttributes = managedObject.entity.attributesByName.values.array.filter({(object) -> Bool in
                 
-                if managedObject.valueForKey(propertyDescription.name) != nil
+                var attribute: NSAttributeDescription = object as! NSAttributeDescription
+                if attribute.name == CKSIncrementalStoreLocalStoreRecordIDAttributeName || attribute.name == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || attribute.name == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
                 {
-                    if property is NSAttributeDescription
+                    return false
+                }
+                
+                return true
+            })
+            
+            var entityRelationships = managedObject.entity.relationshipsByName.values.array.filter({(object) -> Bool in
+                
+                var relationship: NSRelationshipDescription = object as! NSRelationshipDescription
+                return relationship.toMany == false
+            })
+            
+            for attributeDescription in entityAttributes as! [NSAttributeDescription]
+            {
+                if managedObject.valueForKey(attributeDescription.name) != nil
+                {
+                    switch attributeDescription.attributeType
                     {
-                        var attributeDescription:NSAttributeDescription = property as! NSAttributeDescription
-                        switch attributeDescription.attributeType
-                        {
-                        case .StringAttributeType:
-                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! String, forKey: attributeDescription.name)
-                            
-                        case .DateAttributeType:
-                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSDate, forKey: attributeDescription.name)
-                            
-                        case .BinaryDataAttributeType:
-                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
-                            
-                        case .BooleanAttributeType, .DecimalAttributeType, .DoubleAttributeType, .FloatAttributeType, .Integer16AttributeType, .Integer32AttributeType, .Integer32AttributeType, .Integer64AttributeType:
-                            ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-                            
-                        default:
-                            break
-                        }
+                    case .StringAttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! String, forKey: attributeDescription.name)
+                        
+                    case .DateAttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSDate, forKey: attributeDescription.name)
+                        
+                    case .BinaryDataAttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
+                        
+                    case .BooleanAttributeType, .DecimalAttributeType, .DoubleAttributeType, .FloatAttributeType, .Integer16AttributeType, .Integer32AttributeType, .Integer32AttributeType, .Integer64AttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
+                        
+                    default:
+                        break
                     }
-                        
-                    else if property is NSRelationshipDescription
+                }
+            }
+            
+            for relationshipDescription in entityRelationships as! [NSRelationshipDescription]
+            {
+                if managedObject.valueForKey(relationshipDescription.name) != nil
+                {
+                    if relationshipDescription.toMany == false
                     {
-                        var relationshipDescription:NSRelationshipDescription = property as! NSRelationshipDescription
+                        var relationshipManagedObject:NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
                         
-                        if managedObject.valueForKey(relationshipDescription.name) != nil
-                        {
-                            if relationshipDescription.toMany == false
-                            {
-                                var relationshipManagedObject:NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
-                                
-                                var ckRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
-
-                                var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: ckRecordZoneID)
-                                
-                                var ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
-                                
-                                ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
-                            }
-                        }
+                        var ckRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+                        
+                        var relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: ckRecordZoneID)
+                        
+                        var ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
+                        
+                        ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
                     }
                 }
             }

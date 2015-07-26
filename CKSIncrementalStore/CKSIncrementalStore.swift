@@ -1,6 +1,6 @@
 //
 //  CloudKitIncrementalStore.swift
-//  
+//
 //
 //  Created by Nofel Mahmood on 26/03/2015.
 //
@@ -53,7 +53,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         moc.persistentStoreCoordinator=self.backingPersistentStoreCoordinator
         moc.retainsRegisteredObjects=true
         return moc
-    }()
+        }()
     var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
     override class func initialize()
@@ -83,10 +83,10 @@ class CKSIncrementalStore: NSIncrementalStore {
                 default:
                     break
                 }
-
+                
             }
         }
-
+        
         super.init(persistentStoreCoordinator: root, configurationName: name, URL: url, options: options)
         
     }
@@ -149,11 +149,11 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         self.operationQueue = NSOperationQueue()
         self.operationQueue?.maxConcurrentOperationCount = 1
-
+        
         self.triggerSync()
         
         return true
-
+        
     }
     
     internal func handlePush(#userInfo:[NSObject : AnyObject])
@@ -206,7 +206,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             })
             self.operationQueue?.addOperation(self.syncOperation!)
         })
-
+        
         
         if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey) == nil || NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreZoneSubcriptionKey) == nil
         {
@@ -225,7 +225,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             syncOperationBlock()
         }
         
-
+        
         NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidStartSyncOperationNotification, object: self)
         
         
@@ -253,7 +253,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         return []
     }
-
+    
     override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext, error: NSErrorPointer) -> NSIncrementalStoreNode? {
         
         var recordID:String = self.referenceObjectForObjectID(objectID) as! String
@@ -338,7 +338,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     }
     
     // MARK : Fetch Request
-    func backingFetchRequest(fromFetchRequest fetchRequest: NSFetchRequest, backingRequestPredicate: NSPredicate, backingRequestResultType: NSFetchRequestResultType, propertiesToFetch: [AnyObject]?, backingRequestFetchLimit: Int) -> NSFetchRequest
+    func backingFetchRequest(fromFetchRequest fetchRequest: NSFetchRequest, backingRequestPredicate: NSPredicate, backingRequestResultType: NSFetchRequestResultType, propertiesToFetch: [AnyObject]?, backingRequestFetchLimit: Int?) -> NSFetchRequest
     {
         var backingFetchRequestEntity: NSEntityDescription = self.backingMOC.persistentStoreCoordinator!.managedObjectModel.entitiesByName[fetchRequest.entityName!] as! NSEntityDescription
         var backingFetchRequest: NSFetchRequest = NSFetchRequest(entityName: backingFetchRequestEntity.name!)
@@ -348,8 +348,12 @@ class CKSIncrementalStore: NSIncrementalStore {
         backingFetchRequest.sortDescriptors = fetchRequest.sortDescriptors
         backingFetchRequest.propertiesToGroupBy = fetchRequest.propertiesToGroupBy
         backingFetchRequest.resultType = backingRequestResultType
-        backingFetchRequest.fetchLimit = backingRequestFetchLimit
         backingFetchRequest.propertiesToFetch = propertiesToFetch
+        
+        if backingRequestFetchLimit != nil
+        {
+            backingFetchRequest.fetchLimit = backingRequestFetchLimit!
+        }
         
         return backingFetchRequest
     }
@@ -370,12 +374,12 @@ class CKSIncrementalStore: NSIncrementalStore {
     {
         var backingRequestPredicate: NSPredicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue))
         
-        var backingFetchRequest = self.backingFetchRequest(fromFetchRequest: fetchRequest, backingRequestPredicate: backingRequestPredicate, backingRequestResultType: NSFetchRequestResultType.DictionaryResultType, propertiesToFetch: [CKSIncrementalStoreLocalStoreRecordIDAttributeName], backingRequestFetchLimit: 0)
+        var backingFetchRequest = self.backingFetchRequest(fromFetchRequest: fetchRequest, backingRequestPredicate: backingRequestPredicate, backingRequestResultType: NSFetchRequestResultType.DictionaryResultType, propertiesToFetch: [CKSIncrementalStoreLocalStoreRecordIDAttributeName], backingRequestFetchLimit: nil)
         
-        var error: NSError?
-        var resultsFromLocalStore = self.backingMOC.executeFetchRequest(backingFetchRequest, error: &error)
+        var backingFetchError: NSError?
+        var resultsFromLocalStore = self.backingMOC.executeFetchRequest(backingFetchRequest, error: &backingFetchError)
         
-        if error == nil && resultsFromLocalStore!.count > 0
+        if backingFetchError == nil && resultsFromLocalStore!.count > 0
         {
             resultsFromLocalStore = resultsFromLocalStore?.map({(result)->NSManagedObject in
                 
@@ -391,7 +395,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
         return []
     }
-
+    
     // MARK : SaveChanges Request
     private func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext,error:NSErrorPointer)->NSArray
     {
@@ -405,7 +409,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         return NSArray()
     }
-
+    
     func objectIDForBackingObjectForEntity(entityName: String, withReferenceObject referenceObject: String?) -> NSManagedObjectID?
     {
         if referenceObject == nil
@@ -499,11 +503,12 @@ class CKSIncrementalStore: NSIncrementalStore {
             var referenceObject: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
             managedObject.setValue(referenceObject, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
             managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-            self.setRelationshipValuesForBackingObject(managedObject, sourceObject: (object as! NSManagedObject))
+            self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
             mainContext.willChangeValueForKey("objectID")
             mainContext.obtainPermanentIDsForObjects([(object as! NSManagedObject)], error: nil)
             mainContext.didChangeValueForKey("objectID")
-            self.backingMOC.save(nil)
+            var saveError: NSError?
+            self.backingMOC.save(&saveError)
         }
     }
     

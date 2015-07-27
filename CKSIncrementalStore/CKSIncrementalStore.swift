@@ -29,14 +29,6 @@ enum CKSLocalStoreRecordChangeType: Int16
     case RecordDeleted  = 2
 }
 
-enum CKSStoresSyncConflictPolicy: Int16
-{
-    case ClientTellsWhichWins = 0
-    case ServerRecordWins = 1
-    case ClientRecordWins = 2
-    case GreaterModifiedDateWins = 3
-    case KeepBoth = 4
-}
 
 class CKSIncrementalStore: NSIncrementalStore {
     

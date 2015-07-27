@@ -80,6 +80,8 @@ class CKSIncrementalStore: NSIncrementalStore {
                     self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.ClientTellsWhichWins
                 case CKSStoresSyncConflictPolicy.GreaterModifiedDateWins.rawValue:
                     self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
+                case CKSStoresSyncConflictPolicy.KeepBoth.rawValue:
+                    self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.KeepBoth
                 default:
                     break
                 }

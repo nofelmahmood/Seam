@@ -1,6 +1,6 @@
 //
 //  CKSIncrementalStoreCloudStoreSetupOperation.swift
-//  
+//
 //
 //  Created by Nofel Mahmood on 20/07/2015.
 //
@@ -15,7 +15,7 @@ let CKSIncrementalStoreCloudStoreZoneSubcriptionKey = "CKSIncrementalStoreCloudS
 class CKSIncrementalStoreCloudStoreSetupOperation:NSOperation {
     
     var database:CKDatabase?
-    var setupOperationCompletionBlock:((customZoneCreated:Bool,customZoneSubscriptionCreated:Bool,error:NSError?)->Void)?
+    var setupOperationCompletionBlock:((customZoneCreated:Bool,customZoneSubscriptionCreated:Bool)->Void)?
     
     
     init(cloudDatabase:CKDatabase?) {
@@ -26,43 +26,41 @@ class CKSIncrementalStoreCloudStoreSetupOperation:NSOperation {
     
     override func main() {
         
-        var error:NSError?
-        
-        var operationQueue = NSOperationQueue()
-        var zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)
-        
-        var modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
+        let operationQueue = NSOperationQueue()
+        let zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)
+        var error: NSError?
+        let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
         modifyRecordZonesOperation.database = self.database
-        modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones,deletedRecordZonesIDs , operationError) -> Void in
+        modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones, deletedRecordZonesIDs, operationError) -> Void in
             
             error = operationError
-            var customZoneWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey)
-            var customZoneSubscriptionWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreZoneSubcriptionKey)
+            let customZoneWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey)
+            let customZoneSubscriptionWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreZoneSubcriptionKey)
             
             if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil)
             {
                 NSUserDefaults.standardUserDefaults().setBool(true, forKey: CKSIncrementalStoreCloudStoreCustomZoneKey)
+                let recordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, ownerName: CKOwnerDefaultName)
+                let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: CKSubscriptionOptions(rawValue: 0))
                 
-                var subcription:CKSubscription = CKSubscription(zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName), subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: nil)
+                let subscriptionNotificationInfo = CKNotificationInfo()
+                subscriptionNotificationInfo.alertBody = ""
+                subscriptionNotificationInfo.shouldSendContentAvailable = true
+                subscription.notificationInfo = subscriptionNotificationInfo
+                subscriptionNotificationInfo.shouldBadge = false
                 
-                var subcriptionNotificationInfo = CKNotificationInfo()
-                subcriptionNotificationInfo.alertBody = ""
-                subcriptionNotificationInfo.shouldSendContentAvailable = true
-                subcription.notificationInfo = subcriptionNotificationInfo
-                subcriptionNotificationInfo.shouldBadge = false
-                
-                var subcriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subcription], subscriptionIDsToDelete: nil)
-                subcriptionsOperation.database=self.database
-                subcriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
+                let subscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
+                subscriptionsOperation.database=self.database
+                subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
                     
-                    error = operationError
                     if operationError == nil
                     {
                         NSUserDefaults.standardUserDefaults().setBool(true, forKey: CKSIncrementalStoreCloudStoreZoneSubcriptionKey)
                     }
+                    error = operationError
                 })
                 
-                operationQueue.addOperation(subcriptionsOperation)
+                operationQueue.addOperation(subscriptionsOperation)
             }
         })
         
@@ -73,20 +71,19 @@ class CKSIncrementalStoreCloudStoreSetupOperation:NSOperation {
         {
             if error == nil
             {
-                self.setupOperationCompletionBlock!(customZoneCreated: true,customZoneSubscriptionCreated: true,error: error)
+                self.setupOperationCompletionBlock!(customZoneCreated: true, customZoneSubscriptionCreated: true)
             }
             else
             {
                 if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey) == nil
                 {
-                    self.setupOperationCompletionBlock!(customZoneCreated: false, customZoneSubscriptionCreated: false, error: error)
+                    self.setupOperationCompletionBlock!(customZoneCreated: false, customZoneSubscriptionCreated: false)
                 }
                 else
                 {
-                    self.setupOperationCompletionBlock!(customZoneCreated: true, customZoneSubscriptionCreated: false, error: error)
+                    self.setupOperationCompletionBlock!(customZoneCreated: true, customZoneSubscriptionCreated: false)
                 }
             }
         }
     }
 }
-

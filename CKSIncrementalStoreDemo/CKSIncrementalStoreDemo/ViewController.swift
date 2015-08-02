@@ -21,9 +21,15 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
         self.newTaskTextField.delegate = self
         NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncFinished:", name: CKSIncrementalStoreDidFinishSyncOperationNotification, object: CoreDataStack.sharedStack.cksIncrementalStore)
         
-        
-        self.loadTasks()
-        self.tasksTableView.reloadData()
+        do
+        {
+            try self.loadTasks()
+            self.tasksTableView.reloadData()
+        }
+        catch
+        {
+            print("Error")
+        }
         
         // Do any additional setup after loading the view.
     }
@@ -33,36 +39,36 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
         textField.resignFirstResponder()
         return true
     }
-    func textFieldDidEndEditing(textField: UITextField) {
+    func textFieldDidEndEditing(textField: UITextField) throws {
         
-        var newTask:Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: CoreDataStack.sharedStack.managedObjectContext!) as! Task
-        newTask.name = textField.text
-        CoreDataStack.sharedStack.managedObjectContext?.save(nil)
+        let newTask:Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: CoreDataStack.sharedStack.managedObjectContext) as! Task
+        newTask.name = textField.text!
+        try CoreDataStack.sharedStack.managedObjectContext.save()
         
         textField.resignFirstResponder()
-        self.loadTasks()
+        try self.loadTasks()
         self.tasksTableView.reloadData()
     }
-    func loadTasks()
+    func loadTasks() throws
     {
-        CoreDataStack.sharedStack.managedObjectContext?.reset()
-        var fetchRequest = NSFetchRequest(entityName: "Task")
-        var error:NSErrorPointer = nil
-        var results = CoreDataStack.sharedStack.managedObjectContext?.executeFetchRequest(fetchRequest, error: error)
+        CoreDataStack.sharedStack.managedObjectContext.reset()
+        let fetchRequest = NSFetchRequest(entityName: "Task")
+        var results = try CoreDataStack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest)
         
-        if error == nil && results?.count > 0
+        if results.count > 0
         {
             self.tasks = Array<Task>()
             for task in results as! [Task]
             {
-                CoreDataStack.sharedStack.managedObjectContext?.refreshObject(task, mergeChanges: false)
+                CoreDataStack.sharedStack.managedObjectContext.refreshObject(task, mergeChanges: false)
                 self.tasks.append(task)
             }
         }
     }
-    func syncFinished(notification:NSNotification)
+    
+    func syncFinished(notification:NSNotification) throws
     {
-        self.loadTasks()
+        try self.loadTasks()
         self.tasksTableView.reloadData()
     }
     
@@ -72,35 +78,43 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
         // Dispose of any resources that can be recreated.
     }
     
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) throws {
         
         if editingStyle == UITableViewCellEditingStyle.Delete
         {
-            CoreDataStack.sharedStack.managedObjectContext?.deleteObject(self.tasks[indexPath.row])
-            CoreDataStack.sharedStack.managedObjectContext?.save(nil)
-            self.loadTasks()
+            CoreDataStack.sharedStack.managedObjectContext.deleteObject(self.tasks[indexPath.row])
+            try CoreDataStack.sharedStack.managedObjectContext.save()
+            try self.loadTasks()
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Left)
         }
     }
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) throws {
         
-        var alertViewController = UIAlertController(title: "New Task Name", message: "Enter new task name", preferredStyle: UIAlertControllerStyle.Alert)
+        let alertViewController = UIAlertController(title: "New Task Name", message: "Enter new task name", preferredStyle: UIAlertControllerStyle.Alert)
         alertViewController.addTextFieldWithConfigurationHandler { (textField) -> Void in
             
             textField.placeholder = "Task Name"
             textField.keyboardType = UIKeyboardType.Default
         }
-        var doneAction = UIAlertAction(title: "Done", style: UIAlertActionStyle.Default) { (alertAction) -> Void in
+        let doneAction = UIAlertAction(title: "Done", style: UIAlertActionStyle.Default) { (alertAction) -> Void in
             
-            println("Done did press")
-            var taskName = (alertViewController.textFields?.first as! UITextField).text
-            NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
+            let textField = alertViewController.textFields?.first
+            let taskName = textField!.text
+            NSOperationQueue.mainQueue().addOperationWithBlock({ ()  -> Void in
                 
-                var newTask:Task = self.tasks[indexPath.row]
-                newTask.name = taskName
-                var error:NSErrorPointer = nil
-                CoreDataStack.sharedStack.managedObjectContext?.save(error)
-                self.tasksTableView.reloadData()
+                do
+                {
+                    let newTask:Task = self.tasks[indexPath.row]
+                    newTask.name = taskName!
+                    try CoreDataStack.sharedStack.managedObjectContext.save()
+                    self.tasksTableView.reloadData()
+                }
+                catch
+                {
+                    
+                }
+                
             })
         }
         alertViewController.addAction(doneAction)
@@ -113,8 +127,7 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        var cell: UITableViewCell = tableView.dequeueReusableCellWithIdentifier("SimpleTableIdentifier") as! UITableViewCell
-        
+        let cell: UITableViewCell = tableView.dequeueReusableCellWithIdentifier("SimpleTableIdentifier")!
         cell.textLabel?.text = (self.tasks[indexPath.row] as Task).name
         return cell
     }

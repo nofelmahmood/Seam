@@ -18,6 +18,8 @@
 		10471C221B389DD9007AA343 /* CKSIncrementalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C211B389DD9007AA343 /* CKSIncrementalStore.swift */; };
 		10471C241B389E60007AA343 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10471C231B389E60007AA343 /* CloudKit.framework */; };
 		3EC0C4ED1B6E5E1E00EBE856 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EC0C4EC1B6E5E1E00EBE856 /* CoreData.framework */; };
+		3EC0C4EF1B6E5F3200EBE856 /* CKSIncrementalStoreSyncOperationTokenHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC0C4EE1B6E5F3200EBE856 /* CKSIncrementalStoreSyncOperationTokenHandler.swift */; };
+		3EC0C4F11B6E5F9800EBE856 /* CKRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC0C4F01B6E5F9800EBE856 /* CKRecord.swift */; };
 		3ED323FD1B5DFA9700AD0E6D /* CKSIncrementalStoreSyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED323FC1B5DFA9700AD0E6D /* CKSIncrementalStoreSyncOperation.swift */; };
 		3ED323FF1B5DFB2100AD0E6D /* CKSIncrementalStoreCloudStoreSetupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3ED323FE1B5DFB2100AD0E6D /* CKSIncrementalStoreCloudStoreSetupOperation.swift */; };
 		3EF9A5FF1B5C485C007FCBFD /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF9A5FE1B5C485C007FCBFD /* Task.swift */; };
@@ -51,6 +53,8 @@
 		10471C211B389DD9007AA343 /* CKSIncrementalStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKSIncrementalStore.swift; path = ../../CKSIncrementalStore/CKSIncrementalStore.swift; sourceTree = "<group>"; };
 		10471C231B389E60007AA343 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3EC0C4EC1B6E5E1E00EBE856 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		3EC0C4EE1B6E5F3200EBE856 /* CKSIncrementalStoreSyncOperationTokenHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKSIncrementalStoreSyncOperationTokenHandler.swift; path = ../../CKSIncrementalStore/CKSIncrementalStoreSyncOperationTokenHandler.swift; sourceTree = "<group>"; };
+		3EC0C4F01B6E5F9800EBE856 /* CKRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKRecord.swift; path = ../../CKSIncrementalStore/CKRecord.swift; sourceTree = "<group>"; };
 		3ED323FC1B5DFA9700AD0E6D /* CKSIncrementalStoreSyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKSIncrementalStoreSyncOperation.swift; path = ../../CKSIncrementalStore/CKSIncrementalStoreSyncOperation.swift; sourceTree = "<group>"; };
 		3ED323FE1B5DFB2100AD0E6D /* CKSIncrementalStoreCloudStoreSetupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKSIncrementalStoreCloudStoreSetupOperation.swift; path = ../../CKSIncrementalStore/CKSIncrementalStoreCloudStoreSetupOperation.swift; sourceTree = "<group>"; };
 		3EF9A5FE1B5C485C007FCBFD /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
@@ -100,6 +104,8 @@
 		10471BF51B389CF8007AA343 /* CKSIncrementalStoreDemo */ = {
 			isa = PBXGroup;
 			children = (
+				3EC0C4F01B6E5F9800EBE856 /* CKRecord.swift */,
+				3EC0C4EE1B6E5F3200EBE856 /* CKSIncrementalStoreSyncOperationTokenHandler.swift */,
 				3ED323FE1B5DFB2100AD0E6D /* CKSIncrementalStoreCloudStoreSetupOperation.swift */,
 				3ED323FC1B5DFA9700AD0E6D /* CKSIncrementalStoreSyncOperation.swift */,
 				10471C211B389DD9007AA343 /* CKSIncrementalStore.swift */,
@@ -262,7 +268,9 @@
 				10471BF91B389CFA007AA343 /* AppDelegate.swift in Sources */,
 				10471C221B389DD9007AA343 /* CKSIncrementalStore.swift in Sources */,
 				3ED323FF1B5DFB2100AD0E6D /* CKSIncrementalStoreCloudStoreSetupOperation.swift in Sources */,
+				3EC0C4EF1B6E5F3200EBE856 /* CKSIncrementalStoreSyncOperationTokenHandler.swift in Sources */,
 				3EF9A6011B5C485D007FCBFD /* Tag.swift in Sources */,
+				3EC0C4F11B6E5F9800EBE856 /* CKRecord.swift in Sources */,
 				10471BFC1B389CFA007AA343 /* CKSIncrementalStoreDemo.xcdatamodeld in Sources */,
 				3EF9A5FF1B5C485C007FCBFD /* Task.swift in Sources */,
 				10471C1D1B389D3B007AA343 /* CoreDataStack.swift in Sources */,

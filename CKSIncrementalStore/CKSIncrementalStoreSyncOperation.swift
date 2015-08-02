@@ -10,26 +10,6 @@ import UIKit
 import CloudKit
 import CoreData
 
-extension CKRecord
-{
-    class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord
-    {
-        let coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)
-        let record: CKRecord = CKRecord(coder: coder)!
-        coder.finishDecoding()
-        return record
-    }
-    
-    func encodedSystemFields() -> NSData
-    {
-        let data = NSMutableData()
-        let coder = NSKeyedArchiver(forWritingWithMutableData: data)
-        self.encodeSystemFieldsWithCoder(coder)
-        coder.finishEncoding()
-        return data
-    }
-}
-
 let CKSIncrementalStoreSyncOperationErrorDomain = "CKSIncrementalStoreSyncOperationErrorDomain"
 let CKSSyncConflictedResolvedRecordsKey = "CKSSyncConflictedResolvedRecordsKey"
 let CKSIncrementalStoreSyncOperationFetchChangeTokenKey = "CKSIncrementalStoreSyncOperationFetchChangeTokenKey"
@@ -49,43 +29,6 @@ enum CKSStoresSyncError: ErrorType
     case ConflictsDetected
 }
 
-class CKSIncrementalStoreSyncOperationTokenHandler
-{
-    static let defaultHandler = CKSIncrementalStoreSyncOperationTokenHandler()
-    private var newToken: CKServerChangeToken?
-    
-    func token()->CKServerChangeToken?
-    {
-        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncOperationFetchChangeTokenKey) != nil
-        {
-            let fetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncOperationFetchChangeTokenKey) as! NSData
-            return NSKeyedUnarchiver.unarchiveObjectWithData(fetchTokenKeyArchived) as? CKServerChangeToken
-        }
-        
-        return nil
-    }
-    
-    func save(serverChangeToken serverChangeToken:CKServerChangeToken)
-    {
-        self.newToken = serverChangeToken
-    }
-    
-    func commit()
-    {
-        if self.newToken != nil
-        {
-            NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(self.newToken!), forKey: CKSIncrementalStoreSyncOperationFetchChangeTokenKey)
-        }
-    }
-    
-    func delete()
-    {
-        if self.token() != nil
-        {
-            NSUserDefaults.standardUserDefaults().setObject(nil, forKey: CKSIncrementalStoreSyncOperationFetchChangeTokenKey)
-        }
-    }
-}
 
 class CKSIncrementalStoreSyncOperation: NSOperation {
     

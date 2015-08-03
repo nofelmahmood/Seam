@@ -162,19 +162,12 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     
     func applyLocalChangesToServer(insertedOrUpdatedCKRecords insertedOrUpdatedCKRecords: Array<CKRecord> , deletedCKRecordIDs: Array<CKRecordID>) throws
     {
-        var wasSuccessful = false
         let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
         
         let savedRecords:[CKRecord]?
         var conflictedRecords:[CKRecord] = [CKRecord]()
-        ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
-            
-            let error:NSError? = operationError
-            if error != nil
-            {
-                wasSuccessful = false
-            }
-        })
+//        ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
+//        })
         ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
             
             let error:NSError? = operationError
@@ -297,8 +290,8 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 finalCKRecords.append(clientServerCKRecord.serverRecord!)
             }
             
-            let userInfo:Dictionary<String,Array<CKRecord>> = [CKSSyncConflictedResolvedRecordsKey:finalCKRecords]
-            throw NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: CKSStoresSyncError.ConflictsDetected._code, userInfo: userInfo)
+//            let userInfo:Dictionary<String,Array<CKRecord>> = [CKSSyncConflictedResolvedRecordsKey:finalCKRecords]
+//            throw NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: CKSStoresSyncError.ConflictsDetected._code, userInfo: userInfo)
         }
     }
     

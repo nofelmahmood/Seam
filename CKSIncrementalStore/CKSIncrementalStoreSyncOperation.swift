@@ -96,24 +96,26 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         do
         {
             try self.applyLocalChangesToServer(insertedOrUpdatedCKRecords: insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
+            do
+            {
+                try self.fetchAndApplyServerChangesToLocalDatabase()
+            }
+            catch let error as NSError?
+            {
+                throw error!
+            }
         }
         catch let error as NSError?
         {
             let conflictedRecords = error!.userInfo[CKSSyncConflictedResolvedRecordsKey] as! Array<CKRecord>
             self.resolveConflicts(conflictedRecords: conflictedRecords)
-            try! self.applyLocalChangesToServer(insertedOrUpdatedCKRecords: insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
-        }
-        
-        
-        if !wasSuccessful && error != nil
-        {
             var insertedOrUpdatedCKRecordsWithRecordIDStrings:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
+            
             for record in insertedOrUpdatedCKRecords
             {
-                var ckRecord:CKRecord = record as CKRecord
+                let ckRecord:CKRecord = record as CKRecord
                 insertedOrUpdatedCKRecordsWithRecordIDStrings[ckRecord.recordID.recordName] = ckRecord
             }
-            var conflictedRecords = error!.userInfo[CKSSyncConflictedResolvedRecordsKey] as! Array<CKRecord>
             
             for record in conflictedRecords
             {
@@ -121,32 +123,38 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
             
             insertedOrUpdatedCKRecords = insertedOrUpdatedCKRecordsWithRecordIDStrings.values.array
-            error = nil
-            wasSuccessful = self.applyLocalChangesToServer(insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs, error: &error)
+    
+            try self.applyLocalChangesToServer(insertedOrUpdatedCKRecords: insertedOrUpdatedCKRecords, deletedCKRecordIDs: deletedCKRecordIDs)
             
-            if !wasSuccessful && error != nil
+            do
             {
-                return false
+                try self.fetchAndApplyServerChangesToLocalDatabase()
+            }
+            catch let error as NSError?
+            {
+                throw error!
             }
         }
-        
+    }
+    
+    func fetchAndApplyServerChangesToLocalDatabase() throws
+    {
         var moreComing = true
         var insertedOrUpdatedCKRecordsFromServer = Array<CKRecord>()
         var deletedCKRecordIDsFromServer = Array<CKRecordID>()
         while moreComing
         {
-            var returnValue = self.fetchRecordChangesFromServer()
+            let returnValue = self.fetchRecordChangesFromServer()
             insertedOrUpdatedCKRecordsFromServer += returnValue.insertedOrUpdatedCKRecords
             deletedCKRecordIDsFromServer += returnValue.deletedRecordIDs
             moreComing = returnValue.moreComing
         }
         
-        return self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecordsFromServer, deletedCKRecordIDs: deletedCKRecordIDsFromServer)
-        
+        try self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecordsFromServer, deletedCKRecordIDs: deletedCKRecordIDsFromServer)
     }
     
     // MARK: Local Changes
-    func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<AnyObject>,deletedCKRecordIDs:Array<AnyObject>) throws
+    func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<CKRecord>,deletedCKRecordIDs:Array<CKRecordID>) throws
     {
         try self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
         try self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
@@ -260,11 +268,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     {
                         conflictedRecordsWithStringRecordIDs[ckRecordID!.recordName] = (conflictedRecordsWithStringRecordIDs[ckRecordID!.recordName]!.clientRecord,ckRecord)
                     }
-                    wasSuccessful = true
-                }
-                else
-                {
-                    wasSuccessful = false
                 }
             })
             self.operationQueue?.addOperation(ckFetchRecordsOperation)
@@ -296,7 +299,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             
             let userInfo:Dictionary<String,Array<CKRecord>> = [CKSSyncConflictedResolvedRecordsKey:finalCKRecords]
             throw NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: CKSStoresSyncError.ConflictsDetected._code, userInfo: userInfo)
-            wasSuccessful = false
         }
     }
     
@@ -482,13 +484,13 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
     }
     
-    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<AnyObject>) throws
+    func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>) throws
     {
         let predicate = NSPredicate(format: "%K == $ckRecordIDString",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
         
         for object in ckRecords
         {
-            let ckRecord:CKRecord = object as! CKRecord
+            let ckRecord:CKRecord = object
             let fetchRequest = NSFetchRequest(entityName: ckRecord.recordType)
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDString":ckRecord.recordID.recordName])
             fetchRequest.fetchLimit = 1
@@ -623,12 +625,12 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         
     }
     
-    func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<AnyObject>) throws
+    func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<CKRecordID>) throws
     {
         let predicate = NSPredicate(format: "%K IN $ckRecordIDs",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
         let ckRecordIDStrings = ckRecordIDs.map({(object)->String in
             
-            let ckRecordID:CKRecordID = object as! CKRecordID
+            let ckRecordID:CKRecordID = object
             return ckRecordID.recordName
         })
         

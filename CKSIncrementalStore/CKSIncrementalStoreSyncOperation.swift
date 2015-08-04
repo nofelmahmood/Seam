@@ -164,10 +164,10 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     {
         let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
         
-        let savedRecords:[CKRecord]?
+        let savedRecords:[CKRecord] = [CKRecord]()
         var conflictedRecords:[CKRecord] = [CKRecord]()
-//        ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
-//        })
+        ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
+        })
         ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
             
             let error:NSError? = operationError
@@ -180,20 +180,16 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         self.operationQueue?.addOperation(ckModifyRecordsOperation)
         self.operationQueue?.waitUntilAllOperationsAreFinished()
         
-        
-        throw NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: CKSStoresSyncError.ConflictsDetected._code, userInfo: [CKSSyncConflictedResolvedRecordsKey:conflictedRecords])
-        
-        if savedRecords != nil
+        if conflictedRecords.count > 0
         {
-            let savedRecordsWithIDStrings = savedRecords!.map({(object)->String in
-                
-                let ckRecord:CKRecord = object as CKRecord
-                return ckRecord.recordID.recordName
-            })
-            
+            throw NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: CKSStoresSyncError.ConflictsDetected._code, userInfo: [CKSSyncConflictedResolvedRecordsKey:conflictedRecords])
+        }
+        
+        if savedRecords.count > 0
+        {
             var savedRecordsWithType:Dictionary<String,Dictionary<String,CKRecord>> = Dictionary<String,Dictionary<String,CKRecord>>()
             
-            for record in savedRecords!
+            for record in savedRecords
             {
                 if savedRecordsWithType[record.recordType] != nil
                 {
@@ -208,8 +204,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             
             let types = savedRecordsWithType.keys.array
             
-            let ckRecordsManagedObjects:Array<(ckRecord:CKRecord,managedObject:NSManagedObject)> = Array<(ckRecord:CKRecord,managedObject:NSManagedObject)>()
-            
             for type in types
             {
                 let fetchRequest = NSFetchRequest(entityName: type)
@@ -217,7 +211,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 let ckRecordIDStrings = ckRecordsForType!.keys.array
                 
                 fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["recordIDStrings":ckRecordIDStrings])
-                let error:NSErrorPointer = nil
                 var results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
                 if results.count > 0
                 {
@@ -390,7 +383,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 return relationship.toMany == false
             })
             
-            for attributeDescription in entityAttributes as [NSAttributeDescription]
+            for attributeDescription in entityAttributes
             {
                 if managedObject.valueForKey(attributeDescription.name) != nil
                 {
@@ -405,9 +398,26 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                     case .BinaryDataAttributeType:
                         ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
                         
-                    case .BooleanAttributeType, .DecimalAttributeType, .DoubleAttributeType, .FloatAttributeType, .Integer16AttributeType, .Integer32AttributeType, .Integer32AttributeType, .Integer64AttributeType:
+                    case .BooleanAttributeType:
                         ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
                         
+                    case .DecimalAttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
+
+                    case .DoubleAttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
+
+                    case .FloatAttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
+
+                    case .Integer16AttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
+
+                    case .Integer32AttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
+
+                    case .Integer64AttributeType:
+                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
                     default:
                         break
                     }
@@ -491,8 +501,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             if results.count > 0
             {
                 let managedObject = results.first as! NSManagedObject
-                let recordIDString = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
-                
                 let keys = ckRecord.allKeys().filter({(obj)->Bool in
                     
                     if ckRecord.objectForKey(obj as String) is CKReference

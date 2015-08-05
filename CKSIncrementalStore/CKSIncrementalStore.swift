@@ -57,6 +57,7 @@ enum CKSIncrementalStoreError: ErrorType
     case BackingStoreCreationFailed
 }
 
+
 class CKSIncrementalStore: NSIncrementalStore {
     
     private var syncOperation:CKSIncrementalStoreSyncOperation?

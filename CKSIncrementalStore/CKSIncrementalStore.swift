@@ -54,6 +54,7 @@ enum CKSIncrementalStoreError: ErrorType
 {
     case BackingStoreFetchRequestError
     case InvalidRequest
+    case BackingStoreCreationFailed
 }
 
 class CKSIncrementalStore: NSIncrementalStore {
@@ -67,9 +68,9 @@ class CKSIncrementalStore: NSIncrementalStore {
     private var backingPersistentStore:NSPersistentStore?
     private lazy var backingMOC:NSManagedObjectContext={
         
-        var moc=NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
-        moc.persistentStoreCoordinator=self.backingPersistentStoreCoordinator
-        moc.retainsRegisteredObjects=true
+        var moc = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
+        moc.persistentStoreCoordinator = self.backingPersistentStoreCoordinator
+        moc.retainsRegisteredObjects = true
         return moc
         
         }()
@@ -107,58 +108,77 @@ class CKSIncrementalStore: NSIncrementalStore {
             NSStoreUUIDKey:NSProcessInfo().globallyUniqueString,
             NSStoreTypeKey:self.dynamicType.type
         ]
-        let storeURL=self.URL
-        let backingModel: NSManagedObjectModel=(self.persistentStoreCoordinator?.managedObjectModel.copy())! as! NSManagedObjectModel
         
-        for entity in backingModel.entities
+        let storeURL=self.URL
+        let backingMOM: NSManagedObjectModel? = self.backingModel()
+        
+        if backingMOM != nil
         {
-            if entity.superentity != nil
-            {
-                continue
-            }
-
-            let recordIDAttributeDescription = NSAttributeDescription()
-            recordIDAttributeDescription.name=CKSIncrementalStoreLocalStoreRecordIDAttributeName
-            recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
-            recordIDAttributeDescription.indexed=true
+            self.backingPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: backingMOM!)
             
-            let recordEncodedValuesAttributeDescription = NSAttributeDescription()
-            recordEncodedValuesAttributeDescription.name = CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
-            recordEncodedValuesAttributeDescription.attributeType = NSAttributeType.BinaryDataAttributeType
-            recordEncodedValuesAttributeDescription.indexed = true
-            recordEncodedValuesAttributeDescription.optional = true
+            self.backingPersistentStore = try self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
             
-            let recordChangeTypeAttributeDescription = NSAttributeDescription()
-            recordChangeTypeAttributeDescription.name = CKSIncrementalStoreLocalStoreChangeTypeAttributeName
-            recordChangeTypeAttributeDescription.attributeType = NSAttributeType.Integer16AttributeType
-            recordChangeTypeAttributeDescription.indexed = true
-            recordChangeTypeAttributeDescription.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue)
+            self.operationQueue = NSOperationQueue()
+            self.operationQueue?.maxConcurrentOperationCount = 1
             
-            entity.properties.append(recordIDAttributeDescription)
-            entity.properties.append(recordEncodedValuesAttributeDescription)
-            entity.properties.append(recordChangeTypeAttributeDescription)
-            
+            self.triggerSync()
         }
         
-        let deletedObjectsEntity: NSEntityDescription = NSEntityDescription()
-        deletedObjectsEntity.name = CKSDeletedObjectsEntityName
+        throw CKSIncrementalStoreError.BackingStoreCreationFailed
         
-        let recordIDProperty: NSAttributeDescription = NSAttributeDescription()
-        recordIDProperty.name = CKSIncrementalStoreLocalStoreRecordIDAttributeName
-        recordIDProperty.optional = false
-        recordIDProperty.indexed = true
-        
-        deletedObjectsEntity.properties.append(recordIDProperty)
-        backingModel.entities.append(deletedObjectsEntity)
+    }
     
-        self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: backingModel)
+    func backingModel() -> NSManagedObjectModel?
+    {
+        if self.persistentStoreCoordinator?.managedObjectModel != nil
+        {
+            let backingModel: NSManagedObjectModel = self.persistentStoreCoordinator!.managedObjectModel.copy() as! NSManagedObjectModel
+            
+            for entity in backingModel.entities
+            {
+                if entity.superentity != nil
+                {
+                    continue
+                }
+                
+                let recordIDAttributeDescription = NSAttributeDescription()
+                recordIDAttributeDescription.name=CKSIncrementalStoreLocalStoreRecordIDAttributeName
+                recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
+                recordIDAttributeDescription.indexed=true
+                
+                let recordEncodedValuesAttributeDescription = NSAttributeDescription()
+                recordEncodedValuesAttributeDescription.name = CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
+                recordEncodedValuesAttributeDescription.attributeType = NSAttributeType.BinaryDataAttributeType
+                recordEncodedValuesAttributeDescription.indexed = true
+                recordEncodedValuesAttributeDescription.optional = true
+                
+                let recordChangeTypeAttributeDescription = NSAttributeDescription()
+                recordChangeTypeAttributeDescription.name = CKSIncrementalStoreLocalStoreChangeTypeAttributeName
+                recordChangeTypeAttributeDescription.attributeType = NSAttributeType.Integer16AttributeType
+                recordChangeTypeAttributeDescription.indexed = true
+                recordChangeTypeAttributeDescription.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue)
+                
+                entity.properties.append(recordIDAttributeDescription)
+                entity.properties.append(recordEncodedValuesAttributeDescription)
+                entity.properties.append(recordChangeTypeAttributeDescription)
+                
+            }
+            
+            let deletedObjectsEntity: NSEntityDescription = NSEntityDescription()
+            deletedObjectsEntity.name = CKSDeletedObjectsEntityName
+            
+            let recordIDProperty: NSAttributeDescription = NSAttributeDescription()
+            recordIDProperty.name = CKSIncrementalStoreLocalStoreRecordIDAttributeName
+            recordIDProperty.optional = false
+            recordIDProperty.indexed = true
+            
+            deletedObjectsEntity.properties.append(recordIDProperty)
+            backingModel.entities.append(deletedObjectsEntity)
+            
+            return backingModel
+        }
         
-        self.backingPersistentStore = try self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
-        
-        self.operationQueue = NSOperationQueue()
-        self.operationQueue?.maxConcurrentOperationCount = 1
-        
-        self.triggerSync()
+        return nil
     }
     
     internal func handlePush(userInfo userInfo:[NSObject : AnyObject])
@@ -334,18 +354,6 @@ class CKSIncrementalStore: NSIncrementalStore {
     // MARK : Fetch Request    
     func executeInResponseToFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext) throws ->NSArray
     {
-        let backingRequestPredicate: NSPredicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue))
-        
-    
-        if fetchRequest.predicate != nil
-        {
-            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [backingRequestPredicate,fetchRequest.predicate!])
-        }
-        else
-        {
-            fetchRequest.predicate = backingRequestPredicate
-        }
-        
         var resultsFromLocalStore = try self.backingMOC.executeFetchRequest(fetchRequest)
         
         if resultsFromLocalStore.count > 0
@@ -491,6 +499,7 @@ class CKSIncrementalStore: NSIncrementalStore {
                 backingObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
                 try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
             }
+            
             try self.backingMOC.save()
         }
     }

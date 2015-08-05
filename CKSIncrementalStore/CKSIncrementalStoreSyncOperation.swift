@@ -231,7 +231,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     {
         if conflictedRecords.count > 0
         {
-            var conflictedRecordsWithStringRecordIDs:Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)> = Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)>()
+            var conflictedRecordsWithStringRecordIDs: Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)> = Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)>()
             
             for record in conflictedRecords
             {

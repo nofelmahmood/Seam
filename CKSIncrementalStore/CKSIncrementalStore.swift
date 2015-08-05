@@ -175,6 +175,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             
             let recordIDProperty: NSAttributeDescription = NSAttributeDescription()
             recordIDProperty.name = CKSIncrementalStoreLocalStoreRecordIDAttributeName
+            recordIDProperty.attributeType = NSAttributeType.StringAttributeType
             recordIDProperty.optional = false
             recordIDProperty.indexed = true
             
@@ -202,6 +203,16 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
     }
     
+    func entitiesToParticipateInSync() -> [NSEntityDescription]?
+    {
+        return self.backingMOC.persistentStoreCoordinator?.managedObjectModel.entities.filter({ (object) -> Bool in
+            
+            let entity: NSEntityDescription = object
+            return (entity.name)! != CKSDeletedObjectsEntityName
+        })
+    }
+    
+    
     internal func triggerSync()
     {
         if self.operationQueue != nil && self.operationQueue!.operationCount > 0
@@ -211,7 +222,8 @@ class CKSIncrementalStore: NSIncrementalStore {
         
         let syncOperationBlock = ({()->Void in
             
-            self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, conflictPolicy: self.cksStoresSyncConflictPolicy)
+            self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy)
+            
             self.syncOperation?.syncConflictResolutionBlock = self.recordConflictResolutionBlock
             self.syncOperation?.syncCompletionBlock =  ({(error) -> Void in
                 
@@ -266,7 +278,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             
         else if request.requestType == NSPersistentStoreRequestType.SaveRequestType
         {
-            let saveChangesRequest:NSSaveChangesRequest = request as! NSSaveChangesRequest
+            let saveChangesRequest: NSSaveChangesRequest = request as! NSSaveChangesRequest
             return try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
         }
             

@@ -53,13 +53,15 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     private var operationQueue:NSOperationQueue?
     private var localStoreMOC:NSManagedObjectContext?
     private var persistentStoreCoordinator:NSPersistentStoreCoordinator?
+    private var entities: Array<NSEntityDescription>?
     var syncConflictPolicy:CKSStoresSyncConflictPolicy?
     var syncCompletionBlock:((syncError:NSError?) -> ())?
     var syncConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
-    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,conflictPolicy:CKSStoresSyncConflictPolicy?) {
+    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:CKSStoresSyncConflictPolicy?) {
         
         self.persistentStoreCoordinator = persistentStoreCoordinator
+        self.entities = entities
         self.syncConflictPolicy = conflictPolicy
         super.init()
     }
@@ -296,8 +298,8 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     
     func localChanges() throws -> (insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>)
     {
-        let entityNames = self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entities.map( { (entity) -> String in
-            return (entity as NSEntityDescription).name!
+        let entityNames = self.entities!.map( { (entity) -> String in
+            return entity.name!
         })
         
         var deletedManagedObjects: Array<AnyObject> = Array<AnyObject>()
@@ -305,7 +307,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
         
         let predicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue))
         
-        for name in entityNames!
+        for name in entityNames
         {
             let fetchRequest = NSFetchRequest(entityName: name)
             fetchRequest.predicate = predicate
@@ -635,9 +637,12 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             return ckRecordID.recordName
         })
         
-        let entityNames = self.localStoreMOC?.persistentStoreCoordinator?.managedObjectModel.entitiesByName.keys.array
+        let entityNames = self.entities!.map { (entity) -> String in
+            
+            return entity.name!
+        }
         
-        for name in entityNames!
+        for name in entityNames
         {
             let fetchRequest = NSFetchRequest(entityName: name as String)
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":ckRecordIDStrings])

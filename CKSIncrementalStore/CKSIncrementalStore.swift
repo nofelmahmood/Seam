@@ -41,6 +41,8 @@ let CKSIncrementalStoreSyncConflictPolicyOption = "CKSIncrementalStoreSyncConfli
 
 let CKSIncrementalStoreErrorDomain = "CKSIncrementalStoreErrorDomain"
 
+let CKSDeletedObjectsEntityName = "CKS_DeletedObjectEntity"
+
 enum CKSLocalStoreRecordChangeType: Int16
 {
     case RecordNoChange = 0
@@ -106,16 +108,15 @@ class CKSIncrementalStore: NSIncrementalStore {
             NSStoreTypeKey:self.dynamicType.type
         ]
         let storeURL=self.URL
-        let model:AnyObject=(self.persistentStoreCoordinator?.managedObjectModel.copy())!
-        for e in model.entities
+        let backingModel: NSManagedObjectModel=(self.persistentStoreCoordinator?.managedObjectModel.copy())! as! NSManagedObjectModel
+        
+        for entity in backingModel.entities
         {
-            let entity=e as NSEntityDescription
-            
             if entity.superentity != nil
             {
                 continue
             }
-            
+
             let recordIDAttributeDescription = NSAttributeDescription()
             recordIDAttributeDescription.name=CKSIncrementalStoreLocalStoreRecordIDAttributeName
             recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
@@ -139,7 +140,18 @@ class CKSIncrementalStore: NSIncrementalStore {
             
         }
         
-        self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: model as! NSManagedObjectModel)
+        let deletedObjectsEntity: NSEntityDescription = NSEntityDescription()
+        deletedObjectsEntity.name = CKSDeletedObjectsEntityName
+        
+        let recordIDProperty: NSAttributeDescription = NSAttributeDescription()
+        recordIDProperty.name = CKSIncrementalStoreLocalStoreRecordIDAttributeName
+        recordIDProperty.optional = false
+        recordIDProperty.indexed = true
+        
+        deletedObjectsEntity.properties.append(recordIDProperty)
+        backingModel.entities.append(deletedObjectsEntity)
+    
+        self.backingPersistentStoreCoordinator=NSPersistentStoreCoordinator(managedObjectModel: backingModel)
         
         self.backingPersistentStore = try self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
         
@@ -467,8 +479,18 @@ class CKSIncrementalStore: NSIncrementalStore {
             let keys = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys.array
             let sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
             backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
-            backingObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-            try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
+            
+            if changeType == CKSLocalStoreRecordChangeType.RecordDeleted
+            {
+                let deletedObjectRecord = NSEntityDescription.insertNewObjectForEntityForName(CKSDeletedObjectsEntityName, inManagedObjectContext: self.backingMOC)
+                deletedObjectRecord.setValue(recordID, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+                self.backingMOC.deleteObject(backingObject)
+            }
+            else
+            {
+                backingObject.setValue(NSNumber(short: changeType.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+                try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
+            }
             try self.backingMOC.save()
         }
     }

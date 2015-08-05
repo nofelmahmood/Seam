@@ -62,7 +62,6 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
                 self.tasks.append(task)
             }
         }
-        print("Tasks loaded \(results)", appendNewline: true)
         self.tasksTableView.reloadData()
     }
     
@@ -78,19 +77,28 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
         // Dispose of any resources that can be recreated.
     }
     
-    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) throws {
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         
         if editingStyle == UITableViewCellEditingStyle.Delete
         {
             CoreDataStack.sharedStack.managedObjectContext.deleteObject(self.tasks[indexPath.row])
-            try CoreDataStack.sharedStack.managedObjectContext.save()
-            try self.loadTasks()
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Left)
+
+            do
+            {
+                try CoreDataStack.sharedStack.managedObjectContext.save()
+                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Left)
+                try self.loadTasks()
+            }
+            catch
+            {
+                
+            }
+
         }
     }
     
-    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) throws {
-        
+    func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    
         let alertViewController = UIAlertController(title: "New Task Name", message: "Enter new task name", preferredStyle: UIAlertControllerStyle.Alert)
         alertViewController.addTextFieldWithConfigurationHandler { (textField) -> Void in
             
@@ -122,16 +130,15 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
     }
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        print("Tasks Count \(self.tasks.count)", appendNewline: true)
         return self.tasks.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell: SimpleTableViewCell = tableView.dequeueReusableCellWithIdentifier("SimpleTableIdentifier") as! SimpleTableViewCell
+        let cell: UITableViewCell = tableView.dequeueReusableCellWithIdentifier("SimpleTableIdentifier")!
         
         let task: Task = self.tasks[indexPath.row] as Task
-        cell.label.text = task.name
+        cell.textLabel?.text = task.name
         return cell
     }
     /*

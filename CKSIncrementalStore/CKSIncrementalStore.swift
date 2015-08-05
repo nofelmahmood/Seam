@@ -84,7 +84,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     
     override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator?, configurationName name: String?, URL url: NSURL, options: [NSObject : AnyObject]?) {
         
-        self.database=CKContainer.defaultContainer().privateCloudDatabase
+        self.database = CKContainer.defaultContainer().privateCloudDatabase
         if options != nil
         {
             if options![CKSIncrementalStoreSyncConflictPolicyOption] != nil
@@ -116,16 +116,22 @@ class CKSIncrementalStore: NSIncrementalStore {
         {
             self.backingPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: backingMOM!)
             
-            self.backingPersistentStore = try self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
+            do
+            {
+                self.backingPersistentStore = try self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
+                self.operationQueue = NSOperationQueue()
+                self.operationQueue?.maxConcurrentOperationCount = 1
+                self.triggerSync()
+            }
+            catch
+            {
+                throw CKSIncrementalStoreError.BackingStoreCreationFailed
+            }
             
-            self.operationQueue = NSOperationQueue()
-            self.operationQueue?.maxConcurrentOperationCount = 1
-            
-            self.triggerSync()
+            return
         }
         
         throw CKSIncrementalStoreError.BackingStoreCreationFailed
-        
     }
     
     func backingModel() -> NSManagedObjectModel?
@@ -142,9 +148,9 @@ class CKSIncrementalStore: NSIncrementalStore {
                 }
                 
                 let recordIDAttributeDescription = NSAttributeDescription()
-                recordIDAttributeDescription.name=CKSIncrementalStoreLocalStoreRecordIDAttributeName
-                recordIDAttributeDescription.attributeType=NSAttributeType.StringAttributeType
-                recordIDAttributeDescription.indexed=true
+                recordIDAttributeDescription.name = CKSIncrementalStoreLocalStoreRecordIDAttributeName
+                recordIDAttributeDescription.attributeType = NSAttributeType.StringAttributeType
+                recordIDAttributeDescription.indexed = true
                 
                 let recordEncodedValuesAttributeDescription = NSAttributeDescription()
                 recordEncodedValuesAttributeDescription.name = CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName

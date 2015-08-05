@@ -19,7 +19,7 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
         super.viewDidLoad()
         
         self.newTaskTextField.delegate = self
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncFinished:", name: CKSIncrementalStoreDidFinishSyncOperationNotification, object: CoreDataStack.sharedStack.cksIncrementalStore)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: Selector("syncFinished:"), name: CKSIncrementalStoreDidFinishSyncOperationNotification, object: CoreDataStack.sharedStack.cksIncrementalStore)
         
         do
         {
@@ -51,7 +51,6 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
     }
     func loadTasks() throws
     {
-        CoreDataStack.sharedStack.managedObjectContext.reset()
         let fetchRequest = NSFetchRequest(entityName: "Task")
         var results = try CoreDataStack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest)
         
@@ -60,15 +59,16 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
             self.tasks = Array<Task>()
             for task in results as! [Task]
             {
-                CoreDataStack.sharedStack.managedObjectContext.refreshObject(task, mergeChanges: false)
                 self.tasks.append(task)
             }
         }
+        print("Tasks loaded \(results)", appendNewline: true)
+        self.tasksTableView.reloadData()
     }
     
-    func syncFinished(notification:NSNotification) throws
+    func syncFinished(notification:NSNotification)
     {
-        try self.loadTasks()
+        try! self.loadTasks()
         self.tasksTableView.reloadData()
     }
     
@@ -122,13 +122,16 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
     }
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
+        print("Tasks Count \(self.tasks.count)", appendNewline: true)
         return self.tasks.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let cell: UITableViewCell = tableView.dequeueReusableCellWithIdentifier("SimpleTableIdentifier")!
-        cell.textLabel?.text = (self.tasks[indexPath.row] as Task).name
+        let cell: SimpleTableViewCell = tableView.dequeueReusableCellWithIdentifier("SimpleTableIdentifier") as! SimpleTableViewCell
+        
+        let task: Task = self.tasks[indexPath.row] as Task
+        cell.label.text = task.name
         return cell
     }
     /*

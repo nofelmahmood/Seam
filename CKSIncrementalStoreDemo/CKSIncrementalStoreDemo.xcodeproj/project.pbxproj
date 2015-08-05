@@ -17,6 +17,7 @@
 		10471C1D1B389D3B007AA343 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C1C1B389D3B007AA343 /* CoreDataStack.swift */; };
 		10471C221B389DD9007AA343 /* CKSIncrementalStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C211B389DD9007AA343 /* CKSIncrementalStore.swift */; };
 		10471C241B389E60007AA343 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10471C231B389E60007AA343 /* CloudKit.framework */; };
+		3E2B89B31B71DA8000F49DC9 /* SimpleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E2B89B21B71DA8000F49DC9 /* SimpleTableViewCell.swift */; };
 		3EC0C4ED1B6E5E1E00EBE856 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EC0C4EC1B6E5E1E00EBE856 /* CoreData.framework */; };
 		3EC0C4EF1B6E5F3200EBE856 /* CKSIncrementalStoreSyncOperationTokenHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC0C4EE1B6E5F3200EBE856 /* CKSIncrementalStoreSyncOperationTokenHandler.swift */; };
 		3EC0C4F11B6E5F9800EBE856 /* CKRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC0C4F01B6E5F9800EBE856 /* CKRecord.swift */; };
@@ -52,6 +53,7 @@
 		10471C1C1B389D3B007AA343 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		10471C211B389DD9007AA343 /* CKSIncrementalStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKSIncrementalStore.swift; path = ../../CKSIncrementalStore/CKSIncrementalStore.swift; sourceTree = "<group>"; };
 		10471C231B389E60007AA343 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		3E2B89B21B71DA8000F49DC9 /* SimpleTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SimpleTableViewCell.swift; sourceTree = "<group>"; };
 		3EC0C4EC1B6E5E1E00EBE856 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3EC0C4EE1B6E5F3200EBE856 /* CKSIncrementalStoreSyncOperationTokenHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKSIncrementalStoreSyncOperationTokenHandler.swift; path = ../../CKSIncrementalStore/CKSIncrementalStoreSyncOperationTokenHandler.swift; sourceTree = "<group>"; };
 		3EC0C4F01B6E5F9800EBE856 /* CKRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKRecord.swift; path = ../../CKSIncrementalStore/CKRecord.swift; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 				10471BFA1B389CFA007AA343 /* CKSIncrementalStoreDemo.xcdatamodeld */,
 				10471BF61B389CF9007AA343 /* Supporting Files */,
 				10471C1C1B389D3B007AA343 /* CoreDataStack.swift */,
+				3E2B89B21B71DA8000F49DC9 /* SimpleTableViewCell.swift */,
 			);
 			path = CKSIncrementalStoreDemo;
 			sourceTree = "<group>";
@@ -209,6 +212,9 @@
 						CreatedOnToolsVersion = 6.3.2;
 						DevelopmentTeam = UBAKNBA97C;
 						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
 							com.apple.iCloud = {
 								enabled = 1;
 							};
@@ -273,6 +279,7 @@
 				3EC0C4F11B6E5F9800EBE856 /* CKRecord.swift in Sources */,
 				10471BFC1B389CFA007AA343 /* CKSIncrementalStoreDemo.xcdatamodeld in Sources */,
 				3EF9A5FF1B5C485C007FCBFD /* Task.swift in Sources */,
+				3E2B89B31B71DA8000F49DC9 /* SimpleTableViewCell.swift in Sources */,
 				10471C1D1B389D3B007AA343 /* CoreDataStack.swift in Sources */,
 				3ED323FD1B5DFA9700AD0E6D /* CKSIncrementalStoreSyncOperation.swift in Sources */,
 			);

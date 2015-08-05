@@ -39,6 +39,8 @@ let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStore
 
 let CKSIncrementalStoreSyncConflictPolicyOption = "CKSIncrementalStoreSyncConflictPolicyOption"
 
+let CKSIncrementalStoreErrorDomain = "CKSIncrementalStoreErrorDomain"
+
 enum CKSLocalStoreRecordChangeType: Int16
 {
     case RecordNoChange = 0
@@ -48,7 +50,7 @@ enum CKSLocalStoreRecordChangeType: Int16
 
 enum CKSIncrementalStoreError: ErrorType
 {
-    
+    case BackingStoreFetchRequestError
 }
 
 class CKSIncrementalStore: NSIncrementalStore {
@@ -220,18 +222,18 @@ class CKSIncrementalStore: NSIncrementalStore {
         if request.requestType == NSPersistentStoreRequestType.FetchRequestType
         {
             let fetchRequest: NSFetchRequest = request as! NSFetchRequest
-            try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
+            return try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
         }
             
-        else if request.requestType==NSPersistentStoreRequestType.SaveRequestType
+        else if request.requestType == NSPersistentStoreRequestType.SaveRequestType
         {
             let saveChangesRequest:NSSaveChangesRequest = request as! NSSaveChangesRequest
-            try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
+            return try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
         }
             
         else
         {
-            throw NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: 0, userInfo: nil)
+            throw NSError(domain: CKSIncrementalStoreErrorDomain, code: CKSIncrementalStoreError.BackingStoreFetchRequestError._code, userInfo: nil)
         }
         
         return []
@@ -255,11 +257,15 @@ class CKSIncrementalStore: NSIncrementalStore {
             return propertyDescription.name
         })
         
+        let fetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
         let predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,recordID)
-        let backingFetchRequest = self.backingFetchRequest(fromFetchRequest: NSFetchRequest(entityName: objectID.entity.name!), backingRequestPredicate: predicate, backingRequestResultType: NSFetchRequestResultType.DictionaryResultType, propertiesToFetch: propertiesToFetch, backingRequestFetchLimit: 1)
+        fetchRequest.fetchLimit = 1
+        fetchRequest.predicate = predicate
+        fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
+        fetchRequest.propertiesToFetch = propertiesToFetch
         
-        var results = try self.backingMOC.executeFetchRequest(backingFetchRequest)
-        var backingObjectValues = results.first as! Dictionary<String,NSObject>
+        var results = try self.backingMOC.executeFetchRequest(fetchRequest)
+        var backingObjectValues = results.last as! Dictionary<String,NSObject>
         for (key,value) in backingObjectValues
         {
             if value is NSManagedObject
@@ -314,62 +320,34 @@ class CKSIncrementalStore: NSIncrementalStore {
         })
     }
     
-    // MARK : Fetch Request
-    func backingFetchRequest(fromFetchRequest fetchRequest: NSFetchRequest, backingRequestPredicate: NSPredicate, backingRequestResultType: NSFetchRequestResultType, propertiesToFetch: [AnyObject]?, backingRequestFetchLimit: Int?) -> NSFetchRequest
-    {
-        let entities = self.backingMOC.persistentStoreCoordinator!.managedObjectModel.entitiesByName
-        let entityName = fetchRequest.entityName!
-        let backingFetchRequestEntity: NSEntityDescription = (entities[entityName])! as NSEntityDescription
-        let backingFetchRequest: NSFetchRequest = NSFetchRequest(entityName: backingFetchRequestEntity.name!)
-        backingFetchRequest.predicate = self.predicateForBackingFetchRequest(currentPredicate: backingFetchRequest.predicate, backingPredicate: backingRequestPredicate )
-        
-        backingFetchRequest.predicate = self.predicateForBackingFetchRequest(currentPredicate: fetchRequest.predicate, backingPredicate: backingRequestPredicate)
-        backingFetchRequest.sortDescriptors = fetchRequest.sortDescriptors
-        backingFetchRequest.propertiesToGroupBy = fetchRequest.propertiesToGroupBy
-        backingFetchRequest.resultType = backingRequestResultType
-        backingFetchRequest.propertiesToFetch = propertiesToFetch
-        
-        if backingRequestFetchLimit != nil
-        {
-            backingFetchRequest.fetchLimit = backingRequestFetchLimit!
-        }
-        
-        return backingFetchRequest
-    }
-    
-    func predicateForBackingFetchRequest(currentPredicate predicate: NSPredicate?, backingPredicate: NSPredicate) -> NSPredicate
-    {
-        if predicate == nil
-        {
-            return backingPredicate
-        }
-        else
-        {
-            return NSCompoundPredicate(type: NSCompoundPredicateType.OrPredicateType, subpredicates: [backingPredicate,predicate!])
-        }
-    }
-    
+    // MARK : Fetch Request    
     func executeInResponseToFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext) throws ->NSArray
     {
         let backingRequestPredicate: NSPredicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue))
         
-        let backingFetchRequest = self.backingFetchRequest(fromFetchRequest: fetchRequest, backingRequestPredicate: backingRequestPredicate, backingRequestResultType: NSFetchRequestResultType.DictionaryResultType, propertiesToFetch: [CKSIncrementalStoreLocalStoreRecordIDAttributeName], backingRequestFetchLimit: nil)
+    
+        if fetchRequest.predicate != nil
+        {
+            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [backingRequestPredicate,fetchRequest.predicate!])
+        }
+        else
+        {
+            fetchRequest.predicate = backingRequestPredicate
+        }
         
-        var resultsFromLocalStore = try self.backingMOC.executeFetchRequest(backingFetchRequest)
+        var resultsFromLocalStore = try self.backingMOC.executeFetchRequest(fetchRequest)
         
         if resultsFromLocalStore.count > 0
         {
-            resultsFromLocalStore = resultsFromLocalStore.map({(result)->NSManagedObject in
+            return resultsFromLocalStore.map({(result)->NSManagedObject in
                 
-                var resultDictionary: Dictionary<String,NSObject> = result as! Dictionary<String,NSObject>
-                let recordID: String = resultDictionary[CKSIncrementalStoreLocalStoreRecordIDAttributeName] as! String
-                let objectID = self.newObjectIDForEntity((fetchRequest.entity)!, referenceObject: recordID)
+                let result = result as! NSManagedObject
+                let recordID: String = result.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[fetchRequest.entityName!]
+                let objectID = self.newObjectIDForEntity(entity!, referenceObject: recordID)
                 let object = context.objectWithID(objectID)
                 return object
-                
             })
-            
-            return resultsFromLocalStore
         }
         return []
     }

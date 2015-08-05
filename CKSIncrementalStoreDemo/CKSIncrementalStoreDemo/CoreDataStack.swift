@@ -34,7 +34,7 @@ class CoreDataStack: NSObject {
         let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("CKSIncrementalStoreDemo.sqlite")
         var failureReason = "There was an error creating or loading the application's saved data."
         do {
-            self.cksIncrementalStore = try coordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil) as? CKSIncrementalStore
+            self.cksIncrementalStore = try coordinator.addPersistentStoreWithType(CKSIncrementalStore.type, configuration: nil, URL: url, options: nil) as? CKSIncrementalStore
         } catch {
             // Report any error we got.
             var dict = [String: AnyObject]()

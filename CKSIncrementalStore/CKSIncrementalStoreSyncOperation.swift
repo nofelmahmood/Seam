@@ -327,17 +327,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                         
                         return false
                     }))
-                    
-                    deletedManagedObjects += (results!.filter({(object)->Bool in
-                        
-                        let managedObject:NSManagedObject = object as! NSManagedObject
-                        if (managedObject.valueForKey(CKSIncrementalStoreLocalStoreChangeTypeAttributeName)) as! NSNumber == NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue)
-                        {
-                            return true
-                        }
-                        
-                        return false
-                    }))
                 }
             }
             catch
@@ -345,6 +334,17 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 throw CKSStoresSyncError.LocalChangesFetchError
             }
         }
+        
+        do
+        {
+            let fetchRequest = NSFetchRequest(entityName: CKSDeletedObjectsEntityName)
+            deletedManagedObjects = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
+        }
+        catch
+        {
+            throw CKSStoresSyncError.LocalChangesFetchError
+        }
+        
         
         return (insertedOrUpdatedManagedObjects,deletedManagedObjects)
     }

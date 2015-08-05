@@ -390,7 +390,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     }
     
     // MARK : SaveChanges Request
-    private func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext) throws -> NSArray
+    private func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext) throws -> Array<AnyObject>
     {
         try self.insertObjectsInBackingStore(context.insertedObjects, mainContext: context)
         try self.setObjectsInBackingStore(context.updatedObjects, toChangeType: CKSLocalStoreRecordChangeType.RecordUpdated)
@@ -402,7 +402,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             self.triggerSync()
         }
         
-        return NSArray()
+        return []
     }
     
     func objectIDForBackingObjectForEntity(entityName: String, withReferenceObject referenceObject: String?) throws -> NSManagedObjectID?

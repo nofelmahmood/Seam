@@ -62,7 +62,8 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
                 self.tasks.append(task)
             }
         }
-        self.tasksTableView.reloadData()
+        
+        print("Fetched Count \(results.count)", appendNewline: true)
     }
     
     func syncFinished(notification:NSNotification)
@@ -81,13 +82,14 @@ class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate
         
         if editingStyle == UITableViewCellEditingStyle.Delete
         {
-            CoreDataStack.sharedStack.managedObjectContext.deleteObject(self.tasks[indexPath.row])
+            let taskToDelete = self.tasks[indexPath.row]
+            CoreDataStack.sharedStack.managedObjectContext.deleteObject(taskToDelete)
 
             do
             {
                 try CoreDataStack.sharedStack.managedObjectContext.save()
-                tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Left)
                 try self.loadTasks()
+                tableView.reloadData()
             }
             catch
             {

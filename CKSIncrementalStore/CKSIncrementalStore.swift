@@ -51,6 +51,7 @@ enum CKSLocalStoreRecordChangeType: Int16
 enum CKSIncrementalStoreError: ErrorType
 {
     case BackingStoreFetchRequestError
+    case InvalidRequest
 }
 
 class CKSIncrementalStore: NSIncrementalStore {
@@ -233,10 +234,8 @@ class CKSIncrementalStore: NSIncrementalStore {
             
         else
         {
-            throw NSError(domain: CKSIncrementalStoreErrorDomain, code: CKSIncrementalStoreError.BackingStoreFetchRequestError._code, userInfo: nil)
+            throw NSError(domain: CKSIncrementalStoreErrorDomain, code: CKSIncrementalStoreError.InvalidRequest._code, userInfo: nil)
         }
-        
-        return []
     }
     
     override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {

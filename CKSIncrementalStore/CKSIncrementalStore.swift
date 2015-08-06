@@ -487,7 +487,6 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
     }
     
-    
     func insertObjectsInBackingStore(objectsToInsert objects:Set<NSObject>, mainContext: NSManagedObjectContext) throws
     {
         for object in objects
@@ -504,6 +503,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             try mainContext.obtainPermanentIDsForObjects([sourceObject])
             mainContext.didChangeValueForKey("objectID")
             CKSIncrementalStoreChangeSetHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
+            try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
             try self.backingMOC.save()
         }
     }

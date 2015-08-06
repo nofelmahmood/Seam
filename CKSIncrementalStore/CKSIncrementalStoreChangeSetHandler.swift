@@ -57,27 +57,27 @@ class CKSIncrementalStoreChangeSetHandler {
     }
     
     // MARK: Fetch
-    private func updatedRecords(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    private func changeSets(ForChangeType changeType:CKSLocalStoreRecordChangeType, propertiesToFetch: Array<String>,  backingContext: NSManagedObjectContext) throws -> [AnyObject]?
     {
+        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
+        let predicate: NSPredicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: changeType.rawValue))
+        fetchRequest.predicate = predicate
+        fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
+        fetchRequest.propertiesToFetch = propertiesToFetch
         
-    }
-    
-    private func insertedRecords(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
-    {
+        let results = try backingContext.executeFetchRequest(fetchRequest)
         
+        return results
     }
     
     private func recordIDsForDeletedObjects(backingContext: NSManagedObjectContext) throws -> [CKRecordID]?
     {
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
-        let predicate: NSPredicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue))
-        fetchRequest.predicate = predicate
-        fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
-        fetchRequest.propertiesToFetch = [CKSIncrementalStoreLocalStoreRecordIDAttributeName]
-        let results = try backingContext.executeFetchRequest(fetchRequest)
-        if results.count > 0
+        let propertiesToFetch = [CKSIncrementalStoreLocalStoreRecordIDAttributeName]
+        let deletedObjectsChangeSets = try self.changeSets(ForChangeType: CKSLocalStoreRecordChangeType.RecordDeleted, propertiesToFetch: propertiesToFetch, backingContext: backingContext)
+        
+        if deletedObjectsChangeSets!.count > 0
         {
-            return results.map({ (object) -> CKRecordID in
+            return deletedObjectsChangeSets!.map({ (object) -> CKRecordID in
                 
                 let valuesDictionary: Dictionary<String,NSObject> = object as! Dictionary<String,NSObject>
                 let recordID: String = valuesDictionary[CKSIncrementalStoreLocalStoreRecordIDAttributeName] as! String
@@ -89,14 +89,45 @@ class CKSIncrementalStoreChangeSetHandler {
         return nil
     }
     
+    private func recordsForUpdatedObjects(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    {
+        let propertiesToFetch = [CKSIncrementalStoreLocalStoreRecordIDAttributeName,CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName,CKSIncrementalStoreLocalStoreEntityNameAttributeName]
+        let updatedObjectsChangeSets = try self.changeSets(ForChangeType: CKSLocalStoreRecordChangeType.RecordUpdated, propertiesToFetch: propertiesToFetch, backingContext: backingContext)
+        
+        for changeSet in updatedObjectsChangeSets as! [NSManagedObject]
+        {
+            let entityName: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreEntityNameAttributeName) as! String
+            let recordID: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entityName)
+            let predicate: NSPredicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, recordID)
+            fetchRequest.predicate = predicate
+            fetchRequest.fetchLimit = 1
+            let results = try backingContext.executeFetchRequest(fetchRequest)
+            
+            if results.count > 0
+            {
+                let originalObject: NSManagedObject = results.last as! NSManagedObject
+                let encodedFields: NSData = originalObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as! NSData
+                let changedValuesString: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName) as! String
+                let changedPropertiesKeys: Array<String> = changedValuesString.componentsSeparatedByString(",")
+                let ckRecord: CKRecord = CKRecord.recordWithEncodedFields(encodedFields)
+                let valuesDictionary = originalObject.dictionaryWithValuesForKeys(changedPropertiesKeys)
+                ckRecord.setValuesForKeysWithDictionary(valuesDictionary)
+                
+            }
+            
+        }
+        
+    }
+    
     func localChangesInCKRepresentation() -> (insertedOrUpdatedCKRecords: [CKRecord]?, deletedCKRecordIDs: [CKRecordID]?)
     {
-        
     }
     
     func removeAllChangeSets(backingContext: NSManagedObjectContext) throws
     {
         let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
+        fetchRequest.includesPropertyValues = false
         let results = try backingContext.executeFetchRequest(fetchRequest)
         if results.count > 0
         {
@@ -112,9 +143,6 @@ class CKSIncrementalStoreChangeSetHandler {
             }
         }
     }
-    
-
-
 }
 
 

@@ -57,6 +57,16 @@ class CKSIncrementalStoreChangeSetHandler {
     }
     
     // MARK: Fetch
+    private func updatedRecords(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    {
+        
+    }
+    
+    private func insertedRecords(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    {
+        
+    }
+    
     private func recordIDsForDeletedObjects(backingContext: NSManagedObjectContext) throws -> [CKRecordID]?
     {
         let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
@@ -79,15 +89,31 @@ class CKSIncrementalStoreChangeSetHandler {
         return nil
     }
     
-    private func updatedRecords(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    func localChangesInCKRepresentation() -> (insertedOrUpdatedCKRecords: [CKRecord]?, deletedCKRecordIDs: [CKRecordID]?)
     {
         
     }
     
-    private func insertedRecords(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    func removeAllChangeSets(backingContext: NSManagedObjectContext) throws
     {
-        
+        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
+        let results = try backingContext.executeFetchRequest(fetchRequest)
+        if results.count > 0
+        {
+            for result in results
+            {
+                let managedObject: NSManagedObject = result as! NSManagedObject
+                backingContext.deleteObject(managedObject)
+            }
+            
+            if backingContext.hasChanges
+            {
+                try backingContext.save()
+            }
+        }
     }
+    
+
 
 }
 

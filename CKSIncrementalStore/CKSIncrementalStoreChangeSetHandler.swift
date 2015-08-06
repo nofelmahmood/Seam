@@ -22,13 +22,16 @@
 //    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //    SOFTWARE.
 
+
 import UIKit
 import CoreData
+import CloudKit
 
 class CKSIncrementalStoreChangeSetHandler {
 
     static let defaultHandler = CKSIncrementalStoreChangeSetHandler()
     
+    // MARK: Creation
     class func createChangeSet(ForInsertedObjectRecordID recordID: String, entityName: String, backingContext: NSManagedObjectContext)
     {
         let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: backingContext)
@@ -51,4 +54,43 @@ class CKSIncrementalStoreChangeSetHandler {
         let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: backingContext)
         changeSet.setValue(recordID, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
         changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-    }}
+    }
+    
+    // MARK: Fetch
+    private func recordIDsForDeletedObjects(backingContext: NSManagedObjectContext) throws -> [CKRecordID]?
+    {
+        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
+        let predicate: NSPredicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue))
+        fetchRequest.predicate = predicate
+        fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
+        fetchRequest.propertiesToFetch = [CKSIncrementalStoreLocalStoreRecordIDAttributeName]
+        let results = try backingContext.executeFetchRequest(fetchRequest)
+        if results.count > 0
+        {
+            return results.map({ (object) -> CKRecordID in
+                
+                let valuesDictionary: Dictionary<String,NSObject> = object as! Dictionary<String,NSObject>
+                let recordID: String = valuesDictionary[CKSIncrementalStoreLocalStoreRecordIDAttributeName] as! String
+                let cksRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+                return CKRecordID(recordName: recordID, zoneID: cksRecordZoneID)
+            })
+        }
+        
+        return nil
+    }
+    
+    private func updatedRecords(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    {
+        
+    }
+    
+    private func insertedRecords(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    {
+        
+    }
+
+}
+
+
+
+

@@ -182,7 +182,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         let entityNameAttribute: NSAttributeDescription = NSAttributeDescription()
         entityNameAttribute.name = CKSIncrementalStoreLocalStoreEntityNameAttributeName
         entityNameAttribute.attributeType = NSAttributeType.StringAttributeType
-        entityNameAttribute.optional = false
+        entityNameAttribute.optional = true
         changeSetEntity.properties.append(entityNameAttribute)
         
         let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
@@ -503,7 +503,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             mainContext.willChangeValueForKey("objectID")
             try mainContext.obtainPermanentIDsForObjects([sourceObject])
             mainContext.didChangeValueForKey("objectID")
-            self.createNewChangeSet(withRecordID: referenceObject, changedPropertiesKeys: sourceObject.changedValues().keys.array, entityName: sourceObject.entity.name!)
+            CKSIncrementalStoreChangeSetHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
             try self.backingMOC.save()
         }
     }
@@ -522,10 +522,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             fetchRequest.fetchLimit = 1
             var results = try self.backingMOC.executeFetchRequest(fetchRequest)
             let backingObject: NSManagedObject = results.last as! NSManagedObject
-            
-            let deletedObjectRecord = NSEntityDescription.insertNewObjectForEntityForName(CKSDeletedObjectsEntityName, inManagedObjectContext: self.backingMOC)
-            deletedObjectRecord.setValue(recordID, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
-        
+            CKSIncrementalStoreChangeSetHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
             self.backingMOC.deleteObject(backingObject)
             try self.backingMOC.save()
         }
@@ -548,40 +545,11 @@ class CKSIncrementalStore: NSIncrementalStore {
             let keys = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys.array
             let sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
             backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
-        
-            self.createNewChangeSet(withRecordID: recordID, changedPropertiesKeys: sourceObject.changedValues().keys.array, entityName: sourceObject.entity.name!)
+            CKSIncrementalStoreChangeSetHandler.createChangeSet(ForUpdatedObjectRecordID: recordID, changedPropertiesKeys: sourceObject.changedValues().keys.array, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
             try self.backingMOC.save()
         }
     }
     
-    
-    // MARK: Change Set
-    func createChangeSet(ForInsertedObjectRecordID recordID: String, entityName: String)
-    {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: self.backingMOC)
-        changeSet.setValue(recordID, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
-        changeSet.setValue(entityName, forKey: CKSIncrementalStoreLocalStoreEntityNameAttributeName)
-        changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordInserted.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-    }
-    
-    func createChangeSet(ForUpdatedObjectRecordID recordID: String, changedPropertiesKeys: Array<String>, entityName: String)
-    {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: self.backingMOC)
-        let changedPropertyKeysString = ",".join(changedPropertiesKeys)
-        changeSet.setValue(recordID, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
-        changeSet.setValue(changedPropertyKeysString, forKey: CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName)
-        changeSet.setValue(entityName, forKey: CKSIncrementalStoreLocalStoreEntityNameAttributeName)
-        changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-
-    }
-    
-    func createChangeSet(ForDeletedObjectRecordID recordID:String)
-    {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: self.backingMOC)
-        changeSet.setValue(recordID, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
-        changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-
-    }
 
 }

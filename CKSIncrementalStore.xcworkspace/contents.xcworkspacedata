@@ -17,6 +17,9 @@
          location = "group:CKSIncrementalStore/CKSIncrementalStoreSyncOperation.swift">
       </FileRef>
       <FileRef
+         location = "group:CKSIncrementalStore/CKSIncrementalStoreChangeSetHandler.swift">
+      </FileRef>
+      <FileRef
          location = "group:CKSIncrementalStore/CKSIncrementalStoreSyncOperationTokenHandler.swift">
       </FileRef>
       <FileRef

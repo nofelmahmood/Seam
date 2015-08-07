@@ -111,13 +111,24 @@ class CKSIncrementalStoreChangeSetHandler {
                 let changedValuesString: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName) as! String
                 let changedPropertiesKeys: Array<String> = changedValuesString.componentsSeparatedByString(",")
                 let ckRecord: CKRecord = CKRecord.recordWithEncodedFields(encodedFields)
-                let valuesDictionary = originalObject.dictionaryWithValuesForKeys(changedPropertiesKeys)
+                var valuesDictionary = originalObject.dictionaryWithValuesForKeys(changedPropertiesKeys)
+                
+                for (key,value) in valuesDictionary
+                {
+                    if value is NSManagedObject
+                    {
+                        let relationshipManagedObject: NSManagedObject = value as! NSManagedObject
+                        let relationshipRecordID: String = relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                        let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+                        let relationshipCKRecordID: CKRecordID = CKRecordID(recordName: relationshipRecordID, zoneID: ckRecordZoneID)
+                        let ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
+                        valuesDictionary[key] = ckReference
+                    }
+                }
                 ckRecord.setValuesForKeysWithDictionary(valuesDictionary)
                 
             }
-            
         }
-        
     }
     
     func localChangesInCKRepresentation() -> (insertedOrUpdatedCKRecords: [CKRecord]?, deletedCKRecordIDs: [CKRecordID]?)

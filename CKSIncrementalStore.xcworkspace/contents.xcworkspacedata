@@ -25,6 +25,9 @@
       <FileRef
          location = "group:CKSIncrementalStore/CKRecord.swift">
       </FileRef>
+      <FileRef
+         location = "group:CKSIncrementalStore/NSManagedObjectToCKRecordTransformer.swift">
+      </FileRef>
    </Group>
    <FileRef
       location = "group:LICENSE">

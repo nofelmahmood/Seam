@@ -10,15 +10,25 @@ import UIKit
 import CoreData
 import CloudKit
 
+extension NSManagedObjectContext
+{
+    func saveIfHasChanges() throws
+    {
+        if self.hasChanges
+        {
+            try self.save()
+        }
+    }
+}
 
 extension CKRecord
 {
-    func allAttributeValuesAsManagedObjectAttributeValues(usingContext context: NSManagedObjectContext) -> [String:AnyObject]?
+    private func allAttributeValuesAsManagedObjectAttributeValues(usingContext context: NSManagedObjectContext) -> [String:AnyObject]?
     {
         return self.dictionaryWithValuesForKeys(self.attributeKeys())
     }
     
-    func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext) -> [String:NSManagedObject]?
+    private func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext) -> [String:NSManagedObject]?
     {
         let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
         if entity != nil
@@ -55,16 +65,60 @@ extension CKRecord
         return nil
     }
     
-    func createOrUpdateManagedObject(usingContext context: NSManagedObjectContext)
+    public func createOrUpdateManagedObjectFromRecord(usingContext context: NSManagedObjectContext) throws
     {
+        let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
+        if entity?.name != nil
+        {
+            var managedObject: NSManagedObject?
+            let recordIDString = self.recordID.recordName
+            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entity!.name!)
+            fetchRequest.fetchLimit = 1
+            fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, recordIDString)
+            
+            let setValuesOfManagedObject = ({(managedObject: NSManagedObject?) -> Void in
+                
+                if managedObject != nil
+                {
+                    let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
+                    if attributeValuesDictionary != nil
+                    {
+                        managedObject!.setValuesForKeysWithDictionary(attributeValuesDictionary!)
+                    }
+                    let referencesValuesDictionary = self.allCKReferencesAsManagedObjects(usingContext: context)
+                    if referencesValuesDictionary != nil
+                    {
+                        managedObject!.setValuesForKeysWithDictionary(referencesValuesDictionary!)
+                    }
+                }
+            })
+            
+            do
+            {
+                let results = try context.executeFetchRequest(fetchRequest)
+                if results.count > 0
+                {
+                    managedObject = results.last as? NSManagedObject
+                }
+                else
+                {
+                    managedObject = NSEntityDescription.insertNewObjectForEntityForName(entity!.name!, inManagedObjectContext: context)
+                }
+                
+                setValuesOfManagedObject(managedObject)
+            }
+            catch let error as NSError?
+            {
+                print("Error executing request for fetching managed object \(error!)", appendNewline: true)
+                setValuesOfManagedObject(managedObject)
+            }
+        }
         
+        try context.saveIfHasChanges()
     }
 }
 
 extension NSManagedObject
 {
-    func ckRecord()
-    {
-        
-    }
+    
 }

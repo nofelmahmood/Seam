@@ -44,8 +44,6 @@ let CKSIncrementalStoreSyncConflictPolicyOption = "CKSIncrementalStoreSyncConfli
 let CKSIncrementalStoreErrorDomain = "CKSIncrementalStoreErrorDomain"
 
 let CKSChangeSetEntityName = "CKS_ChangeSetEntity"
-let CKSDeletedObjectsEntityName = "CKS_DeletedObjectEntity"
-
 
 enum CKSLocalStoreRecordChangeType: Int16
 {

@@ -72,6 +72,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     private var operationQueue:NSOperationQueue?
     private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
     private var backingPersistentStore:NSPersistentStore?
+    var syncAutomatically: Bool = true
     private lazy var backingMOC:NSManagedObjectContext={
         
         var moc = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)

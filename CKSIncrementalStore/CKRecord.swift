@@ -25,8 +25,9 @@
 
 import UIKit
 import CloudKit
+import CoreData
 
-extension CKRecord
+extension CKRecord: NSManagedObjectToCKRecordTransformer
 {
     class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord
     {
@@ -43,5 +44,13 @@ extension CKRecord
         self.encodeSystemFieldsWithCoder(coder)
         coder.finishEncoding()
         return data
+    }
+    
+    func transformedValue(valueToTransform value: NSManagedObject) {
+        
+    }
+    
+    func reverseTransformedValue(valueToReverseTransform value: CKRecord) {
+        
     }
 }

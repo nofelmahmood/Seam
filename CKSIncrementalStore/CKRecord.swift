@@ -29,6 +29,20 @@ import CoreData
 
 extension CKRecord
 {
+    func attributeKeys() -> [String]
+    {
+        return self.allKeys().filter({ (key) -> Bool in
+            return (self.objectForKey(key) is CKReference) == false
+        })
+    }
+    
+    func referencesKeys() -> [String]
+    {
+        return self.allKeys().filter({ (key) -> Bool in
+            return self.objectForKey(key) is CKReference
+        })
+    }
+    
     class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord
     {
         let coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)

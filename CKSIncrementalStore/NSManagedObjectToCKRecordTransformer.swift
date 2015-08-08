@@ -15,15 +15,7 @@ extension CKRecord
 {
     func allAttributeValuesAsManagedObjectAttributeValues(usingContext context: NSManagedObjectContext) -> [String:AnyObject]?
     {
-        let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
-        if entity != nil
-        {
-            let attributesKeys = self.allKeys().filter({ (key) -> Bool in
-                
-                return (self.objectForKey(key) is CKReference) == false
-            })
-        }
-        return nil
+        return self.dictionaryWithValuesForKeys(self.attributeKeys())
     }
     
     func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext) -> [String:NSManagedObject]?
@@ -31,10 +23,7 @@ extension CKRecord
         let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
         if entity != nil
         {
-            let referencesKeys = self.allKeys().filter { (key) -> Bool in
-                return self.objectForKey(key) is CKReference
-            }
-            let referencesValuesDictionary = self.dictionaryWithValuesForKeys(referencesKeys)
+            let referencesValuesDictionary = self.dictionaryWithValuesForKeys(self.referencesKeys())
             var managedObjectsDictionary: Dictionary<String,NSManagedObject> = Dictionary<String,NSManagedObject>()
             for (key,value) in referencesValuesDictionary
             {
@@ -64,6 +53,11 @@ extension CKRecord
             return managedObjectsDictionary
         }
         return nil
+    }
+    
+    func createOrUpdateManagedObject(usingContext context: NSManagedObjectContext)
+    {
+        
     }
 }
 

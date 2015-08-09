@@ -335,15 +335,15 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
         }
         
-        do
-        {
-            let fetchRequest = NSFetchRequest(entityName: CKSDeletedObjectsEntityName)
-            deletedManagedObjects = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
-        }
-        catch
-        {
-            throw CKSStoresSyncError.LocalChangesFetchError
-        }
+//        do
+//        {
+//            let fetchRequest = NSFetchRequest(entityName: CKSDeletedObjectsEntityName)
+//            deletedManagedObjects = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
+//        }
+//        catch
+//        {
+//            throw CKSStoresSyncError.LocalChangesFetchError
+//        }
         
         
         return (insertedOrUpdatedManagedObjects,deletedManagedObjects)
@@ -621,11 +621,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             }
         }
         
-        if self.localStoreMOC!.hasChanges
-        {
-            try self.localStoreMOC!.save()
-        }
-        
+        try self.localStoreMOC?.saveIfHasChanges()
     }
     
     func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<CKRecordID>) throws
@@ -656,6 +652,6 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
                 
             }
         }
-        try self.localStoreMOC?.save()
+        try self.localStoreMOC?.saveIfHasChanges()
     }
 }

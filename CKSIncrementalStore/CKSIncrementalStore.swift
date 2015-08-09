@@ -227,7 +227,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         return self.backingMOC.persistentStoreCoordinator?.managedObjectModel.entities.filter({ (object) -> Bool in
             
             let entity: NSEntityDescription = object
-            return (entity.name)! != CKSDeletedObjectsEntityName || (entity.name)! != CKSChangeSetEntityName
+            return (entity.name)! != CKSChangeSetEntityName
         })
     }
     
@@ -549,6 +549,4 @@ class CKSIncrementalStore: NSIncrementalStore {
             try self.backingMOC.save()
         }
     }
-    
-
 }

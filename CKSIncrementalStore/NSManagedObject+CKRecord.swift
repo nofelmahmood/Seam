@@ -1,4 +1,4 @@
-//    Transformers.swift
+//    NSManagedObject+CKRecord.swift
 //
 //    The MIT License (MIT)
 //
@@ -22,143 +22,10 @@
 //    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //    SOFTWARE.
 
-import UIKit
+
+import Foundation
 import CoreData
 import CloudKit
-
-extension NSManagedObjectContext
-{
-    func saveIfHasChanges() throws
-    {
-        if self.hasChanges
-        {
-            try self.save()
-        }
-    }
-}
-
-extension CKRecord
-{
-    private func allAttributeValuesAsManagedObjectAttributeValues(usingContext context: NSManagedObjectContext) -> [String:AnyObject]?
-    {
-        return self.dictionaryWithValuesForKeys(self.attributeKeys())
-    }
-    
-    private func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext) -> [String:NSManagedObject]?
-    {
-        let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
-        if entity != nil
-        {
-            let referencesValuesDictionary = self.dictionaryWithValuesForKeys(self.referencesKeys())
-            var managedObjectsDictionary: Dictionary<String,NSManagedObject> = Dictionary<String,NSManagedObject>()
-            for (key,value) in referencesValuesDictionary
-            {
-                let relationshipDescription = entity!.relationshipsByName[key]
-                if relationshipDescription?.destinationEntity?.name != nil
-                {
-                    let recordIDString = (value as! CKReference).recordID.recordName
-                    let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: relationshipDescription!.destinationEntity!.name!)
-                    fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,recordIDString)
-                    fetchRequest.fetchLimit = 1
-                    do
-                    {
-                        let results = try context.executeFetchRequest(fetchRequest)
-                        if results.count > 0
-                        {
-                            let relationshipManagedObject: NSManagedObject = results.last as! NSManagedObject
-                            managedObjectsDictionary[key] = relationshipManagedObject
-                        }
-                        
-                    }
-                    catch
-                    {
-                        print("Failed to find relationship managed object for Key \(key) RecordID \(recordIDString)", appendNewline: true)
-                    }
-                }
-            }
-            return managedObjectsDictionary
-        }
-        return nil
-    }
-    
-    public func createOrUpdateManagedObjectFromRecord(usingContext context: NSManagedObjectContext) throws -> NSManagedObject?
-    {
-        let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
-        if entity?.name != nil
-        {
-            var managedObject: NSManagedObject?
-            let recordIDString = self.recordID.recordName
-            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entity!.name!)
-            fetchRequest.fetchLimit = 1
-            fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, recordIDString)
-            
-            let setValuesOfManagedObject = ({(managedObject: NSManagedObject?) -> Void in
-                
-                if managedObject != nil
-                {
-                    let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
-                    if attributeValuesDictionary != nil
-                    {
-                        managedObject!.setValuesForKeysWithDictionary(attributeValuesDictionary!)
-                    }
-                    let referencesValuesDictionary = self.allCKReferencesAsManagedObjects(usingContext: context)
-                    if referencesValuesDictionary != nil
-                    {
-                        managedObject!.setValuesForKeysWithDictionary(referencesValuesDictionary!)
-                    }
-                }
-            })
-            
-            do
-            {
-                let results = try context.executeFetchRequest(fetchRequest)
-                if results.count > 0
-                {
-                    managedObject = results.last as? NSManagedObject
-                }
-                else
-                {
-                    managedObject = NSEntityDescription.insertNewObjectForEntityForName(entity!.name!, inManagedObjectContext: context)
-                }
-                
-                setValuesOfManagedObject(managedObject)
-            }
-            catch let error as NSError?
-            {
-                print("Error executing request for fetching managed object \(error!)", appendNewline: true)
-                setValuesOfManagedObject(managedObject)
-            }
-            try context.saveIfHasChanges()
-            return managedObject
-        }
-        return nil
-    }
-}
-
-extension NSEntityDescription
-{    
-    func toOneRelationships() -> [NSRelationshipDescription]
-    {
-        return self.relationshipsByName.values.array.filter({ (relationshipDescription) -> Bool in
-            return relationshipDescription.toMany == false
-        })
-    }
-    
-    func toOneRelationshipsByName() -> [String:NSRelationshipDescription]
-    {
-        var relationshipsByNameDictionary: Dictionary<String,NSRelationshipDescription> = Dictionary<String,NSRelationshipDescription>()
-        for (key,value) in self.relationshipsByName
-        {
-            if value.toMany == true
-            {
-                continue
-            }
-            
-            relationshipsByNameDictionary[key] = value
-        }
-        return relationshipsByNameDictionary
-    }
-}
 
 extension NSManagedObject
 {
@@ -265,14 +132,14 @@ extension NSManagedObject
         {
             let attributeKeys = self.entity.attributesByName.filter { (object) -> Bool in
                 return keys!.contains(object.0)
-            }.map { (object) -> String in
-                return object.0
+                }.map { (object) -> String in
+                    return object.0
             }
-        
+            
             let relationshipKeys = self.entity.relationshipsByName.filter { (object) -> Bool in
                 return keys!.contains(object.0)
-            }.map { (object) -> String in
-                return object.0
+                }.map { (object) -> String in
+                    return object.0
             }
             self.setAttributesValues(ofCKRecord: ckRecord!, withValuesOfAttributeWithKeys: attributeKeys)
             self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: relationshipKeys)
@@ -281,7 +148,6 @@ extension NSManagedObject
         
         self.setAttributesValues(ofCKRecord: ckRecord!, withValuesOfAttributeWithKeys: nil)
         self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: nil)
-
+        
         return ckRecord
-    }
 }

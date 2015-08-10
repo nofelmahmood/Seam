@@ -26,7 +26,16 @@
          location = "group:CKSIncrementalStore/CKRecord.swift">
       </FileRef>
       <FileRef
-         location = "group:CKSIncrementalStore/NSManagedObjectToCKRecordTransformer.swift">
+         location = "group:/Users/NofelMahmood/Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/CKSIncrementalStore/NSEntityDescription+Helpers.swift">
+      </FileRef>
+      <FileRef
+         location = "group:CKSIncrementalStore/NSManagedObject+CKRecord.swift">
+      </FileRef>
+      <FileRef
+         location = "group:CKSIncrementalStore/CKRecord+NSManagedObject.swift">
+      </FileRef>
+      <FileRef
+         location = "group:CKSIncrementalStore/NSManagedObjectContext+Helpers.swift">
       </FileRef>
    </Group>
    <FileRef

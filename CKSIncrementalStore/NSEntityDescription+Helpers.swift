@@ -1,4 +1,4 @@
-//    CKRecord.swift
+//    NSEntityDescription+Helpers.swift
 //
 //    The MIT License (MIT)
 //
@@ -24,39 +24,29 @@
 
 
 import UIKit
-import CloudKit
+import CoreData
 
-
-extension CKRecord
-{
-    func attributeKeys() -> [String]
+extension NSEntityDescription
+{    
+    func toOneRelationships() -> [NSRelationshipDescription]
     {
-        return self.allKeys().filter({ (key) -> Bool in
-            return (self.objectForKey(key) is CKReference) == false
+        return self.relationshipsByName.values.array.filter({ (relationshipDescription) -> Bool in
+            return relationshipDescription.toMany == false
         })
     }
     
-    func referencesKeys() -> [String]
+    func toOneRelationshipsByName() -> [String:NSRelationshipDescription]
     {
-        return self.allKeys().filter({ (key) -> Bool in
-            return self.objectForKey(key) is CKReference
-        })
-    }
-    
-    class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord
-    {
-        let coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)
-        let record: CKRecord = CKRecord(coder: coder)!
-        coder.finishDecoding()
-        return record
-    }
-    
-    func encodedSystemFields() -> NSData
-    {
-        let data = NSMutableData()
-        let coder = NSKeyedArchiver(forWritingWithMutableData: data)
-        self.encodeSystemFieldsWithCoder(coder)
-        coder.finishEncoding()
-        return data
+        var relationshipsByNameDictionary: Dictionary<String,NSRelationshipDescription> = Dictionary<String,NSRelationshipDescription>()
+        for (key,value) in self.relationshipsByName
+        {
+            if value.toMany == true
+            {
+                continue
+            }
+            
+            relationshipsByNameDictionary[key] = value
+        }
+        return relationshipsByNameDictionary
     }
 }

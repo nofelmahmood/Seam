@@ -1,4 +1,4 @@
-//    CKRecord.swift
+//    NSManagedObjectContext+Helpers.swift
 //
 //    The MIT License (MIT)
 //
@@ -23,40 +23,16 @@
 //    SOFTWARE.
 
 
-import UIKit
-import CloudKit
+import Foundation
+import CoreData
 
-
-extension CKRecord
+extension NSManagedObjectContext
 {
-    func attributeKeys() -> [String]
+    func saveIfHasChanges() throws
     {
-        return self.allKeys().filter({ (key) -> Bool in
-            return (self.objectForKey(key) is CKReference) == false
-        })
-    }
-    
-    func referencesKeys() -> [String]
-    {
-        return self.allKeys().filter({ (key) -> Bool in
-            return self.objectForKey(key) is CKReference
-        })
-    }
-    
-    class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord
-    {
-        let coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)
-        let record: CKRecord = CKRecord(coder: coder)!
-        coder.finishDecoding()
-        return record
-    }
-    
-    func encodedSystemFields() -> NSData
-    {
-        let data = NSMutableData()
-        let coder = NSKeyedArchiver(forWritingWithMutableData: data)
-        self.encodeSystemFieldsWithCoder(coder)
-        coder.finishEncoding()
-        return data
+        if self.hasChanges
+        {
+            try self.save()
+        }
     }
 }

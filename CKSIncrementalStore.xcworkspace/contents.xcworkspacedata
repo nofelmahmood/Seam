@@ -8,9 +8,6 @@
       location = "container:"
       name = "CKSIncrementalStore">
       <FileRef
-         location = "group:Seam/Seam.xcodeproj">
-      </FileRef>
-      <FileRef
          location = "group:CKSIncrementalStore/CKSIncrementalStore.swift">
       </FileRef>
       <FileRef

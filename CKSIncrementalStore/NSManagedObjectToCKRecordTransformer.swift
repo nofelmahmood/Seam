@@ -2,7 +2,7 @@
 //
 //    The MIT License (MIT)
 //
-//    Copyright (c) 2015 Nofel Mahmood (https://twitter.com/NofelMahmood)
+//    Copyright (c) 2015 Nofel Mahmood ( https://twitter.com/NofelMahmood )
 //
 //    Permission is hereby granted, free of charge, to any person obtaining a copy
 //    of this software and associated documentation files (the "Software"), to deal
@@ -140,7 +140,6 @@ extension NSEntityDescription
     func toOneRelationships() -> [NSRelationshipDescription]
     {
         return self.relationshipsByName.values.array.filter({ (relationshipDescription) -> Bool in
-            
             return relationshipDescription.toMany == false
         })
     }
@@ -154,6 +153,7 @@ extension NSEntityDescription
             {
                 continue
             }
+            
             relationshipsByNameDictionary[key] = value
         }
         return relationshipsByNameDictionary

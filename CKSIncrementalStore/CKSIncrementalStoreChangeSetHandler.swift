@@ -31,6 +31,19 @@ class CKSIncrementalStoreChangeSetHandler {
 
     static let defaultHandler = CKSIncrementalStoreChangeSetHandler()
     
+    class func changedPropertyKeys(keys: [String], entity: NSEntityDescription) -> [String]
+    {
+        return keys.filter({ (key) -> Bool in
+            
+            let property = entity.propertiesByName[key]
+            if property != nil && property is NSRelationshipDescription
+            {
+                let relationshipDescription: NSRelationshipDescription = property as! NSRelationshipDescription
+                return relationshipDescription.toMany == false
+            }
+            return true
+        })
+    }
     // MARK: Creation
     class func createChangeSet(ForInsertedObjectRecordID recordID: String, entityName: String, backingContext: NSManagedObjectContext)
     {
@@ -40,11 +53,13 @@ class CKSIncrementalStoreChangeSetHandler {
         changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordInserted.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
     }
     
-    class func createChangeSet(ForUpdatedObjectRecordID recordID: String, changedPropertiesKeys: Array<String>, entityName: String, backingContext: NSManagedObjectContext)
+    class func createChangeSet(ForUpdatedObject object: NSManagedObject, usingContext context: NSManagedObjectContext)
     {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: backingContext)
-        let changedPropertyKeysString = ",".join(changedPropertiesKeys)
-        changeSet.setValue(recordID, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: context)
+        let changedPropertyKeys = self.changedPropertyKeys(object.changedValues().keys.array, entity: object.entity)
+        let recordIDString: String = object.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+        let changedPropertyKeysString = ",".join(changedPropertyKeys)
+        changeSet.setValue(recordIDString, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
         changeSet.setValue(changedPropertyKeysString, forKey: CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName)
         changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
     }
@@ -89,69 +104,98 @@ class CKSIncrementalStoreChangeSetHandler {
         return nil
     }
     
-    private func recordsForUpdatedObjects(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+    private func recordsForUpdatedObjects(backingContext context: NSManagedObjectContext) throws -> [CKRecord]?
     {
-        let propertiesToFetch = [CKSIncrementalStoreLocalStoreRecordIDAttributeName,CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName,CKSIncrementalStoreLocalStoreEntityNameAttributeName]
-        let updatedObjectsChangeSets = try self.changeSets(ForChangeType: CKSLocalStoreRecordChangeType.RecordUpdated, propertiesToFetch: propertiesToFetch, backingContext: backingContext)
+        let fetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@ || %K == %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordInserted.rawValue), CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue))
         
-        for changeSet in updatedObjectsChangeSets as! [NSManagedObject]
+        let results = try context.executeFetchRequest(fetchRequest)
+        var ckRecords: [CKRecord] = [CKRecord]()
+        
+        if results.count > 0
         {
-            let entityName: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreEntityNameAttributeName) as! String
-            let recordID: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
-            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entityName)
-            let predicate: NSPredicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, recordID)
-            fetchRequest.predicate = predicate
-            fetchRequest.fetchLimit = 1
-            let results = try backingContext.executeFetchRequest(fetchRequest)
+            let recordIDSubstitution = "recordIDString"
+            let predicate = NSPredicate(format: "%K == $recordIDString", CKSIncrementalStoreLocalStoreRecordIDAttributeName)
             
-            if results.count > 0
+            for result in results as! [NSManagedObject]
             {
-                let originalObject: NSManagedObject = results.last as! NSManagedObject
-                let encodedFields: NSData = originalObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as! NSData
-                let changedValuesString: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName) as! String
-                let changedPropertiesKeys: Array<String> = changedValuesString.componentsSeparatedByString(",")
-                let ckRecord: CKRecord = CKRecord.recordWithEncodedFields(encodedFields)
-                var valuesDictionary = originalObject.dictionaryWithValuesForKeys(changedPropertiesKeys)
-                
-                for (key,value) in valuesDictionary
+                result.setValue(NSNumber(bool: true), forKey: CKSIncrementalStoreLocalStoreChangeQueuedAttributeName)
+                let entityName: String = result.valueForKey(CKSIncrementalStoreLocalStoreEntityNameAttributeName) as! String
+                let recordIDString: String = result.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entityName)
+                fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([recordIDSubstitution:recordIDString])
+                fetchRequest.fetchLimit = 1
+                let objects = try context.executeFetchRequest(fetchRequest)
+                if objects.count > 0
                 {
-                    if value is NSManagedObject
-                    {
-                        let relationshipManagedObject: NSManagedObject = value as! NSManagedObject
-                        let relationshipRecordID: String = relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
-                        let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
-                        let relationshipCKRecordID: CKRecordID = CKRecordID(recordName: relationshipRecordID, zoneID: ckRecordZoneID)
-                        let ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
-                        valuesDictionary[key] = ckReference
-                    }
+                    let object: NSManagedObject = objects.last as! NSManagedObject
+                    
                 }
-                ckRecord.setValuesForKeysWithDictionary(valuesDictionary)
                 
             }
         }
+        try context.saveIfHasChanges()
     }
+//    private func recordsForUpdatedObjects(backingContext: NSManagedObjectContext) throws -> [CKRecord]?
+//    {
+//        let propertiesToFetch = [CKSIncrementalStoreLocalStoreRecordIDAttributeName,CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName,CKSIncrementalStoreLocalStoreEntityNameAttributeName]
+//        let updatedObjectsChangeSets = try self.changeSets(ForChangeType: CKSLocalStoreRecordChangeType.RecordUpdated, propertiesToFetch: propertiesToFetch, backingContext: backingContext)
+//        
+//        for changeSet in updatedObjectsChangeSets as! [NSManagedObject]
+//        {
+//            let entityName: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreEntityNameAttributeName) as! String
+//            let recordID: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+//            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entityName)
+//            let predicate: NSPredicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, recordID)
+//            fetchRequest.predicate = predicate
+//            fetchRequest.fetchLimit = 1
+//            let results = try backingContext.executeFetchRequest(fetchRequest)
+//            
+//            if results.count > 0
+//            {
+//                let originalObject: NSManagedObject = results.last as! NSManagedObject
+//                let encodedFields: NSData = originalObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as! NSData
+//                let changedValuesString: String = changeSet.valueForKey(CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName) as! String
+//                let changedPropertiesKeys: Array<String> = changedValuesString.componentsSeparatedByString(",")
+//                let ckRecord: CKRecord = CKRecord.recordWithEncodedFields(encodedFields)
+//                var valuesDictionary = originalObject.dictionaryWithValuesForKeys(changedPropertiesKeys)
+//                
+//                for (key,value) in valuesDictionary
+//                {
+//                    if value is NSManagedObject
+//                    {
+//                        let relationshipManagedObject: NSManagedObject = value as! NSManagedObject
+//                        let relationshipRecordID: String = relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+//                        let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+//                        let relationshipCKRecordID: CKRecordID = CKRecordID(recordName: relationshipRecordID, zoneID: ckRecordZoneID)
+//                        let ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
+//                        valuesDictionary[key] = ckReference
+//                    }
+//                }
+//                ckRecord.setValuesForKeysWithDictionary(valuesDictionary)
+//                
+//            }
+//        }
+//
+//    }
+
     
-    func localChangesInCKRepresentation() -> (insertedOrUpdatedCKRecords: [CKRecord]?, deletedCKRecordIDs: [CKRecordID]?)
-    {
-    }
-    
-    func removeAllChangeSets(backingContext: NSManagedObjectContext) throws
+    func removeAllQueuedChangeSets(backingContext context: NSManagedObjectContext) throws
     {
         let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
         fetchRequest.includesPropertyValues = false
-        let results = try backingContext.executeFetchRequest(fetchRequest)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreChangeQueuedAttributeName, NSNumber(bool: true))
+        let results = try context.executeFetchRequest(fetchRequest)
+        
         if results.count > 0
         {
             for result in results
             {
                 let managedObject: NSManagedObject = result as! NSManagedObject
-                backingContext.deleteObject(managedObject)
+                context.deleteObject(managedObject)
             }
             
-            if backingContext.hasChanges
-            {
-                try backingContext.save()
-            }
+            try context.saveIfHasChanges()
         }
     }
 }

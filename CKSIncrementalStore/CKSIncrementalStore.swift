@@ -35,6 +35,7 @@ let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="cks_LocalStore_Attribu
 let CKSIncrementalStoreLocalStoreRecordIDAttributeName="cks_LocalStore_Attribute_RecordID"
 let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "cks_LocalStore_Attribute_EncodedValues"
 let CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName = "cks_LocalStore_Attribute_ChangedProperties"
+let CKSIncrementalStoreLocalStoreChangeQueuedAttributeName = "cks_LocalStore_Attribute_Queued"
 
 let CKSIncrementalStoreDidStartSyncOperationNotification = "CKSIncrementalStoreDidStartSyncOperationNotification"
 let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStoreDidFinishSyncOperationNotification"
@@ -204,6 +205,13 @@ class CKSIncrementalStore: NSIncrementalStore {
         recordChangeTypeAttribute.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordInserted.rawValue)
         changeSetEntity.properties.append(recordChangeTypeAttribute)
         
+        let changeTypeQueuedAttribute: NSAttributeDescription = NSAttributeDescription()
+        changeTypeQueuedAttribute.name = CKSIncrementalStoreLocalStoreChangeQueuedAttributeName
+        changeTypeQueuedAttribute.optional = false
+        changeTypeQueuedAttribute.attributeType = NSAttributeType.BooleanAttributeType
+        changeTypeQueuedAttribute.defaultValue = NSNumber(bool: false)
+        changeSetEntity.properties.append(changeTypeQueuedAttribute)
+        
         return changeSetEntity
     }
     
@@ -227,7 +235,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         return self.backingMOC.persistentStoreCoordinator?.managedObjectModel.entities.filter({ (object) -> Bool in
             
             let entity: NSEntityDescription = object
-            return (entity.name)! != CKSDeletedObjectsEntityName || (entity.name)! != CKSChangeSetEntityName
+            return (entity.name)! != CKSChangeSetEntityName
         })
     }
     
@@ -549,6 +557,4 @@ class CKSIncrementalStore: NSIncrementalStore {
             try self.backingMOC.save()
         }
     }
-    
-
 }

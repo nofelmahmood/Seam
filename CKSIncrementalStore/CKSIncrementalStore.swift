@@ -509,7 +509,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             mainContext.willChangeValueForKey("objectID")
             try mainContext.obtainPermanentIDsForObjects([sourceObject])
             mainContext.didChangeValueForKey("objectID")
-            CKSIncrementalStoreChangeSetHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
+            CKSIncrementalStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
             try self.backingMOC.save()
         }
@@ -529,7 +529,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             fetchRequest.fetchLimit = 1
             var results = try self.backingMOC.executeFetchRequest(fetchRequest)
             let backingObject: NSManagedObject = results.last as! NSManagedObject
-            CKSIncrementalStoreChangeSetHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
+            CKSIncrementalStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
             self.backingMOC.deleteObject(backingObject)
             try self.backingMOC.save()
         }
@@ -552,7 +552,10 @@ class CKSIncrementalStore: NSIncrementalStore {
             let keys = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys.array
             let sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
             backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
-            CKSIncrementalStoreChangeSetHandler.createChangeSet(ForUpdatedObjectRecordID: recordID, changedPropertiesKeys: sourceObject.changedValues().keys.array, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
+            if sourceObject.changedValues().count != 0
+            {
+                CKSIncrementalStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
+            }
             try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
             try self.backingMOC.save()
         }

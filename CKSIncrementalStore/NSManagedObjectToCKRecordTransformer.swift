@@ -136,7 +136,7 @@ extension CKRecord
 }
 
 extension NSEntityDescription
-{
+{    
     func toOneRelationships() -> [NSRelationshipDescription]
     {
         return self.relationshipsByName.values.array.filter({ (relationshipDescription) -> Bool in
@@ -162,9 +162,18 @@ extension NSEntityDescription
 
 extension NSManagedObject
 {
-    private func setAllAttributesValuesAsCKRecordAttributeValues(ofCKRecord ckRecord:CKRecord)
+    private func setAttributesValues(ofCKRecord ckRecord:CKRecord, withValuesOfAttributeWithKeys keys: [String]?)
     {
-        let attributes = self.entity.attributesByName.keys.array
+        var attributes: [String] = [String]()
+        if keys != nil
+        {
+            attributes = keys!
+        }
+        else
+        {
+            attributes = self.entity.attributesByName.keys.array
+        }
+        
         let valuesDictionary = self.dictionaryWithValuesForKeys(attributes)
         for (key,_) in valuesDictionary
         {
@@ -210,25 +219,35 @@ extension NSManagedObject
         }
     }
     
-    private func setAllRelationshipsAsCKReferences(ofCKRecord ckRecord: CKRecord)
+    private func setRelationshipValues(ofCKRecord ckRecord:CKRecord, withValuesOfRelationshipWithKeys keys: [String]?)
     {
-        let relationships = self.entity.toOneRelationships()
+        var relationships: [String] = [String]()
+        if keys != nil
+        {
+            relationships = keys!
+        }
+        else
+        {
+            relationships = self.entity.toOneRelationshipsByName().keys.array
+        }
+        
         for relationship in relationships
         {
-            let relationshipManagedObject = self.valueForKey(relationship.name)
+            let relationshipManagedObject = self.valueForKey(relationship)
             if relationshipManagedObject != nil
             {
                 let recordIDString: String = self.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
                 let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
                 let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
                 let ckReference: CKReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
-                ckRecord.setObject(ckReference, forKey: relationship.name)
+                ckRecord.setObject(ckReference, forKey: relationship)
             }
         }
     }
     
-    public func createOrUpdateCKRecord(usingEncodedFields encodedFields: NSData?) -> CKRecord?
+    public func createOrUpdateCKRecord(usingValuesOfChangedKeys keys: [String]?) -> CKRecord?
     {
+        let encodedFields: NSData? = self.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as? NSData
         var ckRecord: CKRecord?
         if encodedFields != nil
         {
@@ -241,8 +260,28 @@ extension NSManagedObject
             let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
             ckRecord = CKRecord(recordType: self.entity.name!, recordID: ckRecordID)
         }
-        self.setAllAttributesValuesAsCKRecordAttributeValues(ofCKRecord: ckRecord!)
-        self.setAllRelationshipsAsCKReferences(ofCKRecord: ckRecord!)
+        
+        if keys != nil
+        {
+            let attributeKeys = self.entity.attributesByName.filter { (object) -> Bool in
+                return keys!.contains(object.0)
+            }.map { (object) -> String in
+                return object.0
+            }
+        
+            let relationshipKeys = self.entity.relationshipsByName.filter { (object) -> Bool in
+                return keys!.contains(object.0)
+            }.map { (object) -> String in
+                return object.0
+            }
+            self.setAttributesValues(ofCKRecord: ckRecord!, withValuesOfAttributeWithKeys: attributeKeys)
+            self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: relationshipKeys)
+            return ckRecord
+        }
+        
+        self.setAttributesValues(ofCKRecord: ckRecord!, withValuesOfAttributeWithKeys: nil)
+        self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: nil)
+
         return ckRecord
     }
 }

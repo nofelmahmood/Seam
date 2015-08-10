@@ -150,4 +150,5 @@ extension NSManagedObject
         self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: nil)
         
         return ckRecord
+    }
 }

@@ -552,10 +552,7 @@ class CKSIncrementalStore: NSIncrementalStore {
             let keys = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys.array
             let sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
             backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
-            if sourceObject.changedValues().count != 0
-            {
-                CKSIncrementalStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
-            }
+            CKSIncrementalStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
             try self.backingMOC.save()
         }

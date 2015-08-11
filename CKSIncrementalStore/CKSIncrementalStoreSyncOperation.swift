@@ -47,7 +47,6 @@ enum CKSStoresSyncError: ErrorType
     case ConflictsDetected
 }
 
-
 class CKSIncrementalStoreSyncOperation: NSOperation {
     
     private var operationQueue:NSOperationQueue?
@@ -302,7 +301,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
             return entity.name!
         })
         
-        var deletedManagedObjects: Array<AnyObject> = Array<AnyObject>()
+        let deletedManagedObjects: Array<AnyObject> = Array<AnyObject>()
         var insertedOrUpdatedManagedObjects: Array<AnyObject> = Array<AnyObject>()
         
         let predicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue))

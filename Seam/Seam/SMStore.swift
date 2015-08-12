@@ -1,4 +1,4 @@
-//    CKSIncrementalStore.swift
+//    SMStore.swift
 //
 //    The MIT License (MIT)
 //
@@ -46,6 +46,7 @@ let CKSIncrementalStoreErrorDomain = "CKSIncrementalStoreErrorDomain"
 
 let CKSChangeSetEntityName = "CKS_ChangeSetEntity"
 
+public let SeamStoreType = "SeamStoreType"
 enum CKSLocalStoreRecordChangeType: Int16
 {
     case RecordNoChange = 0
@@ -62,7 +63,7 @@ enum CKSIncrementalStoreError: ErrorType
 }
 
 
-public class CKSIncrementalStore: NSIncrementalStore {
+public class SMStore: NSIncrementalStore {
     
     private var syncOperation:CKSIncrementalStoreSyncOperation?
     private var cloudStoreSetupOperation:CKSIncrementalStoreCloudStoreSetupOperation?
@@ -105,6 +106,7 @@ public class CKSIncrementalStore: NSIncrementalStore {
     }
     
     class public var type:String{
+        
         return NSStringFromClass(self)
     }
     

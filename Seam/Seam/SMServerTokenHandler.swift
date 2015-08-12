@@ -1,4 +1,4 @@
-//    CKSIncrementalStoreSyncOperationTokenHandler.swift
+//    SMServerTokenHandler.swift
 //
 //    The MIT License (MIT)
 //
@@ -26,9 +26,9 @@
 import Foundation
 import CloudKit
 
-class CKSIncrementalStoreSyncOperationTokenHandler
+class SMServerTokenHandler
 {
-    static let defaultHandler = CKSIncrementalStoreSyncOperationTokenHandler()
+    static let defaultHandler = SMServerTokenHandler()
     private var newToken: CKServerChangeToken?
     
     func token()->CKServerChangeToken?

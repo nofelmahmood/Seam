@@ -1,4 +1,4 @@
-//    CKSIncrementalStoreCloudStoreSetupOperation.swift
+//    SMServerStoreSetupOperation.swift
 //
 //    The MIT License (MIT)
 //
@@ -29,7 +29,7 @@ import CloudKit
 let CKSIncrementalStoreCloudStoreCustomZoneKey = "CKSIncrementalStoreCloudStoreCustomZoneKey"
 let CKSIncrementalStoreCloudStoreZoneSubcriptionKey = "CKSIncrementalStoreCloudStoreZoneSubcriptionKey"
 
-class CKSIncrementalStoreCloudStoreSetupOperation:NSOperation {
+class SMServerStoreSetupOperation:NSOperation {
     
     var database:CKDatabase?
     var setupOperationCompletionBlock:((customZoneCreated:Bool,customZoneSubscriptionCreated:Bool)->Void)?

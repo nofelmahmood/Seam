@@ -1,4 +1,4 @@
-//    CKSIncrementalStoreSyncOperation.swift
+//    SMStoreSyncOperation.swift
 //
 //    The MIT License (MIT)
 //
@@ -47,7 +47,7 @@ enum CKSStoresSyncError: ErrorType
     case ConflictsDetected
 }
 
-class CKSIncrementalStoreSyncOperation: NSOperation {
+class SMStoreSyncOperation: NSOperation {
     
     private var operationQueue:NSOperationQueue?
     private var localStoreMOC:NSManagedObjectContext?
@@ -297,6 +297,7 @@ class CKSIncrementalStoreSyncOperation: NSOperation {
     
     func localChanges() throws -> (insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>)
     {
+    
         let entityNames = self.entities!.map( { (entity) -> String in
             return entity.name!
         })

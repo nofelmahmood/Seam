@@ -1,4 +1,4 @@
-//    CKSIncrementalStoreChangeSetHandler.swift
+//    SMStoreChangeSetHandler.swift
 //
 //    The MIT License (MIT)
 //
@@ -27,9 +27,9 @@ import Foundation
 import CoreData
 import CloudKit
 
-class CKSIncrementalStoreChangeSetHandler {
+class SMStoreChangeSetHandler {
 
-    static let defaultHandler = CKSIncrementalStoreChangeSetHandler()
+    static let defaultHandler = SMStoreChangeSetHandler()
     
     func changedPropertyKeys(keys: [String], entity: NSEntityDescription) -> [String]
     {

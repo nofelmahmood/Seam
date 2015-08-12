@@ -16,8 +16,10 @@
 		3E191E4C1B7B6CD300BB9E71 /* SeamDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E4B1B7B6CD300BB9E71 /* SeamDemoTests.swift */; };
 		3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */; };
 		3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E591B7B6D1D00BB9E71 /* CoreData.framework */; };
-		3E191E711B7B75E100BB9E71 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E6F1B7B75DE00BB9E71 /* Seam.framework */; };
-		3E191E721B7B75E100BB9E71 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E6F1B7B75DE00BB9E71 /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */; };
+		3E191E791B7B7A4400BB9E71 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E781B7B7A4400BB9E71 /* Seam.framework */; };
+		3E191E7A1B7B7A4700BB9E71 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E781B7B7A4400BB9E71 /* Seam.framework */; };
+		3E191E7B1B7B7A4700BB9E71 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E781B7B7A4400BB9E71 /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -31,13 +33,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3E191E731B7B75E100BB9E71 /* Embed Frameworks */ = {
+		3E191E7C1B7B7A4700BB9E71 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				3E191E721B7B75E100BB9E71 /* Seam.framework in Embed Frameworks */,
+				3E191E7B1B7B7A4700BB9E71 /* Seam.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -59,7 +61,8 @@
 		3E191E561B7B6CF100BB9E71 /* SeamDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SeamDemo.entitlements; sourceTree = "<group>"; };
 		3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3E191E591B7B6D1D00BB9E71 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		3E191E6F1B7B75DE00BB9E71 /* Seam.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Seam.framework; path = "../../../../../../Library/Developer/Xcode/DerivedData/Seam-fscltwtnrlnhawgrfxejlcwqcnaz/Build/Products/Debug-iphoneos/Seam.framework"; sourceTree = "<group>"; };
+		3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		3E191E781B7B7A4400BB9E71 /* Seam.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Seam.framework; path = "../../../../../../Library/Developer/Xcode/DerivedData/Seam-fscltwtnrlnhawgrfxejlcwqcnaz/Build/Products/Debug-iphoneos/Seam.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E191E711B7B75E100BB9E71 /* Seam.framework in Frameworks */,
+				3E191E7A1B7B7A4700BB9E71 /* Seam.framework in Frameworks */,
+				3E191E791B7B7A4400BB9E71 /* Seam.framework in Frameworks */,
 				3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */,
 				3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */,
 			);
@@ -86,7 +90,7 @@
 		3E191E271B7B6CD300BB9E71 = {
 			isa = PBXGroup;
 			children = (
-				3E191E6F1B7B75DE00BB9E71 /* Seam.framework */,
+				3E191E781B7B7A4400BB9E71 /* Seam.framework */,
 				3E191E591B7B6D1D00BB9E71 /* CoreData.framework */,
 				3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */,
 				3E191E321B7B6CD300BB9E71 /* SeamDemo */,
@@ -110,6 +114,7 @@
 				3E191E561B7B6CF100BB9E71 /* SeamDemo.entitlements */,
 				3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */,
 				3E191E351B7B6CD300BB9E71 /* ViewController.swift */,
+				3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */,
 				3E191E371B7B6CD300BB9E71 /* Main.storyboard */,
 				3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */,
 				3E191E3F1B7B6CD300BB9E71 /* LaunchScreen.storyboard */,
@@ -138,7 +143,7 @@
 				3E191E2C1B7B6CD300BB9E71 /* Sources */,
 				3E191E2D1B7B6CD300BB9E71 /* Frameworks */,
 				3E191E2E1B7B6CD300BB9E71 /* Resources */,
-				3E191E731B7B75E100BB9E71 /* Embed Frameworks */,
+				3E191E7C1B7B7A4700BB9E71 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -241,6 +246,7 @@
 				3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */,
 				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
+				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

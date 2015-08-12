@@ -31,7 +31,7 @@ extension CKRecord
 {
     private func allAttributeValuesAsManagedObjectAttributeValues(usingContext context: NSManagedObjectContext) -> [String:AnyObject]?
     {
-        return self.dictionaryWithValuesForKeys(self.allAttributeKeys())
+        return self.dictionaryWithValuesForKeys(self.attributeKeys())
     }
     
     private func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext) -> [String:NSManagedObject]?

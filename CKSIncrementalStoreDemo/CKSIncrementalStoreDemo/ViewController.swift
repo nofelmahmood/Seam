@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreData
+import Seam
 
 class ViewController: UIViewController,UITableViewDataSource,UITableViewDelegate,UITextFieldDelegate {
     

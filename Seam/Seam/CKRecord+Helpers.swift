@@ -23,13 +23,13 @@
 //    SOFTWARE.
 
 
-import Foundation
+import UIKit
 import CloudKit
 
 
 extension CKRecord
 {
-    func allAttributeKeys() -> [String]
+    func attributeKeys() -> [String]
     {
         return self.allKeys().filter({ (key) -> Bool in
             return (self.objectForKey(key) is CKReference) == false

@@ -37,8 +37,8 @@ let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "cks_LocalSt
 let CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName = "cks_LocalStore_Attribute_ChangedProperties"
 let CKSIncrementalStoreLocalStoreChangeQueuedAttributeName = "cks_LocalStore_Attribute_Queued"
 
-let CKSIncrementalStoreDidStartSyncOperationNotification = "CKSIncrementalStoreDidStartSyncOperationNotification"
-let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStoreDidFinishSyncOperationNotification"
+public let CKSIncrementalStoreDidStartSyncOperationNotification = "CKSIncrementalStoreDidStartSyncOperationNotification"
+public let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStoreDidFinishSyncOperationNotification"
 
 let CKSIncrementalStoreSyncConflictPolicyOption = "CKSIncrementalStoreSyncConflictPolicyOption"
 
@@ -62,7 +62,7 @@ enum CKSIncrementalStoreError: ErrorType
 }
 
 
-class CKSIncrementalStore: NSIncrementalStore {
+public class CKSIncrementalStore: NSIncrementalStore {
     
     private var syncOperation:CKSIncrementalStoreSyncOperation?
     private var cloudStoreSetupOperation:CKSIncrementalStoreCloudStoreSetupOperation?
@@ -83,7 +83,7 @@ class CKSIncrementalStore: NSIncrementalStore {
     
     var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
-    override class func initialize()
+    override public class func initialize()
     {
         NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: self.type)
     }
@@ -104,11 +104,11 @@ class CKSIncrementalStore: NSIncrementalStore {
         
     }
     
-    class var type:String{
+    class public var type:String{
         return NSStringFromClass(self)
     }
     
-    override func loadMetadata() throws {
+    override public  func loadMetadata() throws {
         
         self.metadata=[
             NSStoreUUIDKey:NSProcessInfo().globallyUniqueString,
@@ -215,7 +215,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         return changeSetEntity
     }
     
-    internal func handlePush(userInfo userInfo:[NSObject : AnyObject])
+    public func handlePush(userInfo userInfo:[NSObject : AnyObject])
     {
         let u = userInfo as! [String : NSObject]
         let ckNotification = CKNotification(fromRemoteNotificationDictionary: u)
@@ -294,7 +294,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidStartSyncOperationNotification, object: self)
     }
     
-    override func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
+    override public func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
         
         if request.requestType == NSPersistentStoreRequestType.FetchRequestType
         {
@@ -314,7 +314,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         }
     }
     
-    override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
+    override public func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
         
         let recordID:String = self.referenceObjectForObjectID(objectID) as! String
         let propertiesToFetch = objectID.entity.propertiesByName.values.array.filter({(object) -> Bool in
@@ -360,7 +360,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         
     }
     
-    override func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?) throws -> AnyObject {
+    override public func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?) throws -> AnyObject {
         
         let recordID: String = self.referenceObjectForObjectID(objectID) as! String
         let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
@@ -384,7 +384,7 @@ class CKSIncrementalStore: NSIncrementalStore {
         return []
     }
     
-    override func obtainPermanentIDsForObjects(array: [NSManagedObject]) throws -> [NSManagedObjectID] {
+    override public func obtainPermanentIDsForObjects(array: [NSManagedObject]) throws -> [NSManagedObjectID] {
         
         return array.map({ (object) -> NSManagedObjectID in
             

@@ -23,7 +23,7 @@
 //    SOFTWARE.
 
 
-import Foundation
+import UIKit
 import CloudKit
 
 class CKSIncrementalStoreSyncOperationTokenHandler

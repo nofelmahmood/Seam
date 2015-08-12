@@ -6,7 +6,9 @@
 //  Copyright © 2015 CloudKitSpace. All rights reserved.
 //
 
+import Foundation
 import XCTest
+
 @testable import Seam
 
 class SeamTests: XCTestCase {

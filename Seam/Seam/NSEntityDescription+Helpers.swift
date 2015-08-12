@@ -23,7 +23,7 @@
 //    SOFTWARE.
 
 
-import UIKit
+import Foundation
 import CoreData
 
 extension NSEntityDescription

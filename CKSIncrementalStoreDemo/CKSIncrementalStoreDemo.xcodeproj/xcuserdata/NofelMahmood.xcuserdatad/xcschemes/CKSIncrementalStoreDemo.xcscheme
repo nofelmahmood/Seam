@@ -52,6 +52,16 @@
                ReferencedContainer = "container:CKSIncrementalStoreDemo.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "3E8E25D61B7B0933009C47EA"
+               BuildableName = "SeamTests.xctest"
+               BlueprintName = "SeamTests"
+               ReferencedContainer = "container:CKSIncrementalStoreDemo.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

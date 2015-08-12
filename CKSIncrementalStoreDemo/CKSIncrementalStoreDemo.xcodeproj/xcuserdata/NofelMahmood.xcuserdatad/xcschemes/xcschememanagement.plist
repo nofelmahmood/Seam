@@ -9,6 +9,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>Seam.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>1</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
@@ -18,6 +23,16 @@
 			<true/>
 		</dict>
 		<key>10471C0A1B389CFA007AA343</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3E8E25CD1B7B0932009C47EA</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3E8E25D61B7B0933009C47EA</key>
 		<dict>
 			<key>primary</key>
 			<true/>

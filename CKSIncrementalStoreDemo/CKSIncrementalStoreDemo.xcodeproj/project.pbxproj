@@ -41,6 +41,19 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		3E8E25EA1B7B0933009C47EA /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		10471BF31B389CF8007AA343 /* CKSIncrementalStoreDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CKSIncrementalStoreDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		10471BF71B389CFA007AA343 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -190,6 +203,7 @@
 				10471BEF1B389CF8007AA343 /* Sources */,
 				10471BF01B389CF8007AA343 /* Frameworks */,
 				10471BF11B389CF8007AA343 /* Resources */,
+				3E8E25EA1B7B0933009C47EA /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

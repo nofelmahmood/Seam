@@ -43,16 +43,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		3E191DCA1B7B3CAF00BB9E71 /* CKRecord+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecord+Helpers.swift"; path = "../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/CKRecord+Helpers.swift"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DCB1B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecord+NSManagedObject.swift"; path = "../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/CKRecord+NSManagedObject.swift"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStore.swift; path = ../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/SMStore.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStoreChangeSetHandler.swift; path = ../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/SMStoreChangeSetHandler.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DCE1B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMServerStoreSetupOperation.swift; path = ../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/SMServerStoreSetupOperation.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DCF1B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStoreSyncOperation.swift; path = ../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/SMStoreSyncOperation.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DD01B7B3CAF00BB9E71 /* SMServerTokenHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMServerTokenHandler.swift; path = ../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/SMServerTokenHandler.swift; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DD11B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSEntityDescription+Helpers.swift"; path = "../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/NSEntityDescription+Helpers.swift"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DD21B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSManagedObject+CKRecord.swift"; path = "../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/NSManagedObject+CKRecord.swift"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E191DD31B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSManagedObjectContext+Helpers.swift"; path = "../../../../../../../../Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/Seam/Seam/NSManagedObjectContext+Helpers.swift"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3E191DCA1B7B3CAF00BB9E71 /* CKRecord+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecord+Helpers.swift"; sourceTree = "<group>"; };
+		3E191DCB1B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecord+NSManagedObject.swift"; sourceTree = "<group>"; };
+		3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMStore.swift; sourceTree = "<group>"; };
+		3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMStoreChangeSetHandler.swift; sourceTree = "<group>"; };
+		3E191DCE1B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMServerStoreSetupOperation.swift; sourceTree = "<group>"; };
+		3E191DCF1B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMStoreSyncOperation.swift; sourceTree = "<group>"; };
+		3E191DD01B7B3CAF00BB9E71 /* SMServerTokenHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMServerTokenHandler.swift; sourceTree = "<group>"; };
+		3E191DD11B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSEntityDescription+Helpers.swift"; sourceTree = "<group>"; };
+		3E191DD21B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+CKRecord.swift"; sourceTree = "<group>"; };
+		3E191DD31B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Helpers.swift"; sourceTree = "<group>"; };
 		3E8E26C11B7B11BD009C47EA /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E8E26C41B7B11BD009C47EA /* Seam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Seam.h; sourceTree = "<group>"; };
 		3E8E26C61B7B11BD009C47EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -384,6 +384,7 @@
 		3E8E26D61B7B11BD009C47EA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -392,17 +393,23 @@
 				INFOPLIST_FILE = Seam/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.Seam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				VALIDATE_PRODUCT = NO;
+				VALID_ARCHS = "arm64 armv7 armv7s x86_64 i386";
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Debug;
 		};
 		3E8E26D71B7B11BD009C47EA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -411,10 +418,14 @@
 				INFOPLIST_FILE = Seam/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.Seam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "arm64 armv7 armv7s x86_64 i386";
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Release;
 		};

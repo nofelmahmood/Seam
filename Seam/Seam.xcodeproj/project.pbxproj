@@ -21,15 +21,15 @@
 		3E8E27171B7B1A49009C47EA /* CKRecord+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8E270D1B7B1A49009C47EA /* CKRecord+NSManagedObject.swift */; };
 		3E8E27181B7B1A49009C47EA /* NSManagedObjectContext+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8E270E1B7B1A49009C47EA /* NSManagedObjectContext+Helpers.swift */; };
 		3E8E27191B7B1A93009C47EA /* CKSIncrementalStore.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27051B7B1A49009C47EA /* CKSIncrementalStore.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E271A1B7B1A93009C47EA /* CKSIncrementalStoreCloudStoreSetupOperation.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27061B7B1A49009C47EA /* CKSIncrementalStoreCloudStoreSetupOperation.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E271B1B7B1A93009C47EA /* CKSIncrementalStoreSyncOperation.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27071B7B1A49009C47EA /* CKSIncrementalStoreSyncOperation.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E271C1B7B1A93009C47EA /* CKSIncrementalStoreChangeSetHandler.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27081B7B1A49009C47EA /* CKSIncrementalStoreChangeSetHandler.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E271D1B7B1A93009C47EA /* CKSIncrementalStoreSyncOperationTokenHandler.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27091B7B1A49009C47EA /* CKSIncrementalStoreSyncOperationTokenHandler.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E271E1B7B1A93009C47EA /* CKRecord+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270A1B7B1A49009C47EA /* CKRecord+Helpers.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E271F1B7B1A93009C47EA /* NSEntityDescription+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270B1B7B1A49009C47EA /* NSEntityDescription+Helpers.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E27201B7B1A93009C47EA /* NSManagedObject+CKRecord.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270C1B7B1A49009C47EA /* NSManagedObject+CKRecord.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E27211B7B1A93009C47EA /* CKRecord+NSManagedObject.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270D1B7B1A49009C47EA /* CKRecord+NSManagedObject.swift */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E27221B7B1A93009C47EA /* NSManagedObjectContext+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270E1B7B1A49009C47EA /* NSManagedObjectContext+Helpers.swift */; settings = {ATTRIBUTES = (Public, ); }; };
+		3E8E271A1B7B1A93009C47EA /* CKSIncrementalStoreCloudStoreSetupOperation.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27061B7B1A49009C47EA /* CKSIncrementalStoreCloudStoreSetupOperation.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E8E271B1B7B1A93009C47EA /* CKSIncrementalStoreSyncOperation.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27071B7B1A49009C47EA /* CKSIncrementalStoreSyncOperation.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E8E271C1B7B1A93009C47EA /* CKSIncrementalStoreChangeSetHandler.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27081B7B1A49009C47EA /* CKSIncrementalStoreChangeSetHandler.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E8E271D1B7B1A93009C47EA /* CKSIncrementalStoreSyncOperationTokenHandler.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E27091B7B1A49009C47EA /* CKSIncrementalStoreSyncOperationTokenHandler.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E8E271E1B7B1A93009C47EA /* CKRecord+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270A1B7B1A49009C47EA /* CKRecord+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E8E271F1B7B1A93009C47EA /* NSEntityDescription+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270B1B7B1A49009C47EA /* NSEntityDescription+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E8E27201B7B1A93009C47EA /* NSManagedObject+CKRecord.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270C1B7B1A49009C47EA /* NSManagedObject+CKRecord.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E8E27211B7B1A93009C47EA /* CKRecord+NSManagedObject.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270D1B7B1A49009C47EA /* CKRecord+NSManagedObject.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E8E27221B7B1A93009C47EA /* NSManagedObjectContext+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E270E1B7B1A49009C47EA /* NSManagedObjectContext+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -135,15 +135,15 @@
 			files = (
 				3E8E26C51B7B11BD009C47EA /* Seam.h in Headers */,
 				3E8E27191B7B1A93009C47EA /* CKSIncrementalStore.swift in Headers */,
-				3E8E271A1B7B1A93009C47EA /* CKSIncrementalStoreCloudStoreSetupOperation.swift in Headers */,
-				3E8E271B1B7B1A93009C47EA /* CKSIncrementalStoreSyncOperation.swift in Headers */,
-				3E8E271C1B7B1A93009C47EA /* CKSIncrementalStoreChangeSetHandler.swift in Headers */,
-				3E8E271D1B7B1A93009C47EA /* CKSIncrementalStoreSyncOperationTokenHandler.swift in Headers */,
-				3E8E271E1B7B1A93009C47EA /* CKRecord+Helpers.swift in Headers */,
-				3E8E271F1B7B1A93009C47EA /* NSEntityDescription+Helpers.swift in Headers */,
-				3E8E27201B7B1A93009C47EA /* NSManagedObject+CKRecord.swift in Headers */,
-				3E8E27211B7B1A93009C47EA /* CKRecord+NSManagedObject.swift in Headers */,
 				3E8E27221B7B1A93009C47EA /* NSManagedObjectContext+Helpers.swift in Headers */,
+				3E8E271D1B7B1A93009C47EA /* CKSIncrementalStoreSyncOperationTokenHandler.swift in Headers */,
+				3E8E271B1B7B1A93009C47EA /* CKSIncrementalStoreSyncOperation.swift in Headers */,
+				3E8E271A1B7B1A93009C47EA /* CKSIncrementalStoreCloudStoreSetupOperation.swift in Headers */,
+				3E8E271C1B7B1A93009C47EA /* CKSIncrementalStoreChangeSetHandler.swift in Headers */,
+				3E8E27211B7B1A93009C47EA /* CKRecord+NSManagedObject.swift in Headers */,
+				3E8E271F1B7B1A93009C47EA /* NSEntityDescription+Helpers.swift in Headers */,
+				3E8E271E1B7B1A93009C47EA /* CKRecord+Helpers.swift in Headers */,
+				3E8E27201B7B1A93009C47EA /* NSManagedObject+CKRecord.swift in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -441,6 +441,7 @@
 				3E8E26D71B7B11BD009C47EA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3E8E26D81B7B11BD009C47EA /* Build configuration list for PBXNativeTarget "SeamTests" */ = {
 			isa = XCConfigurationList;
@@ -449,6 +450,7 @@
 				3E8E26DA1B7B11BD009C47EA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

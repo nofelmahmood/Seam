@@ -16,8 +16,9 @@
 		10471C121B389CFA007AA343 /* CKSIncrementalStoreDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C111B389CFA007AA343 /* CKSIncrementalStoreDemoTests.swift */; };
 		10471C1D1B389D3B007AA343 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10471C1C1B389D3B007AA343 /* CoreDataStack.swift */; };
 		10471C241B389E60007AA343 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10471C231B389E60007AA343 /* CloudKit.framework */; };
-		3E8E27021B7B1923009C47EA /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26F51B7B183C009C47EA /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3E8E27041B7B194D009C47EA /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26F51B7B183C009C47EA /* Seam.framework */; };
+		3EA460AC1B7B2C3B00C32E63 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26F51B7B183C009C47EA /* Seam.framework */; };
+		3EA460AD1B7B2C4C00C32E63 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26F51B7B183C009C47EA /* Seam.framework */; };
+		3EA460AE1B7B2C4C00C32E63 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26F51B7B183C009C47EA /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3EC0C4ED1B6E5E1E00EBE856 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EC0C4EC1B6E5E1E00EBE856 /* CoreData.framework */; };
 		3EF9A5FF1B5C485C007FCBFD /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF9A5FE1B5C485C007FCBFD /* Task.swift */; };
 		3EF9A6011B5C485D007FCBFD /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF9A6001B5C485D007FCBFD /* Tag.swift */; };
@@ -34,13 +35,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		3E8E27031B7B1923009C47EA /* Embed Frameworks */ = {
+		3EA460AF1B7B2C4C00C32E63 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				3E8E27021B7B1923009C47EA /* Seam.framework in Embed Frameworks */,
+				3EA460AE1B7B2C4C00C32E63 /* Seam.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,7 +63,7 @@
 		10471C1B1B389D0B007AA343 /* CKSIncrementalStoreDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = CKSIncrementalStoreDemo.entitlements; sourceTree = "<group>"; };
 		10471C1C1B389D3B007AA343 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		10471C231B389E60007AA343 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		3E8E26F51B7B183C009C47EA /* Seam.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Seam.framework; path = "../../../../../../Library/Developer/Xcode/DerivedData/CKSIncrementalStore-abylvmchbzmuxzepytnlxcybkwlv/Build/Products/Debug-iphoneos/Seam.framework"; sourceTree = "<group>"; };
+		3E8E26F51B7B183C009C47EA /* Seam.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EC0C4EC1B6E5E1E00EBE856 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3EF9A5FE1B5C485C007FCBFD /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		3EF9A6001B5C485D007FCBFD /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
@@ -73,9 +74,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3EA460AD1B7B2C4C00C32E63 /* Seam.framework in Frameworks */,
+				3EA460AC1B7B2C3B00C32E63 /* Seam.framework in Frameworks */,
 				3EC0C4ED1B6E5E1E00EBE856 /* CoreData.framework in Frameworks */,
 				10471C241B389E60007AA343 /* CloudKit.framework in Frameworks */,
-				3E8E27041B7B194D009C47EA /* Seam.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,7 +173,7 @@
 				10471BEF1B389CF8007AA343 /* Sources */,
 				10471BF01B389CF8007AA343 /* Frameworks */,
 				10471BF11B389CF8007AA343 /* Resources */,
-				3E8E27031B7B1923009C47EA /* Embed Frameworks */,
+				3EA460AF1B7B2C4C00C32E63 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);

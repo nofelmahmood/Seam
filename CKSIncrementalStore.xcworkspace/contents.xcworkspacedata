@@ -7,40 +7,6 @@
    <FileRef
       location = "group:CKSIncrementalStoreDemo/CKSIncrementalStoreDemo.xcodeproj">
    </FileRef>
-   <Group
-      location = "container:"
-      name = "CKSIncrementalStore">
-      <FileRef
-         location = "group:CKSIncrementalStore/CKSIncrementalStore.swift">
-      </FileRef>
-      <FileRef
-         location = "group:CKSIncrementalStore/CKSIncrementalStoreCloudStoreSetupOperation.swift">
-      </FileRef>
-      <FileRef
-         location = "group:CKSIncrementalStore/CKSIncrementalStoreSyncOperation.swift">
-      </FileRef>
-      <FileRef
-         location = "group:CKSIncrementalStore/CKSIncrementalStoreChangeSetHandler.swift">
-      </FileRef>
-      <FileRef
-         location = "group:CKSIncrementalStore/CKSIncrementalStoreSyncOperationTokenHandler.swift">
-      </FileRef>
-      <FileRef
-         location = "group:/Users/NofelMahmood/Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/CKSIncrementalStore/CKRecord+Helpers.swift">
-      </FileRef>
-      <FileRef
-         location = "group:/Users/NofelMahmood/Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/CKSIncrementalStore/NSEntityDescription+Helpers.swift">
-      </FileRef>
-      <FileRef
-         location = "group:CKSIncrementalStore/NSManagedObject+CKRecord.swift">
-      </FileRef>
-      <FileRef
-         location = "group:CKSIncrementalStore/CKRecord+NSManagedObject.swift">
-      </FileRef>
-      <FileRef
-         location = "group:CKSIncrementalStore/NSManagedObjectContext+Helpers.swift">
-      </FileRef>
-   </Group>
    <FileRef
       location = "group:LICENSE">
    </FileRef>

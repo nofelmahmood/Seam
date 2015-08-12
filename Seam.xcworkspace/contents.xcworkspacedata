@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:SeamDemo/SeamDemo.xcodeproj">
+   </FileRef>
+   <FileRef
       location = "group:Seam/Seam.xcodeproj">
    </FileRef>
    <FileRef

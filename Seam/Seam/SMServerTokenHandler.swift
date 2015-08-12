@@ -31,18 +31,18 @@ class SMServerTokenHandler
     static let defaultHandler = SMServerTokenHandler()
     private var newToken: CKServerChangeToken?
     
-    func token()->CKServerChangeToken?
+    func token() -> CKServerChangeToken?
     {
-        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncOperationFetchChangeTokenKey) != nil
+        if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreSyncOperationServerTokenKey) != nil
         {
-            let fetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreSyncOperationFetchChangeTokenKey) as! NSData
+            let fetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreSyncOperationServerTokenKey) as! NSData
             return NSKeyedUnarchiver.unarchiveObjectWithData(fetchTokenKeyArchived) as? CKServerChangeToken
         }
         
         return nil
     }
     
-    func save(serverChangeToken serverChangeToken:CKServerChangeToken)
+    func save(serverChangeToken serverChangeToken: CKServerChangeToken)
     {
         self.newToken = serverChangeToken
     }
@@ -51,7 +51,7 @@ class SMServerTokenHandler
     {
         if self.newToken != nil
         {
-            NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(self.newToken!), forKey: CKSIncrementalStoreSyncOperationFetchChangeTokenKey)
+            NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(self.newToken!), forKey: SMStoreSyncOperationServerTokenKey)
         }
     }
     
@@ -59,7 +59,7 @@ class SMServerTokenHandler
     {
         if self.token() != nil
         {
-            NSUserDefaults.standardUserDefaults().setObject(nil, forKey: CKSIncrementalStoreSyncOperationFetchChangeTokenKey)
+            NSUserDefaults.standardUserDefaults().setObject(nil, forKey: SMStoreSyncOperationServerTokenKey)
         }
     }
 }

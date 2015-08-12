@@ -48,7 +48,7 @@ extension CKRecord
                 {
                     let recordIDString = (value as! CKReference).recordID.recordName
                     let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: relationshipDescription!.destinationEntity!.name!)
-                    fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,recordIDString)
+                    fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,recordIDString)
                     fetchRequest.fetchLimit = 1
                     do
                     {
@@ -80,7 +80,7 @@ extension CKRecord
             let recordIDString = self.recordID.recordName
             let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entity!.name!)
             fetchRequest.fetchLimit = 1
-            fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName, recordIDString)
+            fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName, recordIDString)
             
             let setValuesOfManagedObject = ({(managedObject: NSManagedObject?) -> Void in
                 

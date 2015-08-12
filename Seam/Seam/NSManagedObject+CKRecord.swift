@@ -103,8 +103,8 @@ extension NSManagedObject
             let relationshipManagedObject = self.valueForKey(relationship)
             if relationshipManagedObject != nil
             {
-                let recordIDString: String = self.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
-                let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+                let recordIDString: String = self.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
+                let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
                 let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
                 let ckReference: CKReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
                 ckRecord.setObject(ckReference, forKey: relationship)
@@ -114,7 +114,7 @@ extension NSManagedObject
     
     public func createOrUpdateCKRecord(usingValuesOfChangedKeys keys: [String]?) -> CKRecord?
     {
-        let encodedFields: NSData? = self.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as? NSData
+        let encodedFields: NSData? = self.valueForKey(SMLocalStoreRecordEncodedValuesAttributeName) as? NSData
         var ckRecord: CKRecord?
         if encodedFields != nil
         {
@@ -122,8 +122,8 @@ extension NSManagedObject
         }
         else
         {
-            let recordIDString = self.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
-            let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+            let recordIDString = self.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
+            let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
             let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
             ckRecord = CKRecord(recordType: self.entity.name!, recordID: ckRecordID)
         }

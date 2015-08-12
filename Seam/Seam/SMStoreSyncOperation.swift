@@ -27,12 +27,11 @@ import Foundation
 import CloudKit
 import CoreData
 
-let CKSIncrementalStoreSyncOperationErrorDomain = "CKSIncrementalStoreSyncOperationErrorDomain"
-let CKSSyncConflictedResolvedRecordsKey = "CKSSyncConflictedResolvedRecordsKey"
-let CKSIncrementalStoreSyncOperationFetchChangeTokenKey = "CKSIncrementalStoreSyncOperationFetchChangeTokenKey"
+let SMStoreSyncOperationErrorDomain = "SMStoreSyncOperationDomain"
+let SMSyncConflictsResolvedRecordsKey = "SMSyncConflictsResolvedRecordsKey"
+let SMStoreSyncOperationServerTokenKey = "SMStoreSyncOperationServerTokenKey"
 
-
-enum CKSStoresSyncConflictPolicy: Int16
+enum SMSyncConflictResolutionPolicy: Int16
 {
     case ClientTellsWhichWins = 0
     case ServerRecordWins = 1
@@ -41,7 +40,7 @@ enum CKSStoresSyncConflictPolicy: Int16
     case KeepBoth = 4
 }
 
-enum CKSStoresSyncError: ErrorType
+enum SMSyncOperationError: ErrorType
 {
     case LocalChangesFetchError
     case ConflictsDetected
@@ -49,15 +48,15 @@ enum CKSStoresSyncError: ErrorType
 
 class SMStoreSyncOperation: NSOperation {
     
-    private var operationQueue:NSOperationQueue?
-    private var localStoreMOC:NSManagedObjectContext?
-    private var persistentStoreCoordinator:NSPersistentStoreCoordinator?
+    private var operationQueue: NSOperationQueue?
+    private var localStoreMOC: NSManagedObjectContext?
+    private var persistentStoreCoordinator: NSPersistentStoreCoordinator?
     private var entities: Array<NSEntityDescription>?
-    var syncConflictPolicy:CKSStoresSyncConflictPolicy?
+    var syncConflictPolicy: SMSyncConflictResolutionPolicy?
     var syncCompletionBlock:((syncError:NSError?) -> ())?
     var syncConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
-    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:CKSStoresSyncConflictPolicy?) {
+    init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy?) {
         
         self.persistentStoreCoordinator = persistentStoreCoordinator
         self.entities = entities
@@ -91,8 +90,8 @@ class SMStoreSyncOperation: NSOperation {
     func performSync() throws
     {
         let localChangesInServerRepresentation = try self.localChangesInServerRepresentation()
-        var insertedOrUpdatedCKRecords:Array<CKRecord> = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
-        let deletedCKRecordIDs:Array<CKRecordID> = localChangesInServerRepresentation.deletedCKRecordIDs
+        var insertedOrUpdatedCKRecords:Array<CKRecord>? = localChangesInServerRepresentation.insertedOrUpdatedCKRecords
+        let deletedCKRecordIDs:Array<CKRecordID>? = localChangesInServerRepresentation.deletedCKRecordIDs
         
         do
         {
@@ -108,11 +107,11 @@ class SMStoreSyncOperation: NSOperation {
         }
         catch let error as NSError?
         {
-            let conflictedRecords = error!.userInfo[CKSSyncConflictedResolvedRecordsKey] as! Array<CKRecord>
+            let conflictedRecords = error!.userInfo[SMSyncConflictsResolvedRecordsKey] as! Array<CKRecord>
             self.resolveConflicts(conflictedRecords: conflictedRecords)
             var insertedOrUpdatedCKRecordsWithRecordIDStrings:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
             
-            for record in insertedOrUpdatedCKRecords
+            for record in insertedOrUpdatedCKRecords!
             {
                 let ckRecord:CKRecord = record as CKRecord
                 insertedOrUpdatedCKRecordsWithRecordIDStrings[ckRecord.recordID.recordName] = ckRecord
@@ -161,7 +160,7 @@ class SMStoreSyncOperation: NSOperation {
         try self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
     }
     
-    func applyLocalChangesToServer(insertedOrUpdatedCKRecords insertedOrUpdatedCKRecords: Array<CKRecord> , deletedCKRecordIDs: Array<CKRecordID>) throws
+    func applyLocalChangesToServer(insertedOrUpdatedCKRecords insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecordID>?) throws
     {
         let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
         
@@ -183,7 +182,7 @@ class SMStoreSyncOperation: NSOperation {
         
         if conflictedRecords.count > 0
         {
-            throw NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: CKSStoresSyncError.ConflictsDetected._code, userInfo: [CKSSyncConflictedResolvedRecordsKey:conflictedRecords])
+            throw NSError(domain: SMStoreSyncOperationErrorDomain, code: SMSyncOperationError.ConflictsDetected._code, userInfo: [SMSyncConflictsResolvedRecordsKey:conflictedRecords])
         }
         
         if savedRecords.count > 0
@@ -201,7 +200,7 @@ class SMStoreSyncOperation: NSOperation {
                 savedRecordsWithType[record.recordType] = recordWithRecordIDString
             }
             
-            let predicate = NSPredicate(format: "%K IN $recordIDStrings",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+            let predicate = NSPredicate(format: "%K IN $recordIDStrings",SMLocalStoreRecordIDAttributeName)
             
             let types = savedRecordsWithType.keys.array
             
@@ -217,9 +216,9 @@ class SMStoreSyncOperation: NSOperation {
                 {
                     for managedObject in results as! [NSManagedObject]
                     {
-                        let ckRecord = ckRecordsForType![managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String]
+                        let ckRecord = ckRecordsForType![managedObject.valueForKey(SMLocalStoreRecordIDAttributeName) as! String]
                         let encodedSystemFields = ckRecord?.encodedSystemFields()
-                        managedObject.setValue(encodedSystemFields, forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
+                        managedObject.setValue(encodedSystemFields, forKey: SMLocalStoreRecordEncodedValuesAttributeName)
                     }
                 }
             }
@@ -267,14 +266,14 @@ class SMStoreSyncOperation: NSOperation {
                 let value = conflictedRecordsWithStringRecordIDs[key]!
                 var clientServerCKRecord = value as (clientRecord:CKRecord?,serverRecord:CKRecord?)
                 
-                if self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientTellsWhichWins
+                if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ClientTellsWhichWins
                 {
                     if self.syncConflictResolutionBlock != nil
                     {
                         clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord!,serverRecord: clientServerCKRecord.serverRecord!)
                     }
                 }
-                else if (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.ClientRecordWins || (self.syncConflictPolicy == CKSStoresSyncConflictPolicy.GreaterModifiedDateWins && clientServerCKRecord.clientRecord!.modificationDate!.compare(clientServerCKRecord.serverRecord!.modificationDate!) == NSComparisonResult.OrderedDescending))
+                else if (self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ClientRecordWins || (self.syncConflictPolicy == SMSyncConflictResolutionPolicy.GreaterModifiedDateWins && clientServerCKRecord.clientRecord!.modificationDate!.compare(clientServerCKRecord.serverRecord!.modificationDate!) == NSComparisonResult.OrderedDescending))
                 {
                     let keys = clientServerCKRecord.serverRecord!.allKeys()
                     let values = clientServerCKRecord.clientRecord!.dictionaryWithValuesForKeys(keys)
@@ -289,176 +288,19 @@ class SMStoreSyncOperation: NSOperation {
         }
     }
     
-    func localChangesInServerRepresentation() throws -> (insertedOrUpdatedCKRecords:Array<CKRecord>,deletedCKRecordIDs:Array<CKRecordID>)
+    func localChangesInServerRepresentation() throws -> (insertedOrUpdatedCKRecords:Array<CKRecord>?,deletedCKRecordIDs:Array<CKRecordID>?)
     {
-        let localChanges = try self.localChanges()
-        return (self.insertedOrUpdatedCKRecords(fromManagedObjects: localChanges.insertedOrUpdatedManagedObjects),self.deletedCKRecordIDs(fromManagedObjects: localChanges.deletedManagedObjects))
-    }
-    
-    func localChanges() throws -> (insertedOrUpdatedManagedObjects:Array<AnyObject>,deletedManagedObjects:Array<AnyObject>)
-    {
-    
-        let entityNames = self.entities!.map( { (entity) -> String in
-            return entity.name!
-        })
+        let changeSetHandler = SMStoreChangeSetHandler.defaultHandler
+        let insertedOrUpdatedCKRecords = try changeSetHandler.recordsForUpdatedObjects(backingContext: self.localStoreMOC!)
+        let deletedCKRecordIDs = try changeSetHandler.recordIDsForDeletedObjects(self.localStoreMOC!)
         
-        let deletedManagedObjects: Array<AnyObject> = Array<AnyObject>()
-        var insertedOrUpdatedManagedObjects: Array<AnyObject> = Array<AnyObject>()
-        
-        let predicate = NSPredicate(format: "%K != %@", CKSIncrementalStoreLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue))
-        
-        for name in entityNames
-        {
-            let fetchRequest = NSFetchRequest(entityName: name)
-            fetchRequest.predicate = predicate
-            var results: Array<AnyObject>?
-            do
-            {
-                results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
-                if results!.count > 0
-                {
-                    insertedOrUpdatedManagedObjects += (results!.filter({(object)->Bool in
-                        
-                        let managedObject:NSManagedObject = object as! NSManagedObject
-                        if (managedObject.valueForKey(CKSIncrementalStoreLocalStoreChangeTypeAttributeName)) as! NSNumber == NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue)
-                        {
-                            return true
-                        }
-                        
-                        return false
-                    }))
-                }
-            }
-            catch
-            {
-                throw CKSStoresSyncError.LocalChangesFetchError
-            }
-        }
-        
-//        do
-//        {
-//            let fetchRequest = NSFetchRequest(entityName: CKSDeletedObjectsEntityName)
-//            deletedManagedObjects = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
-//        }
-//        catch
-//        {
-//            throw CKSStoresSyncError.LocalChangesFetchError
-//        }
-        
-        
-        return (insertedOrUpdatedManagedObjects,deletedManagedObjects)
-    }
-    
-    func insertedOrUpdatedCKRecords(fromManagedObjects managedObjects:Array<AnyObject>)  -> Array<CKRecord>
-    {
-        return managedObjects.map({(object)->CKRecord in
-            
-            let managedObject:NSManagedObject = object as! NSManagedObject
-            let ckRecordID = CKRecordID(recordName: (managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String), zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
-            
-            var ckRecord:CKRecord
-            if managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) != nil
-            {
-                let encodedSystemFields = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName) as! NSData
-                ckRecord = CKRecord.recordWithEncodedFields(encodedSystemFields)
-            }
-                
-            else
-            {
-                ckRecord = CKRecord(recordType: (managedObject.entity.name)!, recordID: ckRecordID)
-            }
-            
-            let entityAttributes = managedObject.entity.attributesByName.values.array.filter({(object) -> Bool in
-                
-                let attribute: NSAttributeDescription = object as NSAttributeDescription
-                if attribute.name == CKSIncrementalStoreLocalStoreRecordIDAttributeName || attribute.name == CKSIncrementalStoreLocalStoreChangeTypeAttributeName || attribute.name == CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
-                {
-                    return false
-                }
-                
-                return true
-            })
-            
-            let entityRelationships = managedObject.entity.relationshipsByName.values.array.filter({(object) -> Bool in
-                
-                let relationship: NSRelationshipDescription = object as NSRelationshipDescription
-                return relationship.toMany == false
-            })
-            
-            for attributeDescription in entityAttributes
-            {
-                if managedObject.valueForKey(attributeDescription.name) != nil
-                {
-                    switch attributeDescription.attributeType
-                    {
-                    case .StringAttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! String, forKey: attributeDescription.name)
-                        
-                    case .DateAttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSDate, forKey: attributeDescription.name)
-                        
-                    case .BinaryDataAttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSData, forKey: attributeDescription.name)
-                        
-                    case .BooleanAttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-                        
-                    case .DecimalAttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-
-                    case .DoubleAttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-
-                    case .FloatAttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-
-                    case .Integer16AttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-
-                    case .Integer32AttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-
-                    case .Integer64AttributeType:
-                        ckRecord.setObject(managedObject.valueForKey(attributeDescription.name) as! NSNumber, forKey: attributeDescription.name)
-                    default:
-                        break
-                    }
-                }
-            }
-            
-            for relationshipDescription in entityRelationships as [NSRelationshipDescription]
-            {
-                if managedObject.valueForKey(relationshipDescription.name) == nil
-                {
-                    continue
-                }
-                
-                let relationshipManagedObject: NSManagedObject = managedObject.valueForKey(relationshipDescription.name) as! NSManagedObject
-                let ckRecordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
-                let relationshipCKRecordID = CKRecordID(recordName: relationshipManagedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: ckRecordZoneID)
-                let ckReference = CKReference(recordID: relationshipCKRecordID, action: CKReferenceAction.DeleteSelf)
-                ckRecord.setObject(ckReference, forKey: relationshipDescription.name)
-            }
-            
-            return ckRecord
-        })
-    }
-    
-    func deletedCKRecordIDs(fromManagedObjects managedObjects:Array<AnyObject>)->Array<CKRecordID>
-    {
-        return managedObjects.map({(object)->CKRecordID in
-            
-            let managedObject:NSManagedObject = object as! NSManagedObject
-            let ckRecordID = CKRecordID(recordName: managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String, zoneID: CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName))
-            
-            return ckRecordID
-        })
+        return (insertedOrUpdatedCKRecords,deletedCKRecordIDs)
     }
     
     func fetchRecordChangesFromServer() -> (insertedOrUpdatedCKRecords:Array<CKRecord>,deletedRecordIDs:Array<CKRecordID>,moreComing:Bool)
     {
         let token = SMServerTokenHandler.defaultHandler.token()
-        let recordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
+        let recordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
         let fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: recordZoneID, previousServerChangeToken: token)
         
         var insertedOrUpdatedCKRecords: Array<CKRecord> = Array<CKRecord>()
@@ -491,7 +333,7 @@ class SMStoreSyncOperation: NSOperation {
     
     func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>) throws
     {
-        let predicate = NSPredicate(format: "%K == $ckRecordIDString",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+        let predicate = NSPredicate(format: "%K == $ckRecordIDString",SMLocalStoreRecordIDAttributeName)
         
         for object in ckRecords
         {
@@ -514,8 +356,8 @@ class SMStoreSyncOperation: NSOperation {
                 
                 let values = ckRecord.dictionaryWithValuesForKeys(keys)
                 managedObject.setValuesForKeysWithDictionary(values)
-                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-                managedObject.setValue(ckRecord.encodedSystemFields(), forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
+                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+                managedObject.setValue(ckRecord.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
                 
                 let changedCKReferenceRecordIDStringsWithKeys = ckRecord.allKeys().filter({(obj)->Bool in
                     
@@ -537,7 +379,7 @@ class SMStoreSyncOperation: NSOperation {
                     let relationship: NSRelationshipDescription? = managedObject.entity.relationshipsByName[key]
                     let attributeEntityName = relationship!.destinationEntity!.name
                     let fetchRequest = NSFetchRequest(entityName: attributeEntityName!)
-                    fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,object.recordIDString)
+                    fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,object.recordIDString)
                     var results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
                     if  results.count > 0
                     {
@@ -562,7 +404,7 @@ class SMStoreSyncOperation: NSOperation {
                 })
                 
                 
-                managedObject.setValue(ckRecord.encodedSystemFields(), forKey: CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName)
+                managedObject.setValue(ckRecord.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
                 let changedCKReferencesRecordIDsWithKeys = ckRecord.allKeys().filter({(object)->Bool in
                     
                     let key:String = object as String
@@ -581,8 +423,8 @@ class SMStoreSyncOperation: NSOperation {
                 
                 let values = ckRecord.dictionaryWithValuesForKeys(keys)
                 managedObject.setValuesForKeysWithDictionary(values)
-                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
-                managedObject.setValue(ckRecord.recordID.recordName, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+                managedObject.setValue(ckRecord.recordID.recordName, forKey: SMLocalStoreRecordIDAttributeName)
                 
                 
                 for object in changedCKReferencesRecordIDsWithKeys
@@ -591,7 +433,7 @@ class SMStoreSyncOperation: NSOperation {
                     let referenceManagedObject = Array(self.localStoreMOC!.registeredObjects).filter({(object)->Bool in
                         
                         let managedObject:NSManagedObject = object as NSManagedObject
-                        if (managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String) == ckReferenceRecordIDString
+                        if (managedObject.valueForKey(SMLocalStoreRecordIDAttributeName) as! String) == ckReferenceRecordIDString
                         {
                             return true
                         }
@@ -608,7 +450,7 @@ class SMStoreSyncOperation: NSOperation {
                         let destinationRelationshipDescription: NSEntityDescription? = relationshipDescription?.destinationEntity
                         let entityName: String? = destinationRelationshipDescription!.name
                         let fetchRequest = NSFetchRequest(entityName: entityName!)
-                        fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,ckReferenceRecordIDString)
+                        fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,ckReferenceRecordIDString)
                         fetchRequest.fetchLimit = 1
                         var results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
                         if results.count > 0
@@ -626,7 +468,7 @@ class SMStoreSyncOperation: NSOperation {
     
     func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<CKRecordID>) throws
     {
-        let predicate = NSPredicate(format: "%K IN $ckRecordIDs",CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+        let predicate = NSPredicate(format: "%K IN $ckRecordIDs",SMLocalStoreRecordIDAttributeName)
         let ckRecordIDStrings = ckRecordIDs.map({(object)->String in
             
             let ckRecordID:CKRecordID = object

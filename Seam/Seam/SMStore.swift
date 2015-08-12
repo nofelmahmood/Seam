@@ -27,18 +27,11 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
-let CKSIncrementalStoreCloudDatabaseCustomZoneName="CKSIncrementalStoreZone"
-let CKSIncrementalStoreCloudDatabaseSyncSubcriptionName="CKSIncrementalStore_Sync_Subcription"
+let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
+let SMStoreCloudStoreSubscriptionName = "SM_CloudStore_Subscription"
 
-let CKSIncrementalStoreLocalStoreEntityNameAttributeName = "cks_LocalStore_Attribute_EntityName"
-let CKSIncrementalStoreLocalStoreChangeTypeAttributeName="cks_LocalStore_Attribute_ChangeType"
-let CKSIncrementalStoreLocalStoreRecordIDAttributeName="cks_LocalStore_Attribute_RecordID"
-let CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName = "cks_LocalStore_Attribute_EncodedValues"
-let CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName = "cks_LocalStore_Attribute_ChangedProperties"
-let CKSIncrementalStoreLocalStoreChangeQueuedAttributeName = "cks_LocalStore_Attribute_Queued"
-
-public let CKSIncrementalStoreDidStartSyncOperationNotification = "CKSIncrementalStoreDidStartSyncOperationNotification"
-public let CKSIncrementalStoreDidFinishSyncOperationNotification = "CKSIncrementalStoreDidFinishSyncOperationNotification"
+public let SMStoreDidStartSyncOperationNotification = "SMStoreDidStartSyncOperationNotification"
+public let SMStoreDidFinishSyncOperationNotification = "SMStoreDidFinishSyncOperationNotification"
 
 let CKSIncrementalStoreSyncConflictPolicyOption = "CKSIncrementalStoreSyncConflictPolicyOption"
 
@@ -67,7 +60,7 @@ public class SMStore: NSIncrementalStore {
     
     private var syncOperation:SMStoreSyncOperation?
     private var cloudStoreSetupOperation:SMServerStoreSetupOperation?
-    private var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
+    private var cksStoresSyncConflictPolicy:SMSyncConflictResolutionPolicy = SMSyncConflictResolutionPolicy.GreaterModifiedDateWins
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
     private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
@@ -97,7 +90,7 @@ public class SMStore: NSIncrementalStore {
             if options![CKSIncrementalStoreSyncConflictPolicyOption] != nil
             {
                 let syncConflictPolicy = options![CKSIncrementalStoreSyncConflictPolicyOption] as! NSNumber
-                self.cksStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy(rawValue: syncConflictPolicy.shortValue)!
+                self.cksStoresSyncConflictPolicy = SMSyncConflictResolutionPolicy(rawValue: syncConflictPolicy.shortValue)!
             }
         }
         
@@ -146,75 +139,12 @@ public class SMStore: NSIncrementalStore {
     {
         if self.persistentStoreCoordinator?.managedObjectModel != nil
         {
-            let backingModel: NSManagedObjectModel = self.persistentStoreCoordinator!.managedObjectModel.copy() as! NSManagedObjectModel
-            
-            for entity in backingModel.entities
-            {
-                self.addExtraBackingStoreAttributes(toEntity: entity)
-            }
-            
-            backingModel.entities.append(self.changeSetEntity())
+            let backingModel: NSManagedObjectModel = SMStoreChangeSetHandler.defaultHandler.modelForLocalStore(usingModel: self.persistentStoreCoordinator!.managedObjectModel)
             
             return backingModel
         }
         
         return nil
-    }
-    
-    func addExtraBackingStoreAttributes(toEntity entity: NSEntityDescription)
-    {
-        let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
-        recordIDAttribute.name = CKSIncrementalStoreLocalStoreRecordIDAttributeName
-        recordIDAttribute.optional = false
-        recordIDAttribute.indexed = true
-        entity.properties.append(recordIDAttribute)
-        
-        let recordEncodedValuesAttribute: NSAttributeDescription = NSAttributeDescription()
-        recordEncodedValuesAttribute.name = CKSIncrementalStoreLocalStoreRecordEncodedValuesAttributeName
-        recordEncodedValuesAttribute.attributeType = NSAttributeType.BinaryDataAttributeType
-        recordEncodedValuesAttribute.optional = true
-        entity.properties.append(recordEncodedValuesAttribute)
-    }
-    
-    func changeSetEntity() -> NSEntityDescription
-    {
-        let changeSetEntity: NSEntityDescription = NSEntityDescription()
-        changeSetEntity.name = CKSChangeSetEntityName
-        
-        let entityNameAttribute: NSAttributeDescription = NSAttributeDescription()
-        entityNameAttribute.name = CKSIncrementalStoreLocalStoreEntityNameAttributeName
-        entityNameAttribute.attributeType = NSAttributeType.StringAttributeType
-        entityNameAttribute.optional = true
-        changeSetEntity.properties.append(entityNameAttribute)
-        
-        let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
-        recordIDAttribute.name = CKSIncrementalStoreLocalStoreRecordIDAttributeName
-        recordIDAttribute.attributeType = NSAttributeType.StringAttributeType
-        recordIDAttribute.optional = false
-        recordIDAttribute.indexed = true
-        changeSetEntity.properties.append(recordIDAttribute)
-        
-        let recordChangedPropertiesAttribute: NSAttributeDescription = NSAttributeDescription()
-        recordChangedPropertiesAttribute.name = CKSIncrementalStoreLocalStoreRecordChangedPropertiesAttributeName
-        recordChangedPropertiesAttribute.attributeType = NSAttributeType.StringAttributeType
-        recordChangedPropertiesAttribute.optional = true
-        changeSetEntity.properties.append(recordChangedPropertiesAttribute)
-        
-        let recordChangeTypeAttribute: NSAttributeDescription = NSAttributeDescription()
-        recordChangeTypeAttribute.name = CKSIncrementalStoreLocalStoreChangeTypeAttributeName
-        recordChangeTypeAttribute.attributeType = NSAttributeType.Integer16AttributeType
-        recordChangeTypeAttribute.optional = false
-        recordChangeTypeAttribute.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordInserted.rawValue)
-        changeSetEntity.properties.append(recordChangeTypeAttribute)
-        
-        let changeTypeQueuedAttribute: NSAttributeDescription = NSAttributeDescription()
-        changeTypeQueuedAttribute.name = CKSIncrementalStoreLocalStoreChangeQueuedAttributeName
-        changeTypeQueuedAttribute.optional = false
-        changeTypeQueuedAttribute.attributeType = NSAttributeType.BooleanAttributeType
-        changeTypeQueuedAttribute.defaultValue = NSNumber(bool: false)
-        changeSetEntity.properties.append(changeTypeQueuedAttribute)
-        
-        return changeSetEntity
     }
     
     public func handlePush(userInfo userInfo:[NSObject : AnyObject])
@@ -225,7 +155,7 @@ public class SMStore: NSIncrementalStore {
         {
             let recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: u)
             
-            if recordZoneNotification.recordZoneID!.zoneName == CKSIncrementalStoreCloudDatabaseCustomZoneName
+            if recordZoneNotification.recordZoneID!.zoneName == SMStoreCloudStoreCustomZoneName
             {
                 self.triggerSync()
             }
@@ -260,7 +190,7 @@ public class SMStore: NSIncrementalStore {
                     print("Sync Performed Successfully")
                     NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
                         
-                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self)
+                        NSNotificationCenter.defaultCenter().postNotificationName(SMStoreDidFinishSyncOperationNotification, object: self)
                         
                     })
                     
@@ -270,7 +200,7 @@ public class SMStore: NSIncrementalStore {
                     print("Sync unSuccessful")
                     NSOperationQueue.mainQueue().addOperationWithBlock({ () -> Void in
                         
-                        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
+                        NSNotificationCenter.defaultCenter().postNotificationName(SMStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
                     })
                 }
                 
@@ -293,7 +223,7 @@ public class SMStore: NSIncrementalStore {
         }
         
         
-        NSNotificationCenter.defaultCenter().postNotificationName(CKSIncrementalStoreDidStartSyncOperationNotification, object: self)
+        NSNotificationCenter.defaultCenter().postNotificationName(SMStoreDidStartSyncOperationNotification, object: self)
     }
     
     override public func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
@@ -335,7 +265,7 @@ public class SMStore: NSIncrementalStore {
         })
         
         let fetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
-        let predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,recordID)
+        let predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,recordID)
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = predicate
         fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
@@ -348,7 +278,7 @@ public class SMStore: NSIncrementalStore {
             if value is NSManagedObject
             {
                 let managedObject: NSManagedObject = value as! NSManagedObject
-                let recordID: String = managedObject.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                let recordID: String = managedObject.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
                 let entities = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName
                 let entityName = managedObject.entity.name!
                 let entity: NSEntityDescription = entities[entityName]! as NSEntityDescription
@@ -366,7 +296,7 @@ public class SMStore: NSIncrementalStore {
         
         let recordID: String = self.referenceObjectForObjectID(objectID) as! String
         let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
-        let predicate: NSPredicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,recordID)
+        let predicate: NSPredicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,recordID)
         fetchRequest.predicate = predicate
         let results = try self.backingMOC.executeFetchRequest(fetchRequest)
         
@@ -377,7 +307,7 @@ public class SMStore: NSIncrementalStore {
             return Array(relationshipValues).map({(object) -> NSManagedObjectID in
                 
                 let value: NSManagedObject = object as! NSManagedObject
-                let recordID: String = value.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                let recordID: String = value.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
                 let objectID: NSManagedObjectID = self.newObjectIDForEntity(value.entity, referenceObject: recordID)
                 return objectID
             })
@@ -407,7 +337,7 @@ public class SMStore: NSIncrementalStore {
             return resultsFromLocalStore.map({(result)->NSManagedObject in
                 
                 let result = result as! NSManagedObject
-                let recordID: String = result.valueForKey(CKSIncrementalStoreLocalStoreRecordIDAttributeName) as! String
+                let recordID: String = result.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
                 let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[fetchRequest.entityName!]
                 let objectID = self.newObjectIDForEntity(entity!, referenceObject: recordID)
                 let object = context.objectWithID(objectID)
@@ -443,7 +373,7 @@ public class SMStore: NSIncrementalStore {
         let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entityName)
         fetchRequest.resultType = NSFetchRequestResultType.ManagedObjectIDResultType
         fetchRequest.fetchLimit = 1
-        fetchRequest.predicate = NSPredicate(format: "%K == %@", CKSIncrementalStoreLocalStoreRecordIDAttributeName,referenceObject!)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,referenceObject!)
         
         var results = try self.backingMOC.executeFetchRequest(fetchRequest)
         if results.count > 0
@@ -506,8 +436,8 @@ public class SMStore: NSIncrementalStore {
             let dictionary = sourceObject.dictionaryWithValuesForKeys(keys)
             managedObject.setValuesForKeysWithDictionary(dictionary)
             let referenceObject: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
-            managedObject.setValue(referenceObject, forKey: CKSIncrementalStoreLocalStoreRecordIDAttributeName)
-            managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: CKSIncrementalStoreLocalStoreChangeTypeAttributeName)
+            managedObject.setValue(referenceObject, forKey: SMLocalStoreRecordIDAttributeName)
+            managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
             mainContext.willChangeValueForKey("objectID")
             try mainContext.obtainPermanentIDsForObjects([sourceObject])
             mainContext.didChangeValueForKey("objectID")
@@ -520,7 +450,7 @@ public class SMStore: NSIncrementalStore {
     private func deleteObjectsFromBackingStore(objectsToDelete objects: Set<NSObject>, mainContext: NSManagedObjectContext) throws
     {
         let predicateObjectRecordIDKey = "objectRecordID"
-        let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+        let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", SMLocalStoreRecordIDAttributeName)
         
         for object in objects
         {
@@ -540,7 +470,7 @@ public class SMStore: NSIncrementalStore {
     private func updateObjectsInBackingStore(objectsToUpdate objects: Set<NSObject>) throws
     {
         let predicateObjectRecordIDKey = "objectRecordID"
-        let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", CKSIncrementalStoreLocalStoreRecordIDAttributeName)
+        let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", SMLocalStoreRecordIDAttributeName)
         
         for object in objects
         {

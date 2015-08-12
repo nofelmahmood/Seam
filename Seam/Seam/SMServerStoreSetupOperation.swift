@@ -44,7 +44,7 @@ class SMServerStoreSetupOperation:NSOperation {
     override func main() {
         
         let operationQueue = NSOperationQueue()
-        let zone = CKRecordZone(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName)
+        let zone = CKRecordZone(zoneName: SMStoreCloudStoreCustomZoneName)
         var error: NSError?
         let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
         modifyRecordZonesOperation.database = self.database
@@ -57,8 +57,8 @@ class SMServerStoreSetupOperation:NSOperation {
             if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil)
             {
                 NSUserDefaults.standardUserDefaults().setBool(true, forKey: CKSIncrementalStoreCloudStoreCustomZoneKey)
-                let recordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, ownerName: CKOwnerDefaultName)
-                let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: CKSIncrementalStoreCloudDatabaseSyncSubcriptionName, options: CKSubscriptionOptions(rawValue: 0))
+                let recordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
+                let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
                 
                 let subscriptionNotificationInfo = CKNotificationInfo()
                 subscriptionNotificationInfo.alertBody = ""

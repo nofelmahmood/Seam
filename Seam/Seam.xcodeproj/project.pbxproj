@@ -83,6 +83,11 @@
 		3E191DF31B7B52A400BB9E71 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */,
+				3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */,
+				3E191DCE1B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift */,
+				3E191DCF1B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift */,
+				3E191DD01B7B3CAF00BB9E71 /* SMServerTokenHandler.swift */,
 			);
 			name = Core;
 			sourceTree = "<group>";
@@ -122,11 +127,6 @@
 			children = (
 				3E191DF41B7B52A900BB9E71 /* Extensions */,
 				3E191DF31B7B52A400BB9E71 /* Core */,
-				3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */,
-				3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */,
-				3E191DCE1B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift */,
-				3E191DCF1B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift */,
-				3E191DD01B7B3CAF00BB9E71 /* SMServerTokenHandler.swift */,
 				3E8E26C41B7B11BD009C47EA /* Seam.h */,
 				3E8E26C61B7B11BD009C47EA /* Info.plist */,
 			);

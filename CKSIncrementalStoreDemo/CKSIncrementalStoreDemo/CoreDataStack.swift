@@ -13,7 +13,7 @@ import Seam
 class CoreDataStack: NSObject {
     
     static let sharedStack = CoreDataStack()
-    var cksIncrementalStore: CKSIncrementalStore?
+    var cksIncrementalStore: SMStore?
     
     // MARK: - Core Data stack
     lazy var applicationDocumentsDirectory: NSURL = {
@@ -35,7 +35,7 @@ class CoreDataStack: NSObject {
         let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("CKSIncrementalStoreDemo.sqlite")
         var failureReason = "There was an error creating or loading the application's saved data."
         do {
-            self.cksIncrementalStore = try coordinator.addPersistentStoreWithType(CKSIncrementalStore.type, configuration: nil, URL: url, options: nil) as? CKSIncrementalStore
+            self.cksIncrementalStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
         } catch {
             // Report any error we got.
             var dict = [String: AnyObject]()

@@ -5,7 +5,7 @@
       location = "group:Seam/Seam.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:CKSIncrementalStoreDemo/CKSIncrementalStoreDemo.xcodeproj">
+      location = "group:/Users/NofelMahmood/Dropbox/Code/Organizations/CloudKitSpace/CKSIncrementalStore/CKSIncrementalStoreDemo/Seam-Demo.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:LICENSE">

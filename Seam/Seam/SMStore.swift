@@ -46,7 +46,7 @@ let CKSIncrementalStoreErrorDomain = "CKSIncrementalStoreErrorDomain"
 
 let CKSChangeSetEntityName = "CKS_ChangeSetEntity"
 
-public let SeamStoreType = "SeamStoreType"
+public let SeamStoreType = SMStore.type
 enum CKSLocalStoreRecordChangeType: Int16
 {
     case RecordNoChange = 0
@@ -65,8 +65,8 @@ enum CKSIncrementalStoreError: ErrorType
 
 public class SMStore: NSIncrementalStore {
     
-    private var syncOperation:CKSIncrementalStoreSyncOperation?
-    private var cloudStoreSetupOperation:CKSIncrementalStoreCloudStoreSetupOperation?
+    private var syncOperation:SMStoreSyncOperation?
+    private var cloudStoreSetupOperation:SMServerStoreSetupOperation?
     private var cksStoresSyncConflictPolicy:CKSStoresSyncConflictPolicy = CKSStoresSyncConflictPolicy.GreaterModifiedDateWins
     private var database:CKDatabase?
     private var operationQueue:NSOperationQueue?
@@ -250,7 +250,7 @@ public class SMStore: NSIncrementalStore {
         
         let syncOperationBlock = ({()->Void in
             
-            self.syncOperation = CKSIncrementalStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy)
+            self.syncOperation = SMStoreSyncOperation(persistentStoreCoordinator: self.backingPersistentStoreCoordinator, entitiesToSync: self.entitiesToParticipateInSync()!, conflictPolicy: self.cksStoresSyncConflictPolicy)
             
             self.syncOperation?.syncConflictResolutionBlock = self.recordConflictResolutionBlock
             self.syncOperation?.syncCompletionBlock =  ({(error) -> Void in
@@ -280,7 +280,7 @@ public class SMStore: NSIncrementalStore {
         
         if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey) == nil || NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreZoneSubcriptionKey) == nil
         {
-            self.cloudStoreSetupOperation = CKSIncrementalStoreCloudStoreSetupOperation(cloudDatabase: self.database)
+            self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
             self.cloudStoreSetupOperation?.setupOperationCompletionBlock = ({(customZoneWasCreated, customZoneSubscriptionWasCreated) -> Void in
                 
                 syncOperationBlock()
@@ -511,7 +511,7 @@ public class SMStore: NSIncrementalStore {
             mainContext.willChangeValueForKey("objectID")
             try mainContext.obtainPermanentIDsForObjects([sourceObject])
             mainContext.didChangeValueForKey("objectID")
-            CKSIncrementalStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
+            SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
             try self.backingMOC.save()
         }
@@ -531,7 +531,7 @@ public class SMStore: NSIncrementalStore {
             fetchRequest.fetchLimit = 1
             var results = try self.backingMOC.executeFetchRequest(fetchRequest)
             let backingObject: NSManagedObject = results.last as! NSManagedObject
-            CKSIncrementalStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
+            SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
             self.backingMOC.deleteObject(backingObject)
             try self.backingMOC.save()
         }
@@ -554,7 +554,7 @@ public class SMStore: NSIncrementalStore {
             let keys = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys.array
             let sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
             backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
-            CKSIncrementalStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
+            SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
             try self.backingMOC.save()
         }

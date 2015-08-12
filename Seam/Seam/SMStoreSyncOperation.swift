@@ -457,7 +457,7 @@ class SMStoreSyncOperation: NSOperation {
     
     func fetchRecordChangesFromServer() -> (insertedOrUpdatedCKRecords:Array<CKRecord>,deletedRecordIDs:Array<CKRecordID>,moreComing:Bool)
     {
-        let token = CKSIncrementalStoreSyncOperationTokenHandler.defaultHandler.token()
+        let token = SMServerTokenHandler.defaultHandler.token()
         let recordZoneID = CKRecordZoneID(zoneName: CKSIncrementalStoreCloudDatabaseCustomZoneName, ownerName: CKOwnerDefaultName)
         let fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: recordZoneID, previousServerChangeToken: token)
         
@@ -468,8 +468,8 @@ class SMStoreSyncOperation: NSOperation {
             
             if operationError == nil
             {
-                CKSIncrementalStoreSyncOperationTokenHandler.defaultHandler.save(serverChangeToken: serverChangeToken!)
-                CKSIncrementalStoreSyncOperationTokenHandler.defaultHandler.commit()
+                SMServerTokenHandler.defaultHandler.save(serverChangeToken: serverChangeToken!)
+                SMServerTokenHandler.defaultHandler.commit()
             }
         })
         

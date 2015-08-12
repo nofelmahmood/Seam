@@ -29,7 +29,7 @@ import CloudKit
 
 extension CKRecord
 {
-    func attributeKeys() -> [String]
+    func allAttributeKeys() -> [String]
     {
         return self.allKeys().filter({ (key) -> Bool in
             return (self.objectForKey(key) is CKReference) == false

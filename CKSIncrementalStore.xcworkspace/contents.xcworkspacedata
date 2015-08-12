@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:Seam/Seam.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:CKSIncrementalStoreDemo/CKSIncrementalStoreDemo.xcodeproj">
    </FileRef>
    <Group

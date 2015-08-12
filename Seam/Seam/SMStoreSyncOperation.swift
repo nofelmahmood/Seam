@@ -29,7 +29,6 @@ import CoreData
 
 let SMStoreSyncOperationErrorDomain = "SMStoreSyncOperationDomain"
 let SMSyncConflictsResolvedRecordsKey = "SMSyncConflictsResolvedRecordsKey"
-let SMStoreSyncOperationServerTokenKey = "SMStoreSyncOperationServerTokenKey"
 
 enum SMSyncConflictResolutionPolicy: Int16
 {
@@ -356,7 +355,7 @@ class SMStoreSyncOperation: NSOperation {
                 
                 let values = ckRecord.dictionaryWithValuesForKeys(keys)
                 managedObject.setValuesForKeysWithDictionary(values)
-                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+                managedObject.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
                 managedObject.setValue(ckRecord.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
                 
                 let changedCKReferenceRecordIDStringsWithKeys = ckRecord.allKeys().filter({(obj)->Bool in
@@ -423,7 +422,7 @@ class SMStoreSyncOperation: NSOperation {
                 
                 let values = ckRecord.dictionaryWithValuesForKeys(keys)
                 managedObject.setValuesForKeysWithDictionary(values)
-                managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+                managedObject.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
                 managedObject.setValue(ckRecord.recordID.recordName, forKey: SMLocalStoreRecordIDAttributeName)
                 
                 

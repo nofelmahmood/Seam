@@ -26,6 +26,8 @@
 import Foundation
 import CloudKit
 
+let SMStoreSyncOperationServerTokenKey = "SMStoreSyncOperationServerTokenKey"
+
 class SMServerTokenHandler
 {
     static let defaultHandler = SMServerTokenHandler()

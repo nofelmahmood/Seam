@@ -35,6 +35,10 @@ let SMLocalStoreRecordEncodedValuesAttributeName = "sm_LocalStore_EncodedValues"
 let SMLocalStoreRecordChangedPropertiesAttributeName = "sm_LocalStore_ChangedProperties"
 let SMLocalStoreChangeQueuedAttributeName = "sm_LocalStore_Queued"
 
+
+let SMLocalStoreChangeSetEntityName = "SM_LocalStore_ChangeSetEntity"
+
+
 class SMStoreChangeSetHandler {
 
     static let defaultHandler = SMStoreChangeSetHandler()
@@ -71,7 +75,7 @@ class SMStoreChangeSetHandler {
     func changeSetEntity() -> NSEntityDescription
     {
         let changeSetEntity: NSEntityDescription = NSEntityDescription()
-        changeSetEntity.name = CKSChangeSetEntityName
+        changeSetEntity.name = SMLocalStoreChangeSetEntityName
         
         let entityNameAttribute: NSAttributeDescription = NSAttributeDescription()
         entityNameAttribute.name = SMLocalStoreEntityNameAttributeName
@@ -96,7 +100,7 @@ class SMStoreChangeSetHandler {
         recordChangeTypeAttribute.name = SMLocalStoreChangeTypeAttributeName
         recordChangeTypeAttribute.attributeType = NSAttributeType.Integer16AttributeType
         recordChangeTypeAttribute.optional = false
-        recordChangeTypeAttribute.defaultValue = NSNumber(short: CKSLocalStoreRecordChangeType.RecordInserted.rawValue)
+        recordChangeTypeAttribute.defaultValue = NSNumber(short: SMLocalStoreRecordChangeType.RecordInserted.rawValue)
         changeSetEntity.properties.append(recordChangeTypeAttribute)
         
         let changeTypeQueuedAttribute: NSAttributeDescription = NSAttributeDescription()
@@ -125,34 +129,34 @@ class SMStoreChangeSetHandler {
     // MARK: Creation
     func createChangeSet(ForInsertedObjectRecordID recordID: String, entityName: String, backingContext: NSManagedObjectContext)
     {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: backingContext)
+        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(SMLocalStoreChangeSetEntityName, inManagedObjectContext: backingContext)
         changeSet.setValue(recordID, forKey: SMLocalStoreRecordIDAttributeName)
         changeSet.setValue(entityName, forKey: SMLocalStoreEntityNameAttributeName)
-        changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordInserted.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+        changeSet.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordInserted.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
     }
     
     func createChangeSet(ForUpdatedObject object: NSManagedObject, usingContext context: NSManagedObjectContext)
     {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: context)
+        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(SMLocalStoreChangeSetEntityName, inManagedObjectContext: context)
         let changedPropertyKeys = self.changedPropertyKeys(object.changedValues().keys.array, entity: object.entity)
         let recordIDString: String = object.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
         let changedPropertyKeysString = ",".join(changedPropertyKeys)
         changeSet.setValue(recordIDString, forKey: SMLocalStoreRecordIDAttributeName)
         changeSet.setValue(changedPropertyKeysString, forKey: SMLocalStoreRecordChangedPropertiesAttributeName)
-        changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+        changeSet.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
     }
     
     func createChangeSet(ForDeletedObjectRecordID recordID:String, backingContext: NSManagedObjectContext)
     {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(CKSChangeSetEntityName, inManagedObjectContext: backingContext)
+        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(SMLocalStoreChangeSetEntityName, inManagedObjectContext: backingContext)
         changeSet.setValue(recordID, forKey: SMLocalStoreRecordIDAttributeName)
-        changeSet.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordDeleted.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+        changeSet.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordDeleted.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
     }
     
     // MARK: Fetch
-    private func changeSets(ForChangeType changeType:CKSLocalStoreRecordChangeType, propertiesToFetch: Array<String>,  backingContext: NSManagedObjectContext) throws -> [AnyObject]?
+    private func changeSets(ForChangeType changeType:SMLocalStoreRecordChangeType, propertiesToFetch: Array<String>,  backingContext: NSManagedObjectContext) throws -> [AnyObject]?
     {
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
+        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: SMLocalStoreChangeSetEntityName)
         let predicate: NSPredicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeTypeAttributeName, NSNumber(short: changeType.rawValue))
         fetchRequest.predicate = predicate
         fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
@@ -166,7 +170,7 @@ class SMStoreChangeSetHandler {
     func recordIDsForDeletedObjects(backingContext: NSManagedObjectContext) throws -> [CKRecordID]?
     {
         let propertiesToFetch = [SMLocalStoreRecordIDAttributeName]
-        let deletedObjectsChangeSets = try self.changeSets(ForChangeType: CKSLocalStoreRecordChangeType.RecordDeleted, propertiesToFetch: propertiesToFetch, backingContext: backingContext)
+        let deletedObjectsChangeSets = try self.changeSets(ForChangeType: SMLocalStoreRecordChangeType.RecordDeleted, propertiesToFetch: propertiesToFetch, backingContext: backingContext)
         
         if deletedObjectsChangeSets!.count > 0
         {
@@ -184,8 +188,8 @@ class SMStoreChangeSetHandler {
     
     func recordsForUpdatedObjects(backingContext context: NSManagedObjectContext) throws -> [CKRecord]?
     {
-        let fetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
-        fetchRequest.predicate = NSPredicate(format: "%K == %@ || %K == %@", SMLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordInserted.rawValue), SMLocalStoreChangeTypeAttributeName, NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue))
+        let fetchRequest = NSFetchRequest(entityName: SMLocalStoreChangeSetEntityName)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@ || %K == %@", SMLocalStoreChangeTypeAttributeName, NSNumber(short: SMLocalStoreRecordChangeType.RecordInserted.rawValue), SMLocalStoreChangeTypeAttributeName, NSNumber(short: SMLocalStoreRecordChangeType.RecordUpdated.rawValue))
         
         let results = try context.executeFetchRequest(fetchRequest)
         var ckRecords: [CKRecord] = [CKRecord]()
@@ -227,7 +231,7 @@ class SMStoreChangeSetHandler {
 
     func removeAllQueuedChangeSetsFromQueue(backingContext context: NSManagedObjectContext) throws
     {
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
+        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: SMLocalStoreChangeSetEntityName)
         fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeQueuedAttributeName, NSNumber(bool: true))
         let results = try context.executeFetchRequest(fetchRequest)
         
@@ -241,7 +245,7 @@ class SMStoreChangeSetHandler {
     
     func removeAllQueuedChangeSets(backingContext context: NSManagedObjectContext) throws
     {
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: CKSChangeSetEntityName)
+        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: SMLocalStoreChangeSetEntityName)
         fetchRequest.includesPropertyValues = false
         fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeQueuedAttributeName, NSNumber(bool: true))
         let results = try context.executeFetchRequest(fetchRequest)

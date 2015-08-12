@@ -33,14 +33,13 @@ let SMStoreCloudStoreSubscriptionName = "SM_CloudStore_Subscription"
 public let SMStoreDidStartSyncOperationNotification = "SMStoreDidStartSyncOperationNotification"
 public let SMStoreDidFinishSyncOperationNotification = "SMStoreDidFinishSyncOperationNotification"
 
-let CKSIncrementalStoreSyncConflictPolicyOption = "CKSIncrementalStoreSyncConflictPolicyOption"
+let SMStoreSyncConflictResolutionPolicyOption = "SMStoreSyncConflictResolutionPolicyOption"
 
-let CKSIncrementalStoreErrorDomain = "CKSIncrementalStoreErrorDomain"
-
-let CKSChangeSetEntityName = "CKS_ChangeSetEntity"
+let SMStoreErrorDomain = "SMStoreErrorDomain"
 
 public let SeamStoreType = SMStore.type
-enum CKSLocalStoreRecordChangeType: Int16
+
+enum SMLocalStoreRecordChangeType: Int16
 {
     case RecordNoChange = 0
     case RecordUpdated  = 1
@@ -48,7 +47,7 @@ enum CKSLocalStoreRecordChangeType: Int16
     case RecordInserted = 3
 }
 
-enum CKSIncrementalStoreError: ErrorType
+enum SMStoreError: ErrorType
 {
     case BackingStoreFetchRequestError
     case InvalidRequest
@@ -87,9 +86,9 @@ public class SMStore: NSIncrementalStore {
         self.database = CKContainer.defaultContainer().privateCloudDatabase
         if options != nil
         {
-            if options![CKSIncrementalStoreSyncConflictPolicyOption] != nil
+            if options![SMStoreSyncConflictResolutionPolicyOption] != nil
             {
-                let syncConflictPolicy = options![CKSIncrementalStoreSyncConflictPolicyOption] as! NSNumber
+                let syncConflictPolicy = options![SMStoreSyncConflictResolutionPolicyOption] as! NSNumber
                 self.cksStoresSyncConflictPolicy = SMSyncConflictResolutionPolicy(rawValue: syncConflictPolicy.shortValue)!
             }
         }
@@ -126,13 +125,13 @@ public class SMStore: NSIncrementalStore {
             }
             catch
             {
-                throw CKSIncrementalStoreError.BackingStoreCreationFailed
+                throw SMStoreError.BackingStoreCreationFailed
             }
             
             return
         }
         
-        throw CKSIncrementalStoreError.BackingStoreCreationFailed
+        throw SMStoreError.BackingStoreCreationFailed
     }
     
     func backingModel() -> NSManagedObjectModel?
@@ -167,7 +166,7 @@ public class SMStore: NSIncrementalStore {
         return self.backingMOC.persistentStoreCoordinator?.managedObjectModel.entities.filter({ (object) -> Bool in
             
             let entity: NSEntityDescription = object
-            return (entity.name)! != CKSChangeSetEntityName
+            return (entity.name)! != SMLocalStoreChangeSetEntityName
         })
     }
     
@@ -208,7 +207,7 @@ public class SMStore: NSIncrementalStore {
             self.operationQueue?.addOperation(self.syncOperation!)
         })
         
-        if NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreCustomZoneKey) == nil || NSUserDefaults.standardUserDefaults().objectForKey(CKSIncrementalStoreCloudStoreZoneSubcriptionKey) == nil
+        if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneKey) == nil || NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreZoneSubcriptionKey) == nil
         {
             self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
             self.cloudStoreSetupOperation?.setupOperationCompletionBlock = ({(customZoneWasCreated, customZoneSubscriptionWasCreated) -> Void in
@@ -242,7 +241,7 @@ public class SMStore: NSIncrementalStore {
             
         else
         {
-            throw NSError(domain: CKSIncrementalStoreErrorDomain, code: CKSIncrementalStoreError.InvalidRequest._code, userInfo: nil)
+            throw NSError(domain: SMStoreErrorDomain, code: SMStoreError.InvalidRequest._code, userInfo: nil)
         }
     }
     
@@ -437,7 +436,7 @@ public class SMStore: NSIncrementalStore {
             managedObject.setValuesForKeysWithDictionary(dictionary)
             let referenceObject: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
             managedObject.setValue(referenceObject, forKey: SMLocalStoreRecordIDAttributeName)
-            managedObject.setValue(NSNumber(short: CKSLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+            managedObject.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
             mainContext.willChangeValueForKey("objectID")
             try mainContext.obtainPermanentIDsForObjects([sourceObject])
             mainContext.didChangeValueForKey("objectID")

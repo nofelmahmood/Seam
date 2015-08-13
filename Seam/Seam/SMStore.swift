@@ -27,8 +27,6 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
-let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
-let SMStoreCloudStoreSubscriptionName = "SM_CloudStore_Subscription"
 
 public let SMStoreDidStartSyncOperationNotification = "SMStoreDidStartSyncOperationNotification"
 public let SMStoreDidFinishSyncOperationNotification = "SMStoreDidFinishSyncOperationNotification"
@@ -53,7 +51,6 @@ enum SMStoreError: ErrorType
     case InvalidRequest
     case BackingStoreCreationFailed
 }
-
 
 public class SMStore: NSIncrementalStore {
     
@@ -207,7 +204,7 @@ public class SMStore: NSIncrementalStore {
             self.operationQueue?.addOperation(self.syncOperation!)
         })
         
-        if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneKey) == nil || NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreZoneSubcriptionKey) == nil
+        if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName) == nil || NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreSubscriptionName) == nil
         {
             self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
             self.cloudStoreSetupOperation?.setupOperationCompletionBlock = ({(customZoneWasCreated, customZoneSubscriptionWasCreated) -> Void in
@@ -353,11 +350,8 @@ public class SMStore: NSIncrementalStore {
         try self.updateObjectsInBackingStore(objectsToUpdate: context.updatedObjects)
         try self.deleteObjectsFromBackingStore(objectsToDelete: context.deletedObjects, mainContext: context)
         
-        if self.backingMOC.hasChanges
-        {
-            try self.backingMOC.save()
-            self.triggerSync()
-        }
+        try self.backingMOC.saveIfHasChanges()
+        self.triggerSync()
         
         return []
     }

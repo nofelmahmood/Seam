@@ -26,8 +26,8 @@
 import Foundation
 import CloudKit
 
-let SMStoreCloudStoreCustomZoneKey = "SMStoreCloudStoreCustomZoneKey"
-let SMStoreCloudStoreZoneSubcriptionKey = "SMStoreCloudStoreZoneSubcriptionKey"
+let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
+let SMStoreCloudStoreSubscriptionName = "SM_CloudStore_Subscription"
 
 class SMServerStoreSetupOperation:NSOperation {
     
@@ -51,12 +51,12 @@ class SMServerStoreSetupOperation:NSOperation {
         modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones, deletedRecordZonesIDs, operationError) -> Void in
             
             error = operationError
-            let customZoneWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneKey)
-            let customZoneSubscriptionWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreZoneSubcriptionKey)
+            let customZoneWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName)
+            let customZoneSubscriptionWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreSubscriptionName)
             
             if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil)
             {
-                NSUserDefaults.standardUserDefaults().setBool(true, forKey: SMStoreCloudStoreCustomZoneKey)
+                NSUserDefaults.standardUserDefaults().setBool(true, forKey: SMStoreCloudStoreCustomZoneName)
                 let recordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
                 let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
                 
@@ -67,12 +67,12 @@ class SMServerStoreSetupOperation:NSOperation {
                 subscriptionNotificationInfo.shouldBadge = false
                 
                 let subscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
-                subscriptionsOperation.database=self.database
+                subscriptionsOperation.database = self.database
                 subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
                     
                     if operationError == nil
                     {
-                        NSUserDefaults.standardUserDefaults().setBool(true, forKey: SMStoreCloudStoreZoneSubcriptionKey)
+                        NSUserDefaults.standardUserDefaults().setBool(true, forKey: SMStoreCloudStoreSubscriptionName)
                     }
                     error = operationError
                 })
@@ -92,7 +92,7 @@ class SMServerStoreSetupOperation:NSOperation {
             }
             else
             {
-                if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneKey) == nil
+                if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName) == nil
                 {
                     self.setupOperationCompletionBlock!(customZoneCreated: false, customZoneSubscriptionCreated: false)
                 }

@@ -1,4 +1,4 @@
-//    NSEntityDescription+Helpers.swift
+//    CKRecordID+NSManagedObject.swift
 //
 //    The MIT License (MIT)
 //
@@ -23,38 +23,15 @@
 //    SOFTWARE.
 
 
-import Foundation
+import UIKit
+import CloudKit
 import CoreData
 
-extension NSEntityDescription
+extension CKRecordID
 {
-    func attributesByNameByRemovingBackingStoreAttributes() -> [String:NSAttributeDescription]
+    func deleteManagedObjectWithRecordID(usingContext context: NSManagedObjectContext)
     {
-        var attributesByName = self.attributesByName
-        attributesByName.removeValueForKey(SMLocalStoreRecordIDAttributeName)
-        attributesByName.removeValueForKey(SMLocalStoreRecordEncodedValuesAttributeName)
-        return attributesByName
-    }
-    
-    func toOneRelationships() -> [NSRelationshipDescription]
-    {
-        return self.relationshipsByName.values.array.filter({ (relationshipDescription) -> Bool in
-            return relationshipDescription.toMany == false
-        })
-    }
-    
-    func toOneRelationshipsByName() -> [String:NSRelationshipDescription]
-    {
-        var relationshipsByNameDictionary: Dictionary<String,NSRelationshipDescription> = Dictionary<String,NSRelationshipDescription>()
-        for (key,value) in self.relationshipsByName
-        {
-            if value.toMany == true
-            {
-                continue
-            }
-            
-            relationshipsByNameDictionary[key] = value
-        }
-        return relationshipsByNameDictionary
+        
     }
 }
+

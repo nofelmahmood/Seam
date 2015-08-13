@@ -63,6 +63,7 @@ class SMStoreChangeSetHandler {
         recordIDAttribute.name = SMLocalStoreRecordIDAttributeName
         recordIDAttribute.optional = false
         recordIDAttribute.indexed = true
+        recordIDAttribute.attributeType = NSAttributeType.StringAttributeType
         entity.properties.append(recordIDAttribute)
         
         let recordEncodedValuesAttribute: NSAttributeDescription = NSAttributeDescription()
@@ -211,11 +212,12 @@ class SMStoreChangeSetHandler {
                 if objects.count > 0
                 {
                     let object: NSManagedObject = objects.last as! NSManagedObject
-                    let changedPropertyKeys = result.valueForKey(SMLocalStoreRecordChangedPropertiesAttributeName) as! String
+    
+                    let changedPropertyKeys = result.valueForKey(SMLocalStoreRecordChangedPropertiesAttributeName) as? String
                     var changedPropertyKeysArray: [String]?
-                    if changedPropertyKeys.isEmpty == false
+                    if changedPropertyKeys != nil && changedPropertyKeys!.isEmpty == false
                     {
-                        changedPropertyKeysArray = changedPropertyKeys.componentsSeparatedByString(",")
+                        changedPropertyKeysArray = changedPropertyKeys!.componentsSeparatedByString(",")
                     }
                     let ckRecord = object.createOrUpdateCKRecord(usingValuesOfChangedKeys: changedPropertyKeysArray)
                     if ckRecord != nil

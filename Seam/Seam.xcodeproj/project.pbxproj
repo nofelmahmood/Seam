@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		3E0226361B7C418A0080F9AB /* CKRecordZone+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0226351B7C418A0080F9AB /* CKRecordZone+Helpers.swift */; };
 		3E0226381B7C43320080F9AB /* CKRecordZoneID+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0226371B7C43320080F9AB /* CKRecordZoneID+Helpers.swift */; };
+		3E02263A1B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0226391B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift */; };
 		3E191DD41B7B3CAF00BB9E71 /* CKRecord+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DCA1B7B3CAF00BB9E71 /* CKRecord+Helpers.swift */; };
 		3E191DD51B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DCB1B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift */; };
 		3E191DD61B7B3CAF00BB9E71 /* SMStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */; };
@@ -47,6 +48,7 @@
 /* Begin PBXFileReference section */
 		3E0226351B7C418A0080F9AB /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
 		3E0226371B7C43320080F9AB /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
+		3E0226391B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecordID+NSManagedObject.swift"; sourceTree = "<group>"; };
 		3E191DCA1B7B3CAF00BB9E71 /* CKRecord+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecord+Helpers.swift"; sourceTree = "<group>"; };
 		3E191DCB1B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecord+NSManagedObject.swift"; sourceTree = "<group>"; };
 		3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMStore.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 				3E191DD11B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift */,
 				3E0226351B7C418A0080F9AB /* CKRecordZone+Helpers.swift */,
 				3E0226371B7C43320080F9AB /* CKRecordZoneID+Helpers.swift */,
+				3E0226391B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -274,6 +277,7 @@
 				3E191DDB1B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift in Sources */,
 				3E191DDD1B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift in Sources */,
 				3E0226381B7C43320080F9AB /* CKRecordZoneID+Helpers.swift in Sources */,
+				3E02263A1B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift in Sources */,
 				3E191DD91B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift in Sources */,
 				3E191DD81B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift in Sources */,
 				3E191DD61B7B3CAF00BB9E71 /* SMStore.swift in Sources */,

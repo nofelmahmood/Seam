@@ -54,15 +54,15 @@ enum SMStoreError: ErrorType
 
 public class SMStore: NSIncrementalStore {
     
-    private var syncOperation:SMStoreSyncOperation?
-    private var cloudStoreSetupOperation:SMServerStoreSetupOperation?
-    private var cksStoresSyncConflictPolicy:SMSyncConflictResolutionPolicy = SMSyncConflictResolutionPolicy.GreaterModifiedDateWins
-    private var database:CKDatabase?
-    private var operationQueue:NSOperationQueue?
-    private var backingPersistentStoreCoordinator:NSPersistentStoreCoordinator?
-    private var backingPersistentStore:NSPersistentStore?
+    private var syncOperation: SMStoreSyncOperation?
+    private var cloudStoreSetupOperation: SMServerStoreSetupOperation?
+    private var cksStoresSyncConflictPolicy: SMSyncConflictResolutionPolicy = SMSyncConflictResolutionPolicy.GreaterModifiedDateWins
+    private var database: CKDatabase?
+    private var operationQueue: NSOperationQueue?
+    private var backingPersistentStoreCoordinator: NSPersistentStoreCoordinator?
+    private var backingPersistentStore: NSPersistentStore?
     var syncAutomatically: Bool = true
-    private lazy var backingMOC:NSManagedObjectContext={
+    private lazy var backingMOC: NSManagedObjectContext={
         
         var moc = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
         moc.persistentStoreCoordinator = self.backingPersistentStoreCoordinator
@@ -102,8 +102,8 @@ public class SMStore: NSIncrementalStore {
     override public func loadMetadata() throws {
         
         self.metadata=[
-            NSStoreUUIDKey:NSProcessInfo().globallyUniqueString,
-            NSStoreTypeKey:self.dynamicType.type
+            NSStoreUUIDKey: NSProcessInfo().globallyUniqueString,
+            NSStoreTypeKey: self.dynamicType.type
         ]
         
         let storeURL=self.URL
@@ -167,7 +167,7 @@ public class SMStore: NSIncrementalStore {
         })
     }
     
-    internal func triggerSync()
+    public func triggerSync()
     {
         if self.operationQueue != nil && self.operationQueue!.operationCount > 0
         {
@@ -398,8 +398,11 @@ public class SMStore: NSIncrementalStore {
                     {
                         let referenceObject: String = self.referenceObjectForObjectID(relationshipManagedObject.objectID) as! String
                         let backingRelationshipObjectID = try self.objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject)
-                        let backingRelationshipObject = try backingObject.managedObjectContext?.existingObjectWithID(backingRelationshipObjectID!)
-                        backingRelationshipValue.insert(backingRelationshipObject!)
+                        if backingRelationshipObjectID != nil
+                        {
+                            let backingRelationshipObject = try backingObject.managedObjectContext?.existingObjectWithID(backingRelationshipObjectID!)
+                            backingRelationshipValue.insert(backingRelationshipObject!)
+                        }
                     }
                 }
                 
@@ -412,8 +415,11 @@ public class SMStore: NSIncrementalStore {
                 {
                     let referenceObject: String = self.referenceObjectForObjectID(relationshipValue.objectID) as! String
                     let backingRelationshipObjectID = try self.objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject)
-                    let backingRelationshipObject = try self.backingMOC.existingObjectWithID(backingRelationshipObjectID!)
-                    backingObject.setValue(backingRelationshipObject, forKey: relationship.name)
+                    if backingRelationshipObjectID != nil
+                    {
+                        let backingRelationshipObject = try self.backingMOC.existingObjectWithID(backingRelationshipObjectID!)
+                        backingObject.setValue(backingRelationshipObject, forKey: relationship.name)
+                    }
                 }
             }
         }
@@ -430,13 +436,12 @@ public class SMStore: NSIncrementalStore {
             managedObject.setValuesForKeysWithDictionary(dictionary)
             let referenceObject: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
             managedObject.setValue(referenceObject, forKey: SMLocalStoreRecordIDAttributeName)
-            managedObject.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
             mainContext.willChangeValueForKey("objectID")
             try mainContext.obtainPermanentIDsForObjects([sourceObject])
             mainContext.didChangeValueForKey("objectID")
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
-            try self.backingMOC.save()
+            try self.backingMOC.saveIfHasChanges()
         }
     }
     
@@ -456,7 +461,7 @@ public class SMStore: NSIncrementalStore {
             let backingObject: NSManagedObject = results.last as! NSManagedObject
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
             self.backingMOC.deleteObject(backingObject)
-            try self.backingMOC.save()
+            try self.backingMOC.saveIfHasChanges()
         }
     }
     
@@ -479,7 +484,7 @@ public class SMStore: NSIncrementalStore {
             backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
-            try self.backingMOC.save()
+            try self.backingMOC.saveIfHasChanges()
         }
     }
 }

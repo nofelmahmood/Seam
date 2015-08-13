@@ -38,7 +38,7 @@ extension NSManagedObject
         }
         else
         {
-            attributes = self.entity.attributesByName.keys.array
+            attributes = self.entity.attributesByNameByRemovingBackingStoreAttributes().keys.array
         }
         
         let valuesDictionary = self.dictionaryWithValuesForKeys(attributes)

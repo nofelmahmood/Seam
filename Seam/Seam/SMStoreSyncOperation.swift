@@ -98,12 +98,15 @@ class SMStoreSyncOperation: NSOperation {
             do
             {
                 try self.fetchAndApplyServerChangesToLocalDatabase()
+                SMServerTokenHandler.defaultHandler.commit()
+                try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
             }
             catch let error as NSError?
             {
                 throw error!
             }
         }
+            
         catch let error as NSError?
         {
             let conflictedRecords = error!.userInfo[SMSyncConflictsResolvedRecordsKey] as! Array<CKRecord>
@@ -128,6 +131,8 @@ class SMStoreSyncOperation: NSOperation {
             do
             {
                 try self.fetchAndApplyServerChangesToLocalDatabase()
+                SMServerTokenHandler.defaultHandler.commit()
+                try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
             }
             catch let error as NSError?
             {
@@ -186,43 +191,24 @@ class SMStoreSyncOperation: NSOperation {
         
         if savedRecords.count > 0
         {
-            var savedRecordsWithType:Dictionary<String,Dictionary<String,CKRecord>> = Dictionary<String,Dictionary<String,CKRecord>>()
+            let recordIDSubstitution = "recordIDSubstitution"
+            let fetchPredicate: NSPredicate = NSPredicate(format: "%K == $recordIDSubstitution", SMLocalStoreRecordIDAttributeName)
             
             for record in savedRecords
             {
-                if savedRecordsWithType[record.recordType] != nil
-                {
-                    savedRecordsWithType[record.recordType]![record.recordID.recordName] = record
-                    continue
-                }
-                let recordWithRecordIDString:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
-                savedRecordsWithType[record.recordType] = recordWithRecordIDString
-            }
-            
-            let predicate = NSPredicate(format: "%K IN $recordIDStrings",SMLocalStoreRecordIDAttributeName)
-            
-            let types = savedRecordsWithType.keys.array
-            
-            for type in types
-            {
-                let fetchRequest = NSFetchRequest(entityName: type)
-                let ckRecordsForType = savedRecordsWithType[type]
-                let ckRecordIDStrings = ckRecordsForType!.keys.array
-                
-                fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["recordIDStrings":ckRecordIDStrings])
-                var results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
+                let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: record.recordType)
+                let recordIDString: String = record.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
+                fetchRequest.predicate = fetchPredicate.predicateWithSubstitutionVariables([recordIDSubstitution:recordIDString])
+                fetchRequest.fetchLimit = 1
+                let results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
                 if results.count > 0
                 {
-                    for managedObject in results as! [NSManagedObject]
-                    {
-                        let ckRecord = ckRecordsForType![managedObject.valueForKey(SMLocalStoreRecordIDAttributeName) as! String]
-                        let encodedSystemFields = ckRecord?.encodedSystemFields()
-                        managedObject.setValue(encodedSystemFields, forKey: SMLocalStoreRecordEncodedValuesAttributeName)
-                    }
+                    let managedObject = results.last as? NSManagedObject
+                    let encodedFields = record.encodedSystemFields()
+                    managedObject?.setValue(encodedFields, forKey: SMLocalStoreRecordEncodedValuesAttributeName)
                 }
             }
-            
-            try self.localStoreMOC!.save()
+            try self.localStoreMOC!.saveIfHasChanges()
         }
     }
     
@@ -281,9 +267,6 @@ class SMStoreSyncOperation: NSOperation {
                 
                 finalCKRecords.append(clientServerCKRecord.serverRecord!)
             }
-            
-//            let userInfo:Dictionary<String,Array<CKRecord>> = [CKSSyncConflictedResolvedRecordsKey:finalCKRecords]
-//            throw NSError(domain: CKSIncrementalStoreSyncOperationErrorDomain, code: CKSStoresSyncError.ConflictsDetected._code, userInfo: userInfo)
         }
     }
     
@@ -310,7 +293,6 @@ class SMStoreSyncOperation: NSOperation {
             if operationError == nil
             {
                 SMServerTokenHandler.defaultHandler.save(serverChangeToken: serverChangeToken!)
-                SMServerTokenHandler.defaultHandler.commit()
             }
         })
         
@@ -332,137 +314,11 @@ class SMStoreSyncOperation: NSOperation {
     
     func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>) throws
     {
-        let predicate = NSPredicate(format: "%K == $ckRecordIDString",SMLocalStoreRecordIDAttributeName)
-        
-        for object in ckRecords
+        for record in ckRecords
         {
-            let ckRecord:CKRecord = object
-            let fetchRequest = NSFetchRequest(entityName: ckRecord.recordType)
-            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDString":ckRecord.recordID.recordName])
-            fetchRequest.fetchLimit = 1
-            var results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
-            if results.count > 0
-            {
-                let managedObject = results.first as! NSManagedObject
-                let keys = ckRecord.allKeys().filter({(obj)->Bool in
-                    
-                    if ckRecord.objectForKey(obj as String) is CKReference
-                    {
-                        return false
-                    }
-                    return true
-                })
-                
-                let values = ckRecord.dictionaryWithValuesForKeys(keys)
-                managedObject.setValuesForKeysWithDictionary(values)
-                managedObject.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
-                managedObject.setValue(ckRecord.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
-                
-                let changedCKReferenceRecordIDStringsWithKeys = ckRecord.allKeys().filter({(obj)->Bool in
-                    
-                    if ckRecord.objectForKey(obj as String) is CKReference
-                    {
-                        return true
-                    }
-                    return false
-                    
-                }).map({(obj)->(key:String,recordIDString:String) in
-                    
-                    let key:String = obj as String
-                    return (key,(ckRecord.objectForKey(key) as! CKReference).recordID.recordName)
-                })
-                
-                for object in changedCKReferenceRecordIDStringsWithKeys
-                {
-                    let key = object.key
-                    let relationship: NSRelationshipDescription? = managedObject.entity.relationshipsByName[key]
-                    let attributeEntityName = relationship!.destinationEntity!.name
-                    let fetchRequest = NSFetchRequest(entityName: attributeEntityName!)
-                    fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,object.recordIDString)
-                    var results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
-                    if  results.count > 0
-                    {
-                        managedObject.setValue(results.first, forKey: object.key)
-                        break
-                    }
-                    
-                }
-            }
-            else
-            {
-                let managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName(ckRecord.recordType, inManagedObjectContext: self.localStoreMOC!) as NSManagedObject
-                let keys = ckRecord.allKeys().filter({(object)->Bool in
-                    
-                    let key:String = object as String
-                    if ckRecord.objectForKey(key) is CKReference
-                    {
-                        return false
-                    }
-                    
-                    return true
-                })
-                
-                
-                managedObject.setValue(ckRecord.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
-                let changedCKReferencesRecordIDsWithKeys = ckRecord.allKeys().filter({(object)->Bool in
-                    
-                    let key:String = object as String
-                    if ckRecord.objectForKey(key) is CKReference
-                    {
-                        return true
-                    }
-                    return false
-                    
-                }).map({(object)->(key:String,recordIDString:String) in
-                    
-                    let key:String = object as String
-                    
-                    return (key,(ckRecord.objectForKey(key) as! CKReference).recordID.recordName)
-                })
-                
-                let values = ckRecord.dictionaryWithValuesForKeys(keys)
-                managedObject.setValuesForKeysWithDictionary(values)
-                managedObject.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordNoChange.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
-                managedObject.setValue(ckRecord.recordID.recordName, forKey: SMLocalStoreRecordIDAttributeName)
-                
-                
-                for object in changedCKReferencesRecordIDsWithKeys
-                {
-                    let ckReferenceRecordIDString:String = object.recordIDString
-                    let referenceManagedObject = Array(self.localStoreMOC!.registeredObjects).filter({(object)->Bool in
-                        
-                        let managedObject:NSManagedObject = object as NSManagedObject
-                        if (managedObject.valueForKey(SMLocalStoreRecordIDAttributeName) as! String) == ckReferenceRecordIDString
-                        {
-                            return true
-                        }
-                        return false
-                    }).first
-                    
-                    if referenceManagedObject != nil
-                    {
-                        managedObject.setValue(referenceManagedObject, forKey: object.key)
-                    }
-                    else
-                    {
-                        let relationshipDescription: NSRelationshipDescription? = managedObject.entity.relationshipsByName[object.key]
-                        let destinationRelationshipDescription: NSEntityDescription? = relationshipDescription?.destinationEntity
-                        let entityName: String? = destinationRelationshipDescription!.name
-                        let fetchRequest = NSFetchRequest(entityName: entityName!)
-                        fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,ckReferenceRecordIDString)
-                        fetchRequest.fetchLimit = 1
-                        var results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
-                        if results.count > 0
-                        {
-                            managedObject.setValue(results.first as! NSManagedObject, forKey: object.key)
-                            break
-                        }
-                    }
-                }
-            }
+            try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
+            try self.localStoreMOC!.saveIfHasChanges()
         }
-        
-        try self.localStoreMOC?.saveIfHasChanges()
     }
     
     func deleteManagedObjects(fromCKRecordIDs ckRecordIDs:Array<CKRecordID>) throws

@@ -118,7 +118,6 @@ extension CKRecord
                 print("Error executing request for fetching managed object \(error!)", appendNewline: true)
                 setValuesOfManagedObject(managedObject)
             }
-            try context.saveIfHasChanges()
             return managedObject
         }
         return nil

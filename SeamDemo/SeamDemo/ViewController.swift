@@ -14,7 +14,31 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        let moc = CoreDataStack.defaultStack.managedObjectContext
+        
+//        do
+//        {
+//            try moc.save()
+//        }
+//        catch
+//        {
+//            print("Error thrown baby", appendNewline: true)
+//        }
+//        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: "Task")
+//        do
+//        {
+//            let results = try moc.executeFetchRequest(fetchRequest)
+//            for result in results as! [Task]
+//            {
+//                result.name = "\(result.name!) ClientChange"
+//            }
+//            try moc.save()
+//        }
+//        catch
+//        {
+//            
+//        }
+        
+//        let moc = CoreDataStack.defaultStack.managedObjectContext
 
 //        let task: Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: moc) as! Task
 //        task.name = "HElaLuia"
@@ -35,18 +59,18 @@ class ViewController: UIViewController {
 //        outdoorTasksTag.task = cycling
         
         
-        if moc.hasChanges
-        {
-            do
-            {
-                try moc.save()
-            }
-            catch let error as NSError?
-            {
-                print("Error Occured \(error!)", appendNewline: true)
-            }
-        }
-        CoreDataStack.defaultStack.seamStore!.triggerSync()
+//        if moc.hasChanges
+//        {
+//            do
+//            {
+//                try moc.save()
+//            }
+//            catch let error as NSError?
+//            {
+//                print("Error Occured \(error!)", appendNewline: true)
+//            }
+//        }
+//        CoreDataStack.defaultStack.seamStore!.triggerSync()
 //        CoreDataStack.defaultStack.seamStore!.tri
         
     }

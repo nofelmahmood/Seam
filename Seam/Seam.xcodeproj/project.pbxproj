@@ -25,7 +25,7 @@
 		3E191DEA1B7B3DB500BB9E71 /* SMStore.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */; settings = {ATTRIBUTES = (Public, ); }; };
 		3E191DEB1B7B3DB500BB9E71 /* SMStoreChangeSetHandler.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E191DEC1B7B3DB500BB9E71 /* SMServerStoreSetupOperation.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCE1B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift */; settings = {ATTRIBUTES = (Private, ); }; };
-		3E191DED1B7B3DB500BB9E71 /* SMStoreSyncOperation.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCF1B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E191DED1B7B3DB500BB9E71 /* SMStoreSyncOperation.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCF1B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift */; settings = {ATTRIBUTES = (Public, ); }; };
 		3E191DEE1B7B3DB500BB9E71 /* SMServerTokenHandler.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD01B7B3CAF00BB9E71 /* SMServerTokenHandler.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E191DEF1B7B3DB500BB9E71 /* NSEntityDescription+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD11B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E191DF01B7B3DB600BB9E71 /* NSManagedObject+CKRecord.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD21B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -160,8 +160,8 @@
 			files = (
 				3E8E26C51B7B11BD009C47EA /* Seam.h in Headers */,
 				3E191DEA1B7B3DB500BB9E71 /* SMStore.swift in Headers */,
-				3E191DE81B7B3DB500BB9E71 /* CKRecord+Helpers.swift in Headers */,
 				3E191DED1B7B3DB500BB9E71 /* SMStoreSyncOperation.swift in Headers */,
+				3E191DE81B7B3DB500BB9E71 /* CKRecord+Helpers.swift in Headers */,
 				3E191DEC1B7B3DB500BB9E71 /* SMServerStoreSetupOperation.swift in Headers */,
 				3E191DF11B7B3DB600BB9E71 /* NSManagedObjectContext+Helpers.swift in Headers */,
 				3E191DE91B7B3DB500BB9E71 /* CKRecord+NSManagedObject.swift in Headers */,

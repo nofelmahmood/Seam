@@ -56,7 +56,7 @@ public class SMStore: NSIncrementalStore {
     
     private var syncOperation: SMStoreSyncOperation?
     private var cloudStoreSetupOperation: SMServerStoreSetupOperation?
-    private var cksStoresSyncConflictPolicy: SMSyncConflictResolutionPolicy = SMSyncConflictResolutionPolicy.GreaterModifiedDateWins
+    private var cksStoresSyncConflictPolicy: SMSyncConflictResolutionPolicy = SMSyncConflictResolutionPolicy.ServerRecordWins
     private var database: CKDatabase?
     private var operationQueue: NSOperationQueue?
     private var backingPersistentStoreCoordinator: NSPersistentStoreCoordinator?
@@ -117,8 +117,7 @@ public class SMStore: NSIncrementalStore {
             {
                 self.backingPersistentStore = try self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
                 self.operationQueue = NSOperationQueue()
-                self.operationQueue?.maxConcurrentOperationCount = 1
-                self.triggerSync()
+                self.operationQueue!.maxConcurrentOperationCount = 1
             }
             catch
             {

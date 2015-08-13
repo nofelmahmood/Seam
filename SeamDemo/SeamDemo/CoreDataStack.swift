@@ -8,7 +8,7 @@
 
 import UIKit
 import CoreData
-import Seam
+// import Seam
 
 class CoreDataStack: NSObject {
 

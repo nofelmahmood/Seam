@@ -36,6 +36,7 @@ extension CKRecord
     
     private func allCKReferencesAsManagedObjects(usingContext context: NSManagedObjectContext) -> [String:NSManagedObject]?
     {
+        // Fix it : Need to fix relationships. No relationships are being saved at the moment
         let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
         if entity != nil
         {
@@ -81,11 +82,14 @@ extension CKRecord
             let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entity!.name!)
             fetchRequest.fetchLimit = 1
             fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName, recordIDString)
-            
-            let setValuesOfManagedObject = ({(managedObject: NSManagedObject?) -> Void in
-                
+
+            let results = try context.executeFetchRequest(fetchRequest)
+            if results.count > 0
+            {
+                managedObject = results.last as? NSManagedObject
                 if managedObject != nil
                 {
+                    managedObject!.setValue(self.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
                     let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
                     if attributeValuesDictionary != nil
                     {
@@ -97,26 +101,25 @@ extension CKRecord
                         managedObject!.setValuesForKeysWithDictionary(referencesValuesDictionary!)
                     }
                 }
-            })
-            
-            do
-            {
-                let results = try context.executeFetchRequest(fetchRequest)
-                if results.count > 0
-                {
-                    managedObject = results.last as? NSManagedObject
-                }
-                else
-                {
-                    managedObject = NSEntityDescription.insertNewObjectForEntityForName(entity!.name!, inManagedObjectContext: context)
-                }
-                
-                setValuesOfManagedObject(managedObject)
             }
-            catch let error as NSError?
+            else
             {
-                print("Error executing request for fetching managed object \(error!)", appendNewline: true)
-                setValuesOfManagedObject(managedObject)
+                managedObject = NSEntityDescription.insertNewObjectForEntityForName(entity!.name!, inManagedObjectContext: context)
+                if managedObject != nil
+                {
+                    managedObject!.setValue(recordIDString, forKey: SMLocalStoreRecordIDAttributeName)
+                    managedObject!.setValue(self.encodedSystemFields(), forKey: SMLocalStoreRecordEncodedValuesAttributeName)
+                    let attributeValuesDictionary = self.allAttributeValuesAsManagedObjectAttributeValues(usingContext: context)
+                    if attributeValuesDictionary != nil
+                    {
+                        managedObject!.setValuesForKeysWithDictionary(attributeValuesDictionary!)
+                    }
+                    let referencesValuesDictionary = self.allCKReferencesAsManagedObjects(usingContext: context)
+                    if referencesValuesDictionary != nil
+                    {
+                        managedObject!.setValuesForKeysWithDictionary(referencesValuesDictionary!)
+                    }
+                }
             }
             return managedObject
         }

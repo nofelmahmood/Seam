@@ -18,6 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
 
+        let moc = CoreDataStack.defaultStack.managedObjectContext
+        CoreDataStack.defaultStack.seamStore!.triggerSync()
+
         return true
     }
 

@@ -217,7 +217,14 @@ class SMStoreChangeSetHandler {
                     var changedPropertyKeysArray: [String]?
                     if changedPropertyKeys != nil && changedPropertyKeys!.isEmpty == false
                     {
-                        changedPropertyKeysArray = changedPropertyKeys!.componentsSeparatedByString(",")
+                        if changedPropertyKeys!.rangeOfString(",") != nil
+                        {
+                            changedPropertyKeysArray = changedPropertyKeys!.componentsSeparatedByString(",")
+                        }
+                        else
+                        {
+                            changedPropertyKeysArray = [changedPropertyKeys!]
+                        }
                     }
                     let ckRecord = object.createOrUpdateCKRecord(usingValuesOfChangedKeys: changedPropertyKeysArray)
                     if ckRecord != nil

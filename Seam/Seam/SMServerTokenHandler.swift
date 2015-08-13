@@ -49,6 +49,11 @@ class SMServerTokenHandler
         self.newToken = serverChangeToken
     }
     
+    func unCommittedToken() -> CKServerChangeToken?
+    {
+        return newToken
+    }
+    
     func commit()
     {
         if self.newToken != nil

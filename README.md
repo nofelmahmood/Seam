@@ -1,9 +1,27 @@
 ![](http://s14.postimg.org/ll5smugr5/Logo.png)
 
+Seam is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. All you have to do is use it as a store type for your CoreData store. Local caching and sync is taken care of. It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
 
-CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html). It automatically creates and manages a SQLite store using CoreData to store and sync with user's private database on CloudKit Servers.
+## What becomes What
 
-It helps you to reuse your CoreData knowledge to power your apps with CloudKit. It handles almost all the CloudKit hassle.
+| CloudKit  | CoreData |
+| ------------- | ------------- |
+| NSNumber   | NSNumber  |
+| NSDate    | NSDate
+| NSString  | NSString   |
+| NSData | NSData
+| CKReference | NSManagedObject |
+
+### On Relationships
+
+#### To - one 
+To one relationships are translated as CKReferences on the CloudKit Servers.
+#### To - many
+To many relationships are not explicitly handled. Seam only creates and manages to-one relationships on the CloudKit Servers.
+
+<strong>Example</strong> -> If an Employee has a to-one relationship to 
+
+<strong>Note : Always create inverse relationships or Seam wouldn't be able to translate CloudKit Records into CoreData Models. Unexpected errors and curroption of data can possibly occur.</strong>
 
 ####Seeing is believing !
 ![](https://cdn.pbrd.co/images/1ueV7gsM.gif)

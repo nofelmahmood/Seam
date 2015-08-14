@@ -4,6 +4,8 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 
 ## What becomes What
 
+### Attributes
+
 | CloudKit  | CoreData |
 | ------------- | ------------- |
 | NSNumber   | NSNumber  |
@@ -12,16 +14,14 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 | NSData | NSData
 | CKReference | NSManagedObject |
 
-### On Relationships
+### Relationships
 
-#### To - one 
-To one relationships are translated as CKReferences on the CloudKit Servers.
-#### To - many
-To many relationships are not explicitly handled. Seam only creates and manages to-one relationships on the CloudKit Servers.
+| Relationship  | How does the translation happen |
+| ------------- | ------------- |
+| To - one    | To one relationships are translated as CKReferences on the CloudKit Servers.|
+| To - many    | To many relationships are not explicitly handled. Seam only creates and manages to-one relationships on the CloudKit Servers. <br/> <strong>Example</strong> -> If an Employee has a to-one relationship to Department and Department has a to-many relationship to Employee than Seam will only create the former on the CloudKit Servers. It will fullfil the later by using the to-one relationship. If all employees of a department are accessed Seam will fulfil it by fetching all the employees that belong to that particular department.|
 
-<strong>Example</strong> -> If an Employee has a to-one relationship to 
-
-<strong>Note : Always create inverse relationships or Seam wouldn't be able to translate CloudKit Records into CoreData Models. Unexpected errors and curroption of data can possibly occur.</strong>
+<strong>Note :</strong> Always create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CloudKit Records into CoreData Models. Unexpected errors and curroption of data can possibly occur.
 
 ####Seeing is believing !
 ![](https://cdn.pbrd.co/images/1ueV7gsM.gif)

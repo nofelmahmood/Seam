@@ -62,9 +62,6 @@ extension CKRecord
     
     private func allAttributeValuesAsManagedObjectAttributeValues(usingContext context: NSManagedObjectContext) -> [String:AnyObject]?
     {
-        print("Entity \(self.recordType) Changed Keys \(self.changedKeys())")
-        print("Entity \(self.recordType) All Keys \(self.allKeys())")
-        print("Value \(self.dictionaryWithValuesForKeys(self.allKeys()))", appendNewline: true)
         let entity = context.persistentStoreCoordinator?.managedObjectModel.entitiesByName[self.recordType]
         return self.dictionaryWithValuesForKeys(self.allAttributeKeys(usingAttributesByNameFromEntity: entity!.attributesByName))
     }
@@ -77,7 +74,7 @@ extension CKRecord
         if entity != nil
         {
             let referencesValuesDictionary = self.dictionaryWithValuesForKeys(self.allReferencesKeys(usingRelationshipsByNameFromEntity: entity!.relationshipsByName))
-            var managedObjectsDictionary: Dictionary<String,AnyObject> = Dictionary<String,NSManagedObject>()
+            var managedObjectsDictionary: Dictionary<String,AnyObject> = Dictionary<String,AnyObject>()
             for (key,value) in referencesValuesDictionary
             {
                 if (value as? String) != nil && (value as! String) == SMCloudRecordNilValue

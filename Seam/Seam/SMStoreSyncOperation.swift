@@ -30,6 +30,8 @@ import CoreData
 let SMStoreSyncOperationErrorDomain = "SMStoreSyncOperationDomain"
 let SMSyncConflictsResolvedRecordsKey = "SMSyncConflictsResolvedRecordsKey"
 
+let SMCloudRecordNilValue = "SM_Cloud_Store_NilValue"
+
 enum SMSyncConflictResolutionPolicy: Int16
 {
     case ClientTellsWhichWins = 0
@@ -51,8 +53,8 @@ class SMStoreSyncOperation: NSOperation {
     private var persistentStoreCoordinator: NSPersistentStoreCoordinator?
     private var entities: Array<NSEntityDescription>?
     var syncConflictPolicy: SMSyncConflictResolutionPolicy?
-    var syncCompletionBlock:((syncError:NSError?) -> ())?
-    var syncConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
+    var syncCompletionBlock: ((syncError:NSError?) -> ())?
+    var syncConflictResolutionBlock: ((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
     
     init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy?) {
         
@@ -169,6 +171,7 @@ class SMStoreSyncOperation: NSOperation {
         let savedRecords:[CKRecord] = [CKRecord]()
         var conflictedRecords:[CKRecord] = [CKRecord]()
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
+ 
         })
         ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
             
@@ -176,7 +179,7 @@ class SMStoreSyncOperation: NSOperation {
             if error != nil && error!.code == CKErrorCode.ServerRecordChanged.rawValue
             {
                 print("Conflicted Record \(error!)", appendNewline: true)
-//                conflictedRecords.append(ckRecord!)
+                conflictedRecords.append(ckRecord!)
             }
         })
         
@@ -313,8 +316,71 @@ class SMStoreSyncOperation: NSOperation {
             deletedCKRecordIDs.append(recordID as CKRecordID)
         })
         
+        
         self.operationQueue!.addOperation(fetchRecordChangesOperation)
         self.operationQueue!.waitUntilAllOperationsAreFinished()
+        
+        if insertedOrUpdatedCKRecords.count > 0
+        {
+            let recordIDs: [CKRecordID] = insertedOrUpdatedCKRecords.map { (record) -> CKRecordID in
+                return record.recordID
+            }
+            var recordTypes: Set<String> = Set<String>()
+            for record in insertedOrUpdatedCKRecords
+            {
+                recordTypes.insert(record.recordType)
+            }
+            
+            var desiredKeys: [String]?
+            for recordType in recordTypes
+            {
+                if desiredKeys == nil
+                {
+                    desiredKeys = [String]()
+                }
+                let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[recordType]
+                if entity != nil
+                {
+                    let properties = entity!.propertiesByName.keys.array.filter({ (key) -> Bool in
+                        
+                        if key == SMLocalStoreRecordIDAttributeName || key == SMLocalStoreRecordEncodedValuesAttributeName
+                        {
+                            return false
+                        }
+                        return true
+                    })
+                    desiredKeys!.extend(properties)
+                }
+            }
+            insertedOrUpdatedCKRecords.removeAll()
+            let fetchRecordsOperation: CKFetchRecordsOperation = CKFetchRecordsOperation(recordIDs: recordIDs)
+            fetchRecordsOperation.desiredKeys = desiredKeys
+            fetchRecordsOperation.fetchRecordsCompletionBlock = ({(recordsByRecordID,operationError) -> Void in
+                
+                if operationError == nil && recordsByRecordID != nil
+                {
+                    insertedOrUpdatedCKRecords = recordsByRecordID!.values.array
+                }
+            })
+            
+            self.operationQueue!.addOperation(fetchRecordsOperation)
+            self.operationQueue!.waitUntilAllOperationsAreFinished()
+            for record in insertedOrUpdatedCKRecords
+            {
+                let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[record.recordType]
+                if entity != nil
+                {
+                    for key in entity!.propertiesByName.keys.array
+                    {
+                        if record[key] == nil && key != SMLocalStoreRecordIDAttributeName && key != SMLocalStoreRecordEncodedValuesAttributeName
+                        {
+                            record[key] = SMCloudRecordNilValue
+                        }
+                    }
+                }
+            }
+        }
+        
         if fetchRecordChangesOperation.moreComing
         {
             print("More Coming", appendNewline: true)
@@ -323,6 +389,7 @@ class SMStoreSyncOperation: NSOperation {
         {
             print("Not coming", appendNewline: true)
         }
+        
         return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
     }
     

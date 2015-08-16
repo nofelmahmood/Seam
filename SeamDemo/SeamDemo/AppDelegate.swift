@@ -19,6 +19,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
 
         let moc = CoreDataStack.defaultStack.managedObjectContext
+//        do
+//        {
+//            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: "Task")
+//            let results = try moc.executeFetchRequest(fetchRequest)
+//            for task in results as! [Task]
+//            {
+//                task.name = "\(task.name!) Client Change"
+//            }
+//            try moc.saveIfHasChanges()
+//        }
+//        catch
+//        {
+//            print("Error Tasks")
+//        }
         CoreDataStack.defaultStack.seamStore!.triggerSync()
 
         return true

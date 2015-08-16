@@ -21,9 +21,7 @@
 		3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */; };
 		3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E591B7B6D1D00BB9E71 /* CoreData.framework */; };
 		3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */; };
-		3E96E9B41B7CB9E000186E43 /* CKRecord+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9A71B7CB9E000186E43 /* CKRecord+Helpers.swift */; };
 		3E96E9B51B7CB9E000186E43 /* CKRecord+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9A81B7CB9E000186E43 /* CKRecord+NSManagedObject.swift */; };
-		3E96E9B61B7CB9E000186E43 /* CKRecordID+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9A91B7CB9E000186E43 /* CKRecordID+NSManagedObject.swift */; };
 		3E96E9B71B7CB9E000186E43 /* CKRecordZone+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AA1B7CB9E000186E43 /* CKRecordZone+Helpers.swift */; };
 		3E96E9B81B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AB1B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift */; };
 		3E96E9B91B7CB9E000186E43 /* NSEntityDescription+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AC1B7CB9E000186E43 /* NSEntityDescription+Helpers.swift */; };
@@ -66,9 +64,7 @@
 		3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3E191E591B7B6D1D00BB9E71 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
-		3E96E9A71B7CB9E000186E43 /* CKRecord+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecord+Helpers.swift"; path = "../../Seam/Seam/CKRecord+Helpers.swift"; sourceTree = "<group>"; };
 		3E96E9A81B7CB9E000186E43 /* CKRecord+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecord+NSManagedObject.swift"; path = "../../Seam/Seam/CKRecord+NSManagedObject.swift"; sourceTree = "<group>"; };
-		3E96E9A91B7CB9E000186E43 /* CKRecordID+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecordID+NSManagedObject.swift"; path = "../../Seam/Seam/CKRecordID+NSManagedObject.swift"; sourceTree = "<group>"; };
 		3E96E9AA1B7CB9E000186E43 /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecordZone+Helpers.swift"; path = "../../Seam/Seam/CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
 		3E96E9AB1B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecordZoneID+Helpers.swift"; path = "../../Seam/Seam/CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
 		3E96E9AC1B7CB9E000186E43 /* NSEntityDescription+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSEntityDescription+Helpers.swift"; path = "../../Seam/Seam/NSEntityDescription+Helpers.swift"; sourceTree = "<group>"; };
@@ -162,9 +158,7 @@
 		3E96E9A61B7CB99B00186E43 /* SeamFramework Files */ = {
 			isa = PBXGroup;
 			children = (
-				3E96E9A71B7CB9E000186E43 /* CKRecord+Helpers.swift */,
 				3E96E9A81B7CB9E000186E43 /* CKRecord+NSManagedObject.swift */,
-				3E96E9A91B7CB9E000186E43 /* CKRecordID+NSManagedObject.swift */,
 				3E96E9AA1B7CB9E000186E43 /* CKRecordZone+Helpers.swift */,
 				3E96E9AB1B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift */,
 				3E96E9AC1B7CB9E000186E43 /* NSEntityDescription+Helpers.swift */,
@@ -302,13 +296,11 @@
 				3E96E9BB1B7CB9E000186E43 /* NSManagedObjectContext+Helpers.swift in Sources */,
 				3E0226421B7C62D20080F9AB /* Tag+CoreDataProperties.swift in Sources */,
 				3E96E9B51B7CB9E000186E43 /* CKRecord+NSManagedObject.swift in Sources */,
-				3E96E9B41B7CB9E000186E43 /* CKRecord+Helpers.swift in Sources */,
 				3E96E9C01B7CB9E000186E43 /* SMStoreSyncOperation.swift in Sources */,
 				3E96E9B71B7CB9E000186E43 /* CKRecordZone+Helpers.swift in Sources */,
 				3E0226411B7C62D20080F9AB /* Task.swift in Sources */,
 				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
 				3E96E9B91B7CB9E000186E43 /* NSEntityDescription+Helpers.swift in Sources */,
-				3E96E9B61B7CB9E000186E43 /* CKRecordID+NSManagedObject.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

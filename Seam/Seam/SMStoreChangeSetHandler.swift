@@ -143,6 +143,7 @@ class SMStoreChangeSetHandler {
         let recordIDString: String = object.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
         let changedPropertyKeysString = ",".join(changedPropertyKeys)
         changeSet.setValue(recordIDString, forKey: SMLocalStoreRecordIDAttributeName)
+        changeSet.setValue(object.entity.name!, forKey: SMLocalStoreEntityNameAttributeName)
         changeSet.setValue(changedPropertyKeysString, forKey: SMLocalStoreRecordChangedPropertiesAttributeName)
         changeSet.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
     }

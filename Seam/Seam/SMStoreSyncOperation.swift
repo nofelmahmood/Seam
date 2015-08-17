@@ -30,7 +30,7 @@ import CoreData
 let SMStoreSyncOperationErrorDomain = "SMStoreSyncOperationDomain"
 let SMSyncConflictsResolvedRecordsKey = "SMSyncConflictsResolvedRecordsKey"
 
-let SMCloudRecordNilValue = "SM_Cloud_Store_NilValue"
+let SMCloudRecordNilValue = "@!SM_CloudStore_Record_Nil_Value"
 
 enum SMSyncConflictResolutionPolicy: Int16
 {

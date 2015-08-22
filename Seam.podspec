@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'Seam'
-  spec.version      = '0.5.2'
+  spec.version      = '0.6'
   spec.license      = { :type => 'MIT' }
   spec.homepage     = 'https://github.com/nofelmahmood/CKSIncrementalStore'
   spec.authors      = { 'Nofel Mahmood' => 'nofelmehmood@gmail.com' }

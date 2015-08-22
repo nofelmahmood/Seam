@@ -1,3 +1,5 @@
+##### CKSIncrementalStore has been merged into Seam. You can still use the old implementation from this [branch](https://github.com/nofelmahmood/Seam/tree/CKSIncrementalStore). I am busy documenting the new framework. This line will be removed once it is complete. Thank you for your patience and interest. :)
+
 ![](http://s14.postimg.org/ll5smugr5/Logo.png)
 
 Seam is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. All you have to do is use it as a store type for your CoreData store. Local caching and sync is taken care of. It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.

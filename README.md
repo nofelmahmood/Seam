@@ -11,7 +11,7 @@
 
 Seam is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. All you have to do is use it as a store type for your CoreData store. Local caching and sync is taken care of. It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
 
-## What becomes What
+## CoreData to CloudKit
 
 ### Attributes
 

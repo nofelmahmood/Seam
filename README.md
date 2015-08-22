@@ -15,22 +15,32 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 
 ### Attributes
 
-| CloudKit  | CoreData |
+| CoreData  | CloudKit |
 | ------------- | ------------- |
-| NSNumber   | NSNumber  |
-| NSDate    | NSDate
-| NSString  | NSString   |
-| NSData | NSData
-| CKReference | NSManagedObject |
+| NSDate    | Date/Time
+| NSData | Bytes
+| NSString  | String   |
+| Integer16 | Int(64) |
+| Integer32 | Int(64) |
+| Integer64 | Int(64) |
+| Decimal | Double | 
+| Float | Double |
+| Boolean | Int(64) |
+| NSManagedObject | Reference |
+
+**In the table above :** `Integer16`, `Integer32`, `Integer64`, `Decimal`, `Float` and `Boolean` are referring to the instance of `NSNumber` used to represent them in CoreData Models. `NSManagedObject` refers to a `to-one relationship` in a CoreData Model.
 
 ### Relationships
 
-| Relationship  | How does the translation happen |
+| CoreData Relationship  | Translation on CloudKit |
 | ------------- | ------------- |
 | To - one    | To one relationships are translated as CKReferences on the CloudKit Servers.|
-| To - many    | To many relationships are not explicitly handled. Seam only creates and manages to-one relationships on the CloudKit Servers. <br/> <strong>Example</strong> -> If an Employee has a to-one relationship to Department and Department has a to-many relationship to Employee than Seam will only create the former on the CloudKit Servers. It will fullfil the later by using the to-one relationship. If all employees of a department are accessed Seam will fulfil it by fetching all the employees that belong to that particular department.|
+| To - many    | To many relationships are not explicitly created. Seam only creates and manages to-one relationships on the CloudKit Servers. <br/> <strong>Example</strong> -> If an Employee has a to-one relationship to Department and Department has a to-many relationship to Employee than Seam will only create the former on the CloudKit Servers. It will fullfil the later by using the to-one relationship. If all employees of a department are accessed Seam will fulfil it by fetching all the employees that belong to that particular department.|
 
-<strong>Note :</strong> Always create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CloudKit Records into CoreData Models. Unexpected errors and curroption of data can possibly occur.
+<strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and curroption of data can possibly occur.
+
+### CloudKit Records
+
 
 ####Seeing is believing !
 ![](https://cdn.pbrd.co/images/1ueV7gsM.gif)

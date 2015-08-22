@@ -406,6 +406,7 @@ public class SMStore: NSIncrementalStore {
                 }
                 
                 backingObject.setValue(backingRelationshipValue, forKey: relationship.name)
+                
             }
             else
             {

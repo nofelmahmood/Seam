@@ -48,21 +48,29 @@ Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you kn
 #### Conflict Resolution Policies
 In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
 
-- **ClientTellsWhichWins**
+1. **ClientTellsWhichWins**
 
 This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the records as arguments. You do whatever changes you want on the second argument and return it.
 
-- **ServerRecordWins**
+2. **ServerRecordWins**
 
 This is the default. It considers the server record as the true record.
 
-- **ClientRecordWins**
+3. **ClientRecordWins**
 
 This considers the client record as the true record.
 
-- **KeepBoth**
+4. **KeepBoth**
 
 This saves both versions of the record.
+
+
+### Getting Started 
+Download the demo project. Run it and see the magic as it happens.
+
+### How to use
+
+Follow the five steps.
 
 ####Seeing is believing !
 ![](https://cdn.pbrd.co/images/1ueV7gsM.gif)
@@ -100,17 +108,9 @@ CloudKit `Public Database` and here's the two reasons why, straight from the doc
 See the sample iOS demo app. Run it on two devices and start adding, removing and modifying records and experience the magic.
 
 ## Installation
-`CocoaPods` is the recommended way of adding CKSIncrementalStore to your project.
+CocoaPods is the recommended way of adding CKSIncrementalStore to your project.
 
-You want to to add pod `'CKSIncrementalStore', '~> 0.5.2'` similar to the following to your Podfile:
-```
-target 'MyApp' do
-  pod 'CKSIncrementalStore', '~> 0.5.2'
-end
-```
-
-Then run a `[sudo] pod install` inside your terminal, or from CocoaPods.app.
-
+Add this `'Seam', '~> 0.6'` to your pod file.
 
 ## Credits
 CKSIncrementalStore was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)

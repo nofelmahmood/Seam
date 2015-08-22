@@ -39,8 +39,30 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 
 <strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and curroption of data can possibly occur.
 
-### CloudKit Records
+### Sync
 
+Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing two notifications repectively.
+- **SMStoreDidStartSyncOperationNotification**
+- **SMStoreDidFinishSyncOperationNotification**
+
+#### Conflict Resolution Policies
+In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
+
+- **ClientTellsWhichWins**
+
+This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the records as arguments. You do whatever changes you want on the second argument and return it.
+
+- **ServerRecordWins**
+
+This is the default. It considers the server record as the true record.
+
+- **ClientRecordWins**
+
+This considers the client record as the true record.
+
+- **KeepBoth**
+
+This saves both versions of the record.
 
 ####Seeing is believing !
 ![](https://cdn.pbrd.co/images/1ueV7gsM.gif)
@@ -61,89 +83,6 @@ if persistentStore != nil
     // Store it in a property.
 }
 
-```
-#### How Sync Works
-
-Sync operation uses a private instance of NSManagedObjectContext to perform the operation and throws two notifications to notify when the operation starts and finishes.
-
-##### Notifications
-* <b>CKSIncrementalStoreDidStartSyncOperationNotification</b>
-
-Notification is posted when the sync operation starts.
-
-`Example`
-
-```swift
-NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncFinished:", name: CKSIncrementalStoreDidStartSyncOperationNotification, object: self.cksIncrementalStore)
-
-```
-* <b>CKSIncrementalStoreDidFinishSyncOperationNotification</b>
-
-Notification is posted when the sync operation finishes.
-
-`Example`
-
-```swift
-NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncFinished:", name: CKSIncrementalStoreDidFinishSyncOperationNotification, object: self.cksIncrementalStore)
-```
-
-Sync works in two ways. One is manual and the other is automatic.
-
-##### Ways to Sync
-* <b>Manual Sync</b>
-
-Anytime call triggerSync() on an instance of CKSIncrementalStore.
-
-```swift
-self.cksIncrementalStore.triggerSync()
-```
-* <b>Automatic Sync</b>
-
-Well anytime you call save on an instance of `NSManagedObjectContext`, CKSIncrementalStore calls `triggerSync()` automatically. 
-
-But what if some other device changes some records on the server. Don't worry we have you covered but we need some of your help too.
-
-Enable [Push Notifications](http://code.tutsplus.com/tutorials/setting-up-push-notifications-on-ios--cms-21925) for your app. Then in your AppDelegate's method
-
-```swift
-func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) 
-{
-    self.cksIncrementalStore?.handlePush(userInfo: userInfo)
-}
-```
-#### Sync Conflict Resolution
-
-Life is usually filled up with conflicts and so is data. The good thing about "data" is that we can easily resolve conflicts using libraries like this one.
-
-`CKSIncrementalStore supports 4 sync conflict resolution policies out of the box.`
-
-* <b>GreaterModifiedDateWins</b>
-
-This is the default. Record with the greater modified date is considered to be the true record.
-
-* <b>UserTellsWhichWins</b>
-
-Setting this sync policy requires that you set the `recordConflictResolutionBlock` instance of `CKSIncrementalStore`.
-
-```swift
-var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
-```
-It gives you two versions of the record. Client record and Server record. You do what ever changes you want on the server record and return it.
-
-* <b>ServerRecordWins</b>
-
-It simply considers the Server record as the true record.
-
-* <b>ClientRecordWins</b>
-
-It simply considers the Client record as the true record.
-
-You can set any policy by passing it as an option while adding `CKSIncrementalStore` to `NSPersistentStoreCoordinator`.
-
-```swift
-var options:Dictionary<NSObject,AnyObject> = Dictionary<NSObject,AnyObject>()
-options[CKSIncrementalStoreSyncConflictPolicyOption] = NSNumber(short: CKSStoresSyncConflictPolicy.ClientRecordWins.rawValue)
-var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType(CKSIncrementalStore.type, configuration: nil, URL: url, options: options, error: &error)
 ```
 ### What it does support
 

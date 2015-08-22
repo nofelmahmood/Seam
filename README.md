@@ -39,7 +39,7 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 
 <strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and curroption of data can possibly occur.
 
-### Sync
+## Sync
 
 Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing two notifications repectively.
 - **SMStoreDidStartSyncOperationNotification**
@@ -48,27 +48,27 @@ Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you kn
 #### Conflict Resolution Policies
 In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
 
-1. **ClientTellsWhichWins**
+- **ClientTellsWhichWins**
 
 This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the records as arguments. You do whatever changes you want on the second argument and return it.
 
-2. **ServerRecordWins**
+- **ServerRecordWins**
 
 This is the default. It considers the server record as the true record.
 
-3. **ClientRecordWins**
+- **ClientRecordWins**
 
 This considers the client record as the true record.
 
-4. **KeepBoth**
+- **KeepBoth**
 
 This saves both versions of the record.
 
 
-### Getting Started 
+## Getting Started 
 Download the demo project. Run it and see the magic as it happens.
 
-### How to use
+## How to use
 
 Follow the five steps.
 
@@ -92,6 +92,8 @@ if persistentStore != nil
 }
 
 ```
+## Support
+
 ### What it does support
 
 CKSIncrementalStore supports only user's CloudKit `Private Database` at this time. It creates and uses a custom zone to store data and fetch changes from the server.

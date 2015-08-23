@@ -66,13 +66,27 @@ This saves both versions of the record.
 
 ## How to use
 
-1. Declare a SMStore type property in the class where your CoreData stack resides.
-1. Add it to your app's NSPersistentStoreCoordinator.
-2. Assign the returned store to this property.
-3. Enable Push Notifications for your app.
-4. Implement didReceiveRemoteNotification Method.
-5. Call smStore.handlePush()
-6. Enjoy
+- Declare a SMStore type property in the class where your CoreData stack resides.
+```swift
+var smStore: SMStore?
+```
+- Add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
+```swift
+do 
+{
+   self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
+}
+```
+- Enable Push Notifications for your app.
+![](http://s29.postimg.org/rb9vj0egn/Screen_Shot_2015_08_23_at_5_44_59_pm.png)
+- Implement didReceiveRemoteNotification Method in your AppDelegate and call `handlePush` on the instance of SMStore created earlier.
+```swift
+ func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) 
+ {
+    self.smStore?.handlePush(userInfo: userInfo)
+ }
+```
+- Enjoy
 
 ## Support
 

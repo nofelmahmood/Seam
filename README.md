@@ -50,7 +50,7 @@ In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
 
 - ClientTellsWhichWins
 
-This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the records as arguments. You do whatever changes you want on the second argument and return it.
+This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the record as arguments. You do whatever changes you want on the second argument and return it.
 
 - ServerRecordWins
 

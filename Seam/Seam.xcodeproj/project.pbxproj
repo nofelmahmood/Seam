@@ -349,6 +349,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.Seam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VALID_ARCHS = "arm64 armv7 armv7s x86_64 i386";
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};

@@ -133,6 +133,11 @@ class SMStoreSyncOperation: NSOperation {
             SMServerTokenHandler.defaultHandler.commit()
             try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
         }
+            
+        catch
+        {
+            print("Unknown Error")
+        }
         
     }
     
@@ -259,6 +264,22 @@ class SMStoreSyncOperation: NSOperation {
                     {                        
                         clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord!,serverRecord: clientServerCKRecord.serverRecord!)
                     }
+                    else
+                    {
+                        print("ClientTellsWhichWins conflict resolution policy requires to set syncConflictResolutionBlock on the instance of SMStore")
+                    }
+                }
+                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ClientRecordWins
+                {
+                    
+                }
+                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ServerRecordWins
+                {
+                    
+                }
+                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.KeepBoth
+                {
+                    
                 }
 //                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.KeepBoth
 //                {

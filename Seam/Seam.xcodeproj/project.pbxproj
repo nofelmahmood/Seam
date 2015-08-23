@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		3E0226361B7C418A0080F9AB /* CKRecordZone+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0226351B7C418A0080F9AB /* CKRecordZone+Helpers.swift */; };
 		3E0226381B7C43320080F9AB /* CKRecordZoneID+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0226371B7C43320080F9AB /* CKRecordZoneID+Helpers.swift */; };
-		3E02263A1B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0226391B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift */; };
-		3E191DD41B7B3CAF00BB9E71 /* CKRecord+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DCA1B7B3CAF00BB9E71 /* CKRecord+Helpers.swift */; };
 		3E191DD51B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DCB1B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift */; };
 		3E191DD61B7B3CAF00BB9E71 /* SMStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */; };
 		3E191DD71B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */; };
@@ -20,7 +18,6 @@
 		3E191DDB1B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DD11B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift */; };
 		3E191DDC1B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DD21B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift */; };
 		3E191DDD1B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191DD31B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift */; };
-		3E191DE81B7B3DB500BB9E71 /* CKRecord+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCA1B7B3CAF00BB9E71 /* CKRecord+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E191DE91B7B3DB500BB9E71 /* CKRecord+NSManagedObject.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCB1B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E191DEA1B7B3DB500BB9E71 /* SMStore.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */; settings = {ATTRIBUTES = (Public, ); }; };
 		3E191DEB1B7B3DB500BB9E71 /* SMStoreChangeSetHandler.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -31,25 +28,11 @@
 		3E191DF01B7B3DB600BB9E71 /* NSManagedObject+CKRecord.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD21B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E191DF11B7B3DB600BB9E71 /* NSManagedObjectContext+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD31B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E8E26C51B7B11BD009C47EA /* Seam.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E26C41B7B11BD009C47EA /* Seam.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3E8E26CC1B7B11BD009C47EA /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26C11B7B11BD009C47EA /* Seam.framework */; };
-		3E8E26D11B7B11BD009C47EA /* SeamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8E26D01B7B11BD009C47EA /* SeamTests.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		3E8E26CD1B7B11BD009C47EA /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3E8E26B81B7B11BD009C47EA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 3E8E26C01B7B11BD009C47EA;
-			remoteInfo = Seam;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		3E0226351B7C418A0080F9AB /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
 		3E0226371B7C43320080F9AB /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
-		3E0226391B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecordID+NSManagedObject.swift"; sourceTree = "<group>"; };
-		3E191DCA1B7B3CAF00BB9E71 /* CKRecord+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecord+Helpers.swift"; sourceTree = "<group>"; };
 		3E191DCB1B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CKRecord+NSManagedObject.swift"; sourceTree = "<group>"; };
 		3E191DCC1B7B3CAF00BB9E71 /* SMStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMStore.swift; sourceTree = "<group>"; };
 		3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SMStoreChangeSetHandler.swift; sourceTree = "<group>"; };
@@ -62,9 +45,6 @@
 		3E8E26C11B7B11BD009C47EA /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E8E26C41B7B11BD009C47EA /* Seam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Seam.h; sourceTree = "<group>"; };
 		3E8E26C61B7B11BD009C47EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		3E8E26CB1B7B11BD009C47EA /* SeamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SeamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		3E8E26D01B7B11BD009C47EA /* SeamTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamTests.swift; sourceTree = "<group>"; };
-		3E8E26D21B7B11BD009C47EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,14 +52,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3E8E26C81B7B11BD009C47EA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3E8E26CC1B7B11BD009C47EA /* Seam.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,14 +73,12 @@
 		3E191DF41B7B52A900BB9E71 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				3E191DCA1B7B3CAF00BB9E71 /* CKRecord+Helpers.swift */,
 				3E191DCB1B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift */,
 				3E191DD21B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift */,
 				3E191DD31B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift */,
 				3E191DD11B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift */,
 				3E0226351B7C418A0080F9AB /* CKRecordZone+Helpers.swift */,
 				3E0226371B7C43320080F9AB /* CKRecordZoneID+Helpers.swift */,
-				3E0226391B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -117,7 +87,6 @@
 			isa = PBXGroup;
 			children = (
 				3E8E26C31B7B11BD009C47EA /* Seam */,
-				3E8E26CF1B7B11BD009C47EA /* SeamTests */,
 				3E8E26C21B7B11BD009C47EA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -126,7 +95,6 @@
 			isa = PBXGroup;
 			children = (
 				3E8E26C11B7B11BD009C47EA /* Seam.framework */,
-				3E8E26CB1B7B11BD009C47EA /* SeamTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -142,15 +110,6 @@
 			path = Seam;
 			sourceTree = "<group>";
 		};
-		3E8E26CF1B7B11BD009C47EA /* SeamTests */ = {
-			isa = PBXGroup;
-			children = (
-				3E8E26D01B7B11BD009C47EA /* SeamTests.swift */,
-				3E8E26D21B7B11BD009C47EA /* Info.plist */,
-			);
-			path = SeamTests;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -161,7 +120,6 @@
 				3E8E26C51B7B11BD009C47EA /* Seam.h in Headers */,
 				3E191DEA1B7B3DB500BB9E71 /* SMStore.swift in Headers */,
 				3E191DED1B7B3DB500BB9E71 /* SMStoreSyncOperation.swift in Headers */,
-				3E191DE81B7B3DB500BB9E71 /* CKRecord+Helpers.swift in Headers */,
 				3E191DEC1B7B3DB500BB9E71 /* SMServerStoreSetupOperation.swift in Headers */,
 				3E191DF11B7B3DB600BB9E71 /* NSManagedObjectContext+Helpers.swift in Headers */,
 				3E191DE91B7B3DB500BB9E71 /* CKRecord+NSManagedObject.swift in Headers */,
@@ -193,24 +151,6 @@
 			productReference = 3E8E26C11B7B11BD009C47EA /* Seam.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		3E8E26CA1B7B11BD009C47EA /* SeamTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 3E8E26D81B7B11BD009C47EA /* Build configuration list for PBXNativeTarget "SeamTests" */;
-			buildPhases = (
-				3E8E26C71B7B11BD009C47EA /* Sources */,
-				3E8E26C81B7B11BD009C47EA /* Frameworks */,
-				3E8E26C91B7B11BD009C47EA /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				3E8E26CE1B7B11BD009C47EA /* PBXTargetDependency */,
-			);
-			name = SeamTests;
-			productName = SeamTests;
-			productReference = 3E8E26CB1B7B11BD009C47EA /* SeamTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -222,9 +162,6 @@
 				ORGANIZATIONNAME = CloudKitSpace;
 				TargetAttributes = {
 					3E8E26C01B7B11BD009C47EA = {
-						CreatedOnToolsVersion = 7.0;
-					};
-					3E8E26CA1B7B11BD009C47EA = {
 						CreatedOnToolsVersion = 7.0;
 					};
 				};
@@ -242,20 +179,12 @@
 			projectRoot = "";
 			targets = (
 				3E8E26C01B7B11BD009C47EA /* Seam */,
-				3E8E26CA1B7B11BD009C47EA /* SeamTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		3E8E26BF1B7B11BD009C47EA /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		3E8E26C91B7B11BD009C47EA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -273,11 +202,9 @@
 				3E191DD51B7B3CAF00BB9E71 /* CKRecord+NSManagedObject.swift in Sources */,
 				3E191DDA1B7B3CAF00BB9E71 /* SMServerTokenHandler.swift in Sources */,
 				3E0226361B7C418A0080F9AB /* CKRecordZone+Helpers.swift in Sources */,
-				3E191DD41B7B3CAF00BB9E71 /* CKRecord+Helpers.swift in Sources */,
 				3E191DDB1B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift in Sources */,
 				3E191DDD1B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift in Sources */,
 				3E0226381B7C43320080F9AB /* CKRecordZoneID+Helpers.swift in Sources */,
-				3E02263A1B7C58B80080F9AB /* CKRecordID+NSManagedObject.swift in Sources */,
 				3E191DD91B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift in Sources */,
 				3E191DD81B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift in Sources */,
 				3E191DD61B7B3CAF00BB9E71 /* SMStore.swift in Sources */,
@@ -285,23 +212,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		3E8E26C71B7B11BD009C47EA /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				3E8E26D11B7B11BD009C47EA /* SeamTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		3E8E26CE1B7B11BD009C47EA /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 3E8E26C01B7B11BD009C47EA /* Seam */;
-			targetProxy = 3E8E26CD1B7B11BD009C47EA /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3E8E26D31B7B11BD009C47EA /* Debug */ = {
@@ -377,6 +288,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -386,6 +298,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -441,26 +354,6 @@
 			};
 			name = Release;
 		};
-		3E8E26D91B7B11BD009C47EA /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				INFOPLIST_FILE = SeamTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		3E8E26DA1B7B11BD009C47EA /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				INFOPLIST_FILE = SeamTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -478,15 +371,6 @@
 			buildConfigurations = (
 				3E8E26D61B7B11BD009C47EA /* Debug */,
 				3E8E26D71B7B11BD009C47EA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		3E8E26D81B7B11BD009C47EA /* Build configuration list for PBXNativeTarget "SeamTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				3E8E26D91B7B11BD009C47EA /* Debug */,
-				3E8E26DA1B7B11BD009C47EA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

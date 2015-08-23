@@ -88,6 +88,12 @@ do
 ```
 - Enjoy
 
+## Options 
+
+- SMStoreSyncConflictResolutionPolicyOption
+
+Use SMSyncConflictResolutionPolicy enum to use as a value for this option to specify the desired conflict resolution policy when adding SeamStoreType to your app's NSPersistentStoreCoordinator.
+
 ## Support
 
 ### What it does support

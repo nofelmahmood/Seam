@@ -1,5 +1,3 @@
-##### CKSIncrementalStore has been merged into Seam. You can still use the old implementation from this [branch](https://github.com/nofelmahmood/Seam/tree/CKSIncrementalStore). I am busy documenting the new framework. This line will be removed once it is complete. Thank you for your patience and interest. :)
-
 ![](http://s14.postimg.org/ll5smugr5/Logo.png)
 
 <p align="center">

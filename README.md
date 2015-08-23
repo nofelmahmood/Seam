@@ -41,62 +41,44 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 
 ## Sync
 
-Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing two notifications repectively.
-- **SMStoreDidStartSyncOperationNotification**
-- **SMStoreDidFinishSyncOperationNotification**
+Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
+- SMStoreDidStartSyncOperationNotification
+- SMStoreDidFinishSyncOperationNotification
 
 #### Conflict Resolution Policies
 In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
 
-- **ClientTellsWhichWins**
+- ClientTellsWhichWins
 
 This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the records as arguments. You do whatever changes you want on the second argument and return it.
 
-- **ServerRecordWins**
+- ServerRecordWins
 
 This is the default. It considers the server record as the true record.
 
-- **ClientRecordWins**
+- ClientRecordWins
 
 This considers the client record as the true record.
 
-- **KeepBoth**
+- KeepBoth
 
 This saves both versions of the record.
 
-
-## Getting Started 
-Download the demo project. Run it and see the magic as it happens.
-
 ## How to use
 
-Follow the five steps.
+1. Declare a SMStore type property in the class where your CoreData stack resides.
+1. Add it to your app's NSPersistentStoreCoordinator.
+2. Assign the returned store to this property.
+3. Enable Push Notifications for your app.
+4. Implement didReceiveRemoteNotification Method.
+5. Call smStore.handlePush()
+6. Enjoy
 
-####Seeing is believing !
-![](https://cdn.pbrd.co/images/1ueV7gsM.gif)
-
-### Start by Adding it
-
-```swift
-var coordinator: NSPersistentStoreCoordinator? = NSPersistentStoreCoordinator(managedObjectModel:self.managedObjectModel)
-let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("CKSIncrementalStore_iOSDemo.sqlite")
-var error: NSError? = nil
-var failureReason = "There was an error creating or loading the application's saved data."
-  
-var persistentStore:NSPersistentStore? = coordinator!.addPersistentStoreWithType(CKSIncrementalStore.type, configuration: nil, URL: url, options: nil, error: &error)
-
-if persistentStore != nil
-{
-    self.cksIncrementalStore = persistentStore as? CKSIncrementalStore
-    // Store it in a property.
-}
-
-```
 ## Support
 
 ### What it does support
 
-CKSIncrementalStore supports only user's CloudKit `Private Database` at this time. It creates and uses a custom zone to store data and fetch changes from the server.
+Seam supports only user's CloudKit `Private Database` at this time. It creates and uses a custom zone to store data and fetch changes from the server.
 
 ### What it does not support
 
@@ -107,18 +89,18 @@ CloudKit `Public Database` and here's the two reasons why, straight from the doc
 2. [ You cannot create custom zones in a public database.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/c/tdef/CKRecordZoneCapabilities)
 
 ## Getting Started 
-See the sample iOS demo app. Run it on two devices and start adding, removing and modifying records and experience the magic.
+Download the demo project. Run it and see the magic as it happens.
 
 ## Installation
-CocoaPods is the recommended way of adding CKSIncrementalStore to your project.
+CocoaPods is the recommended way of adding Seam to your project.
 
 Add this `'Seam', '~> 0.6'` to your pod file.
 
 ## Credits
-CKSIncrementalStore was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)
+Seam was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)
 
 ## Contact 
 Follow Nofel Mahmood on [Twitter](http://twitter.com/NofelMahmood) and [GitHub](http://github.com/nofelmahmood) or email him at nofelmehmood@gmail.com
 
 ## License
-CKSIncrementalStore is available under the MIT license. See the LICENSE file for more info.
+Seam is available under the MIT license. See the LICENSE file for more info.

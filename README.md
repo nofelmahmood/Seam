@@ -1,5 +1,3 @@
-##### CKSIncrementalStore has been merged into Seam. You can still use the old implementation from this [branch](https://github.com/nofelmahmood/Seam/tree/CKSIncrementalStore). I am busy documenting the new framework. This line will be removed once it is complete. Thank you for your patience and interest. :)
-
 ![](http://s14.postimg.org/ll5smugr5/Logo.png)
 
 <p align="center">
@@ -66,13 +64,38 @@ This saves both versions of the record.
 
 ## How to use
 
-1. Declare a SMStore type property in the class where your CoreData stack resides.
-1. Add it to your app's NSPersistentStoreCoordinator.
-2. Assign the returned store to this property.
-3. Enable Push Notifications for your app.
-4. Implement didReceiveRemoteNotification Method.
-5. Call smStore.handlePush()
-6. Enjoy
+- Declare a SMStore type property in the class where your CoreData stack resides.
+```swift
+var smStore: SMStore?
+```
+- Add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
+```swift
+do 
+{
+   self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
+}
+```
+- Enable Push Notifications for your app.
+![](http://s29.postimg.org/rb9vj0egn/Screen_Shot_2015_08_23_at_5_44_59_pm.png)
+- Implement didReceiveRemoteNotification Method in your AppDelegate and call `handlePush` on the instance of SMStore created earlier.
+```swift
+ func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) 
+ {
+    self.smStore?.handlePush(userInfo: userInfo)
+ }
+```
+- Enjoy
+
+## Options 
+
+- SMStoreSyncConflictResolutionPolicyOption
+
+Use SMSyncConflictResolutionPolicy enum to use as a value for this option to specify the desired conflict resolution policy when adding SeamStoreType to your app's NSPersistentStoreCoordinator.
+## Requirements
+
+Xcode 7 Beta 5.
+
+Swift 2.0
 
 ## Support
 
@@ -82,7 +105,7 @@ Seam supports only user's CloudKit `Private Database` at this time. It creates a
 
 ### What it does not support
 
-CloudKit `Public Database` and here's the two reasons why, straight from the docs.
+CloudKit `Public Database` and here are the two reasons why, straight from the docs.
 
 1. [The disadvantage of using the default zone for storing records is that it does not have any special capabilities. You cannot save a group of records to iCloud atomically in the default zone. Similarly, you cannot use a CKFetchRecordChangesOperation object on records in the default zone.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/occ/clm/CKRecordZone/defaultRecordZone)
 

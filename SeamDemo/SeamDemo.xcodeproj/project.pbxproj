@@ -21,8 +21,6 @@
 		3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */; };
 		3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E591B7B6D1D00BB9E71 /* CoreData.framework */; };
 		3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */; };
-		3E3A94C61B89AB9C009BEF07 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E3A94C51B89AB9C009BEF07 /* Seam.framework */; };
-		3E3A94C71B89AB9C009BEF07 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3E3A94C51B89AB9C009BEF07 /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3E96E9B51B7CB9E000186E43 /* CKRecord+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9A81B7CB9E000186E43 /* CKRecord+NSManagedObject.swift */; };
 		3E96E9B71B7CB9E000186E43 /* CKRecordZone+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AA1B7CB9E000186E43 /* CKRecordZone+Helpers.swift */; };
 		3E96E9B81B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AB1B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift */; };
@@ -53,7 +51,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				3E3A94C71B89AB9C009BEF07 /* Seam.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -80,7 +77,6 @@
 		3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3E191E591B7B6D1D00BB9E71 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
-		3E3A94C51B89AB9C009BEF07 /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; name = Seam.framework; path = "/Users/NofelMahmood/Library/Developer/Xcode/DerivedData/Seam-bkngdqoewkasllewlkhzaopxdouu/Build/Products/Debug-iphoneos/Seam.framework"; sourceTree = "<absolute>"; };
 		3E96E9A81B7CB9E000186E43 /* CKRecord+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecord+NSManagedObject.swift"; path = "../../Seam/Seam/CKRecord+NSManagedObject.swift"; sourceTree = "<group>"; };
 		3E96E9AA1B7CB9E000186E43 /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecordZone+Helpers.swift"; path = "../../Seam/Seam/CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
 		3E96E9AB1B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecordZoneID+Helpers.swift"; path = "../../Seam/Seam/CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
@@ -100,7 +96,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */,
-				3E3A94C61B89AB9C009BEF07 /* Seam.framework in Frameworks */,
 				3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -129,7 +124,6 @@
 		3E191E271B7B6CD300BB9E71 = {
 			isa = PBXGroup;
 			children = (
-				3E3A94C51B89AB9C009BEF07 /* Seam.framework */,
 				3E191E591B7B6D1D00BB9E71 /* CoreData.framework */,
 				3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */,
 				3E191E321B7B6CD300BB9E71 /* SeamDemo */,

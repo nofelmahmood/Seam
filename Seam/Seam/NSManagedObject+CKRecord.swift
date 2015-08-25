@@ -38,7 +38,7 @@ extension NSManagedObject
         }
         else
         {
-            attributes = self.entity.attributesByNameByRemovingBackingStoreAttributes().keys.array
+            attributes = Array(self.entity.attributesByNameByRemovingBackingStoreAttributes().keys)
         }
         
         let valuesDictionary = self.dictionaryWithValuesForKeys(attributes)
@@ -95,7 +95,7 @@ extension NSManagedObject
         }
         else
         {
-            relationships = self.entity.toOneRelationshipsByName().keys.array
+            relationships = Array(self.entity.toOneRelationshipsByName().keys)
         }
         
         for relationship in relationships

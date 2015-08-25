@@ -139,9 +139,10 @@ class SMStoreChangeSetHandler {
     func createChangeSet(ForUpdatedObject object: NSManagedObject, usingContext context: NSManagedObjectContext)
     {
         let changeSet = NSEntityDescription.insertNewObjectForEntityForName(SMLocalStoreChangeSetEntityName, inManagedObjectContext: context)
-        let changedPropertyKeys = self.changedPropertyKeys(object.changedValues().keys.array, entity: object.entity)
+        let changedPropertyKeys = self.changedPropertyKeys(Array(object.changedValues().keys), entity: object.entity)
         let recordIDString: String = object.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
-        let changedPropertyKeysString = ",".join(changedPropertyKeys)
+        
+        let changedPropertyKeysString = changedPropertyKeys.joinWithSeparator(",")
         changeSet.setValue(recordIDString, forKey: SMLocalStoreRecordIDAttributeName)
         changeSet.setValue(object.entity.name!, forKey: SMLocalStoreEntityNameAttributeName)
         changeSet.setValue(changedPropertyKeysString, forKey: SMLocalStoreRecordChangedPropertiesAttributeName)
@@ -262,9 +263,8 @@ class SMStoreChangeSetHandler {
         
         if results.count > 0
         {
-            for result in results
+            for managedObject in results as! [NSManagedObject]
             {
-                let managedObject: NSManagedObject = result as! NSManagedObject
                 context.deleteObject(managedObject)
             }
             

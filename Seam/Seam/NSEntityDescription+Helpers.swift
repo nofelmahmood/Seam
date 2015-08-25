@@ -38,7 +38,7 @@ extension NSEntityDescription
     
     func toOneRelationships() -> [NSRelationshipDescription]
     {
-        return self.relationshipsByName.values.array.filter({ (relationshipDescription) -> Bool in
+        return Array(self.relationshipsByName.values).filter({ (relationshipDescription) -> Bool in
             return relationshipDescription.toMany == false
         })
     }

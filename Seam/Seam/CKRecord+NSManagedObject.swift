@@ -101,7 +101,7 @@ extension CKRecord
                     }
                     catch
                     {
-                        print("Failed to find relationship managed object for Key \(key) RecordID \(recordIDString)", appendNewline: true)
+                        print("Failed to find relationship managed object for Key \(key) RecordID \(recordIDString)", terminator: "\n")
                     }
                 }
             }

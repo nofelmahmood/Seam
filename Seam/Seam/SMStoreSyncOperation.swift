@@ -43,7 +43,8 @@ enum SMSyncConflictResolutionPolicy: Int16
 enum SMSyncOperationError: ErrorType
 {
     case LocalChangesFetchError
-    case ConflictsDetected(conflictedRecords: Array<CKRecord>)
+    case ConflictsDetected(conflictedRecords: [CKRecord])
+    case UnknownError
 }
 
 class SMStoreSyncOperation: NSOperation {
@@ -67,7 +68,7 @@ class SMStoreSyncOperation: NSOperation {
     // MARK: Sync
     override func main() {
         
-        print("Sync Started", appendNewline: true)
+        print("Sync Started", terminator: "\n")
         self.operationQueue = NSOperationQueue()
         self.operationQueue!.maxConcurrentOperationCount = 1
         
@@ -79,13 +80,13 @@ class SMStoreSyncOperation: NSOperation {
             do
             {
                 try self.performSync()
-                print("Sync Performed", appendNewline: true)
+                print("Sync Performed", terminator: "\n")
                 self.syncCompletionBlock!(syncError: nil)
             }
                 
             catch let error as NSError?
             {
-                print("Sync Performed with Error", appendNewline: true)
+                print("Sync Performed with Error", terminator: "\n")
                 self.syncCompletionBlock!(syncError: error)
             }
         }
@@ -104,19 +105,14 @@ class SMStoreSyncOperation: NSOperation {
             return
         }
             
-        catch let error as NSError?
-        {
-            throw error!
-        }
-            
         catch SMSyncOperationError.ConflictsDetected(let conflictedRecords)
         {
             self.resolveConflicts(conflictedRecords: conflictedRecords)
-            var insertedOrUpdatedCKRecordsWithRecordIDStrings:Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
+            var insertedOrUpdatedCKRecordsWithRecordIDStrings: Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
             
             for record in localChangesInServerRepresentation.insertedOrUpdatedCKRecords!
             {
-                let ckRecord:CKRecord = record as CKRecord
+                let ckRecord: CKRecord = record as CKRecord
                 insertedOrUpdatedCKRecordsWithRecordIDStrings[ckRecord.recordID.recordName] = ckRecord
             }
             
@@ -125,7 +121,8 @@ class SMStoreSyncOperation: NSOperation {
                 insertedOrUpdatedCKRecordsWithRecordIDStrings[record.recordID.recordName] = record
             }
             
-            localChangesInServerRepresentation.insertedOrUpdatedCKRecords = insertedOrUpdatedCKRecordsWithRecordIDStrings.values.array
+        
+            localChangesInServerRepresentation.insertedOrUpdatedCKRecords = Array(insertedOrUpdatedCKRecordsWithRecordIDStrings.values)
     
             try self.applyLocalChangesToServer(insertedOrUpdatedCKRecords: localChangesInServerRepresentation.insertedOrUpdatedCKRecords, deletedCKRecordIDs: localChangesInServerRepresentation.deletedCKRecordIDs)
             
@@ -136,7 +133,7 @@ class SMStoreSyncOperation: NSOperation {
             
         catch
         {
-            print("Unknown Error")
+            throw SMSyncOperationError.UnknownError
         }
         
     }
@@ -144,13 +141,13 @@ class SMStoreSyncOperation: NSOperation {
     func fetchAndApplyServerChangesToLocalDatabase() throws
     {
         var moreComing = true
-        var insertedOrUpdatedCKRecordsFromServer = Array<CKRecord>()
-        var deletedCKRecordIDsFromServer = Array<CKRecordID>()
+        var insertedOrUpdatedCKRecordsFromServer = [CKRecord]()
+        var deletedCKRecordIDsFromServer = [CKRecordID]()
         while moreComing
         {
             let returnValue = self.fetchRecordChangesFromServer()
-            insertedOrUpdatedCKRecordsFromServer += returnValue.insertedOrUpdatedCKRecords
-            deletedCKRecordIDsFromServer += returnValue.deletedRecordIDs
+            insertedOrUpdatedCKRecordsFromServer.appendContentsOf([] + returnValue.insertedOrUpdatedCKRecords)
+            deletedCKRecordIDsFromServer.appendContentsOf([] + returnValue.deletedRecordIDs)
             moreComing = returnValue.moreComing
         }
         
@@ -158,7 +155,7 @@ class SMStoreSyncOperation: NSOperation {
     }
     
     // MARK: Local Changes
-    func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords:Array<CKRecord>,deletedCKRecordIDs:Array<CKRecordID>) throws
+    func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords: [CKRecord], deletedCKRecordIDs:[CKRecordID]) throws
     {
         try self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
         try self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
@@ -173,8 +170,8 @@ class SMStoreSyncOperation: NSOperation {
         
         let ckModifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
         
-        let savedRecords:[CKRecord] = [CKRecord]()
-        var conflictedRecords:[CKRecord] = [CKRecord]()
+        let savedRecords: [CKRecord] = [CKRecord]()
+        var conflictedRecords: [CKRecord] = [CKRecord]()
         ckModifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,operationError)->Void in
  
         })
@@ -183,7 +180,7 @@ class SMStoreSyncOperation: NSOperation {
             let error:NSError? = operationError
             if error != nil && error!.code == CKErrorCode.ServerRecordChanged.rawValue
             {
-                print("Conflicted Record \(error!)", appendNewline: true)
+                print("Conflicted Record \(error!)", terminator: "\n")
                 conflictedRecords.append(ckRecord!)
             }
         })
@@ -219,7 +216,7 @@ class SMStoreSyncOperation: NSOperation {
         }
     }
     
-    func resolveConflicts(conflictedRecords conflictedRecords: Array<CKRecord>)
+    func resolveConflicts(conflictedRecords conflictedRecords: [CKRecord])
     {
         if conflictedRecords.count > 0
         {
@@ -251,9 +248,9 @@ class SMStoreSyncOperation: NSOperation {
             self.operationQueue?.addOperation(ckFetchRecordsOperation)
             self.operationQueue?.waitUntilAllOperationsAreFinished()
             
-            var finalCKRecords:[CKRecord] = [CKRecord]()
+            var finalCKRecords: [CKRecord] = [CKRecord]()
             
-            for key in conflictedRecordsWithStringRecordIDs.keys.array
+            for key in Array(conflictedRecordsWithStringRecordIDs.keys)
             {
                 let value = conflictedRecordsWithStringRecordIDs[key]!
                 var clientServerCKRecord = value as (clientRecord:CKRecord?,serverRecord:CKRecord?)
@@ -314,8 +311,8 @@ class SMStoreSyncOperation: NSOperation {
         let recordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
         let fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: recordZoneID, previousServerChangeToken: token)
         
-        var insertedOrUpdatedCKRecords: Array<CKRecord> = Array<CKRecord>()
-        var deletedCKRecordIDs: Array<CKRecordID> = Array<CKRecordID>()
+        var insertedOrUpdatedCKRecords: [CKRecord] = [CKRecord]()
+        var deletedCKRecordIDs: [CKRecordID] = [CKRecordID]()
         
         fetchRecordChangesOperation.fetchRecordChangesCompletionBlock = ({(serverChangeToken,clientChangeToken,operationError)->Void in
             
@@ -362,7 +359,7 @@ class SMStoreSyncOperation: NSOperation {
                 let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[recordType]
                 if entity != nil
                 {
-                    let properties = entity!.propertiesByName.keys.array.filter({ (key) -> Bool in
+                    let properties = Array(entity!.propertiesByName.keys).filter({ (key) -> Bool in
                         
                         if key == SMLocalStoreRecordIDAttributeName || key == SMLocalStoreRecordEncodedValuesAttributeName
                         {
@@ -370,7 +367,7 @@ class SMStoreSyncOperation: NSOperation {
                         }
                         return true
                     })
-                    desiredKeys!.extend(properties)
+                    desiredKeys!.appendContentsOf(properties)
                 }
             }
             insertedOrUpdatedCKRecords.removeAll()
@@ -380,7 +377,7 @@ class SMStoreSyncOperation: NSOperation {
                 
                 if operationError == nil && recordsByRecordID != nil
                 {
-                    insertedOrUpdatedCKRecords = recordsByRecordID!.values.array
+                    insertedOrUpdatedCKRecords = Array(recordsByRecordID!.values)
                 }
             })
             
@@ -391,7 +388,7 @@ class SMStoreSyncOperation: NSOperation {
                 let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[record.recordType]
                 if entity != nil
                 {
-                    for key in entity!.propertiesByName.keys.array
+                    for key in Array(entity!.propertiesByName.keys)
                     {
                         if record[key] == nil && key != SMLocalStoreRecordIDAttributeName && key != SMLocalStoreRecordEncodedValuesAttributeName
                         {
@@ -404,11 +401,11 @@ class SMStoreSyncOperation: NSOperation {
         
         if fetchRecordChangesOperation.moreComing
         {
-            print("More Coming", appendNewline: true)
+            print("More Coming", terminator: "\n")
         }
         else
         {
-            print("Not coming", appendNewline: true)
+            print("Not coming", terminator: "\n")
         }
         
         return (insertedOrUpdatedCKRecords,deletedCKRecordIDs,fetchRecordChangesOperation.moreComing)
@@ -443,7 +440,7 @@ class SMStoreSyncOperation: NSOperation {
             {
                 let fetchRequest = NSFetchRequest(entityName: name as String)
                 fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":ckRecordIDStrings])
-                var results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
+                let results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
                 if results.count > 0
                 {
                     for object in results as! [NSManagedObject]

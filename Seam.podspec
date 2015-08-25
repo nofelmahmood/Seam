@@ -6,7 +6,7 @@ Pod::Spec.new do |spec|
   spec.authors      = { 'Nofel Mahmood' => 'nofelmehmood@gmail.com' }
   spec.social_media_url = "https://twitter.com/NofelMahmood"
   spec.summary      = 'CloudKit spreading awesomeness through CoreData.'
-  spec.source       = { :git => 'https://github.com/nofelmahmood/Seam.git', :branch => 'master' }
+  spec.source       = { :path => '/' }
   spec.ios.deployment_target = '8.3'
   spec.osx.deployment_target = '10.10'
   spec.header_dir   = 'Seam'

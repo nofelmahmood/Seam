@@ -244,7 +244,7 @@ public class SMStore: NSIncrementalStore {
     override public func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
         
         let recordID:String = self.referenceObjectForObjectID(objectID) as! String
-        let propertiesToFetch = objectID.entity.propertiesByName.values.array.filter({(object) -> Bool in
+        let propertiesToFetch = Array(objectID.entity.propertiesByName.values).filter({(object) -> Bool in
             
             if object is NSRelationshipDescription
             {
@@ -266,7 +266,7 @@ public class SMStore: NSIncrementalStore {
         fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
         fetchRequest.propertiesToFetch = propertiesToFetch
         
-        var results = try self.backingMOC.executeFetchRequest(fetchRequest)
+        let results = try self.backingMOC.executeFetchRequest(fetchRequest)
         var backingObjectValues = results.last as! Dictionary<String,NSObject>
         for (key,value) in backingObjectValues
         {
@@ -325,7 +325,7 @@ public class SMStore: NSIncrementalStore {
     // MARK : Fetch Request    
     func executeInResponseToFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext) throws ->NSArray
     {
-        var resultsFromLocalStore = try self.backingMOC.executeFetchRequest(fetchRequest)
+        let resultsFromLocalStore = try self.backingMOC.executeFetchRequest(fetchRequest)
         
         if resultsFromLocalStore.count > 0
         {
@@ -367,7 +367,7 @@ public class SMStore: NSIncrementalStore {
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,referenceObject!)
         
-        var results = try self.backingMOC.executeFetchRequest(fetchRequest)
+        let results = try self.backingMOC.executeFetchRequest(fetchRequest)
         if results.count > 0
         {
             return results.last as? NSManagedObjectID
@@ -378,7 +378,7 @@ public class SMStore: NSIncrementalStore {
     
     private func setRelationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject) throws
     {
-        for relationship in sourceObject.entity.relationshipsByName.values.array as [NSRelationshipDescription]
+        for relationship in Array(sourceObject.entity.relationshipsByName.values) as [NSRelationshipDescription]
         {
             if sourceObject.hasFaultForRelationshipNamed(relationship.name) || sourceObject.valueForKey(relationship.name) == nil
             {
@@ -431,7 +431,7 @@ public class SMStore: NSIncrementalStore {
         {
             let sourceObject: NSManagedObject = object as! NSManagedObject
             let managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName((sourceObject.entity.name)!, inManagedObjectContext: self.backingMOC) as NSManagedObject
-            let keys = sourceObject.entity.attributesByName.keys.array
+            let keys = Array(sourceObject.entity.attributesByName.keys)
             let dictionary = sourceObject.dictionaryWithValuesForKeys(keys)
             managedObject.setValuesForKeysWithDictionary(dictionary)
             let referenceObject: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
@@ -457,7 +457,7 @@ public class SMStore: NSIncrementalStore {
             let recordID: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([predicateObjectRecordIDKey: recordID])
             fetchRequest.fetchLimit = 1
-            var results = try self.backingMOC.executeFetchRequest(fetchRequest)
+            let results = try self.backingMOC.executeFetchRequest(fetchRequest)
             let backingObject: NSManagedObject = results.last as! NSManagedObject
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
             self.backingMOC.deleteObject(backingObject)
@@ -477,9 +477,9 @@ public class SMStore: NSIncrementalStore {
             let recordID: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([predicateObjectRecordIDKey:recordID])
             fetchRequest.fetchLimit = 1
-            var results = try self.backingMOC.executeFetchRequest(fetchRequest)
+            let results = try self.backingMOC.executeFetchRequest(fetchRequest)
             let backingObject: NSManagedObject = results.last as! NSManagedObject
-            let keys = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys.array
+            let keys = Array(self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys)
             let sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
             backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)

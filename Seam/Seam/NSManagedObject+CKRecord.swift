@@ -45,7 +45,7 @@ extension NSManagedObject
         for (key,_) in valuesDictionary
         {
             let attributeDescription = self.entity.attributesByName[key]
-            if attributeDescription != nil
+            if attributeDescription != nil && self.valueForKey(attributeDescription!.name) != nil
             {
                 switch(attributeDescription!.attributeType)
                 {
@@ -81,6 +81,10 @@ extension NSManagedObject
                 default:
                     break
                 }
+            }
+            else if attributeDescription != nil && self.valueForKey(attributeDescription!.name) == nil
+            {
+                ckRecord.setObject(nil, forKey: attributeDescription!.name)
             }
             
         }

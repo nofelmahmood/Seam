@@ -204,14 +204,11 @@ class SMStoreSyncOperation: NSOperation {
                     } else {
                         print("ClientTellsWhichWins conflict resolution policy requires to set syncConflictResolutionBlock on the instance of SMStore")
                     }
-                }
-                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ClientRecordWins {
+                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ClientRecordWins {
                     
-                }
-                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ServerRecordWins {
+                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ServerRecordWins {
                     
-                }
-                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.KeepBoth {
+                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.KeepBoth {
                     
                 }
 //                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.KeepBoth

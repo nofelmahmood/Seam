@@ -26,12 +26,10 @@
 import Foundation
 import CoreData
 
-extension NSManagedObjectContext
-{
-    func saveIfHasChanges() throws
-    {
-        if self.hasChanges
-        {
+extension NSManagedObjectContext {
+    
+    func saveIfHasChanges() throws {
+        if self.hasChanges {
             try self.save()
         }
     }

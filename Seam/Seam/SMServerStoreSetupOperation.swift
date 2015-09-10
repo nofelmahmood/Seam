@@ -34,70 +34,50 @@ class SMServerStoreSetupOperation:NSOperation {
     var database:CKDatabase?
     var setupOperationCompletionBlock:((customZoneCreated:Bool,customZoneSubscriptionCreated:Bool)->Void)?
     
-    
     init(cloudDatabase:CKDatabase?) {
-        
         self.database = cloudDatabase
         super.init()
     }
     
     override func main() {
-        
         let operationQueue = NSOperationQueue()
         let zone = CKRecordZone(zoneName: SMStoreCloudStoreCustomZoneName)
         var error: NSError?
         let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
         modifyRecordZonesOperation.database = self.database
         modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones, deletedRecordZonesIDs, operationError) -> Void in
-            
             error = operationError
             let customZoneWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName)
             let customZoneSubscriptionWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreSubscriptionName)
-            
-            if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil)
-            {
+            if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil) {
                 NSUserDefaults.standardUserDefaults().setBool(true, forKey: SMStoreCloudStoreCustomZoneName)
                 let recordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
                 let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
-                
                 let subscriptionNotificationInfo = CKNotificationInfo()
                 subscriptionNotificationInfo.alertBody = ""
                 subscriptionNotificationInfo.shouldSendContentAvailable = true
                 subscription.notificationInfo = subscriptionNotificationInfo
                 subscriptionNotificationInfo.shouldBadge = false
-                
                 let subscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
                 subscriptionsOperation.database = self.database
                 subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
-                    
-                    if operationError == nil
-                    {
+                    if operationError == nil {
                         NSUserDefaults.standardUserDefaults().setBool(true, forKey: SMStoreCloudStoreSubscriptionName)
                     }
                     error = operationError
                 })
-                
                 operationQueue.addOperation(subscriptionsOperation)
             }
         })
-        
         operationQueue.addOperation(modifyRecordZonesOperation)
         operationQueue.waitUntilAllOperationsAreFinished()
-        
-        if self.setupOperationCompletionBlock != nil
-        {
-            if error == nil
-            {
+        if self.setupOperationCompletionBlock != nil {
+            if error == nil {
                 self.setupOperationCompletionBlock!(customZoneCreated: true, customZoneSubscriptionCreated: true)
-            }
-            else
-            {
-                if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName) == nil
-                {
+            } else {
+                if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName) == nil {
                     self.setupOperationCompletionBlock!(customZoneCreated: false, customZoneSubscriptionCreated: false)
-                }
-                else
-                {
+                } else {
                     self.setupOperationCompletionBlock!(customZoneCreated: true, customZoneSubscriptionCreated: false)
                 }
             }

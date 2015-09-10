@@ -27,86 +27,58 @@ import Foundation
 import CoreData
 import CloudKit
 
-extension NSManagedObject
-{
-    private func setAttributesValues(ofCKRecord ckRecord:CKRecord, withValuesOfAttributeWithKeys keys: [String]?)
-    {
+extension NSManagedObject {
+    private func setAttributesValues(ofCKRecord ckRecord:CKRecord, withValuesOfAttributeWithKeys keys: [String]?) {
         var attributes: [String] = [String]()
-        if keys != nil
-        {
+        if keys != nil {
             attributes = keys!
-        }
-        else
-        {
+        } else {
             attributes = Array(self.entity.attributesByNameByRemovingBackingStoreAttributes().keys)
         }
-        
         let valuesDictionary = self.dictionaryWithValuesForKeys(attributes)
-        for (key,_) in valuesDictionary
-        {
+        for (key,_) in valuesDictionary {
             let attributeDescription = self.entity.attributesByName[key]
-            if attributeDescription != nil && self.valueForKey(attributeDescription!.name) != nil
-            {
-                switch(attributeDescription!.attributeType)
-                {
+            if attributeDescription != nil && self.valueForKey(attributeDescription!.name) != nil {
+                switch(attributeDescription!.attributeType) {
                 case .StringAttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! String, forKey: attributeDescription!.name)
-                    
                 case .DateAttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSDate, forKey: attributeDescription!.name)
-                    
                 case .BinaryDataAttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSData, forKey: attributeDescription!.name)
-                    
                 case .BooleanAttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                    
                 case .DecimalAttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                    
                 case .DoubleAttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                    
                 case .FloatAttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                    
                 case .Integer16AttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                    
                 case .Integer32AttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                    
                 case .Integer64AttributeType:
                     ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
                 default:
                     break
                 }
-            }
-            else if attributeDescription != nil && self.valueForKey(attributeDescription!.name) == nil
-            {
+            } else if attributeDescription != nil && self.valueForKey(attributeDescription!.name) == nil {
                 ckRecord.setObject(nil, forKey: attributeDescription!.name)
             }
-            
         }
     }
     
-    private func setRelationshipValues(ofCKRecord ckRecord:CKRecord, withValuesOfRelationshipWithKeys keys: [String]?)
-    {
+    private func setRelationshipValues(ofCKRecord ckRecord:CKRecord, withValuesOfRelationshipWithKeys keys: [String]?) {
         var relationships: [String] = [String]()
-        if keys != nil
-        {
+        if keys != nil {
             relationships = keys!
-        }
-        else
-        {
+        } else {
             relationships = Array(self.entity.toOneRelationshipsByName().keys)
         }
-        
-        for relationship in relationships
-        {
+        for relationship in relationships {
             let relationshipManagedObject = self.valueForKey(relationship)
-            if relationshipManagedObject != nil
-            {
+            if relationshipManagedObject != nil {
                 let recordIDString: String = self.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
                 let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
                 let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
@@ -116,30 +88,23 @@ extension NSManagedObject
         }
     }
     
-    public func createOrUpdateCKRecord(usingValuesOfChangedKeys keys: [String]?) -> CKRecord?
-    {
+    public func createOrUpdateCKRecord(usingValuesOfChangedKeys keys: [String]?) -> CKRecord? {
         let encodedFields: NSData? = self.valueForKey(SMLocalStoreRecordEncodedValuesAttributeName) as? NSData
         var ckRecord: CKRecord?
-        if encodedFields != nil
-        {
+        if encodedFields != nil {
             ckRecord = CKRecord.recordWithEncodedFields(encodedFields!)
-        }
-        else
-        {
+        } else {
             let recordIDString = self.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
             let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
             let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
             ckRecord = CKRecord(recordType: self.entity.name!, recordID: ckRecordID)
         }
-        
-        if keys != nil
-        {
+        if keys != nil {
             let attributeKeys = self.entity.attributesByName.filter { (object) -> Bool in
                 return keys!.contains(object.0)
                 }.map { (object) -> String in
                     return object.0
             }
-            
             let relationshipKeys = self.entity.relationshipsByName.filter { (object) -> Bool in
                 return keys!.contains(object.0)
                 }.map { (object) -> String in
@@ -149,10 +114,8 @@ extension NSManagedObject
             self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: relationshipKeys)
             return ckRecord
         }
-        
         self.setAttributesValues(ofCKRecord: ckRecord!, withValuesOfAttributeWithKeys: nil)
         self.setRelationshipValues(ofCKRecord: ckRecord!, withValuesOfRelationshipWithKeys: nil)
-        
         return ckRecord
     }
 }

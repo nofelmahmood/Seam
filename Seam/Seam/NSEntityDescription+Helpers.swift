@@ -26,33 +26,27 @@
 import Foundation
 import CoreData
 
-extension NSEntityDescription
-{
-    func attributesByNameByRemovingBackingStoreAttributes() -> [String:NSAttributeDescription]
-    {
+extension NSEntityDescription {
+    
+    func attributesByNameByRemovingBackingStoreAttributes() -> [String:NSAttributeDescription] {
         var attributesByName = self.attributesByName
         attributesByName.removeValueForKey(SMLocalStoreRecordIDAttributeName)
         attributesByName.removeValueForKey(SMLocalStoreRecordEncodedValuesAttributeName)
         return attributesByName
     }
     
-    func toOneRelationships() -> [NSRelationshipDescription]
-    {
+    func toOneRelationships() -> [NSRelationshipDescription] {
         return Array(self.relationshipsByName.values).filter({ (relationshipDescription) -> Bool in
             return relationshipDescription.toMany == false
         })
     }
     
-    func toOneRelationshipsByName() -> [String:NSRelationshipDescription]
-    {
+    func toOneRelationshipsByName() -> [String:NSRelationshipDescription] {
         var relationshipsByNameDictionary: Dictionary<String,NSRelationshipDescription> = Dictionary<String,NSRelationshipDescription>()
-        for (key,value) in self.relationshipsByName
-        {
-            if value.toMany == true
-            {
+        for (key,value) in self.relationshipsByName {
+            if value.toMany == true {
                 continue
             }
-            
             relationshipsByNameDictionary[key] = value
         }
         return relationshipsByNameDictionary

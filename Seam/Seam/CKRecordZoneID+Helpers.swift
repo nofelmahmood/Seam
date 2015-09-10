@@ -26,12 +26,10 @@
 import CloudKit
 
 
-extension CKRecordZoneID
-{
-    class func smCloudStoreCustomZoneID() -> CKRecordZoneID
-    {
+extension CKRecordZoneID {
+    
+    class func smCloudStoreCustomZoneID() -> CKRecordZoneID {
         let zoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
-        
         return zoneID
     }
 }

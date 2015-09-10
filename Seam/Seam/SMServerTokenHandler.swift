@@ -28,44 +28,35 @@ import CloudKit
 
 let SMStoreSyncOperationServerTokenKey = "SMStoreSyncOperationServerTokenKey"
 
-class SMServerTokenHandler
-{
+class SMServerTokenHandler {
+
     static let defaultHandler = SMServerTokenHandler()
     private var newToken: CKServerChangeToken?
     
-    func token() -> CKServerChangeToken?
-    {
-        if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreSyncOperationServerTokenKey) != nil
-        {
+    func token() -> CKServerChangeToken? {
+        if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreSyncOperationServerTokenKey) != nil {
             let fetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreSyncOperationServerTokenKey) as! NSData
             return NSKeyedUnarchiver.unarchiveObjectWithData(fetchTokenKeyArchived) as? CKServerChangeToken
         }
-        
         return nil
     }
     
-    func save(serverChangeToken serverChangeToken: CKServerChangeToken)
-    {
+    func save(serverChangeToken serverChangeToken: CKServerChangeToken) {
         self.newToken = serverChangeToken
     }
     
-    func unCommittedToken() -> CKServerChangeToken?
-    {
+    func unCommittedToken() -> CKServerChangeToken? {
         return newToken
     }
     
-    func commit()
-    {
-        if self.newToken != nil
-        {
+    func commit() {
+        if self.newToken != nil {
             NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(self.newToken!), forKey: SMStoreSyncOperationServerTokenKey)
         }
     }
     
-    func delete()
-    {
-        if self.token() != nil
-        {
+    func delete() {
+        if self.token() != nil {
             NSUserDefaults.standardUserDefaults().setObject(nil, forKey: SMStoreSyncOperationServerTokenKey)
         }
     }

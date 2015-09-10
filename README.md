@@ -93,7 +93,7 @@ do
 Use SMSyncConflictResolutionPolicy enum to use as a value for this option to specify the desired conflict resolution policy when adding SeamStoreType to your app's NSPersistentStoreCoordinator.
 ## Requirements
 
-Xcode 7 Beta 6.
+Xcode 7
 
 Swift 2.0
 

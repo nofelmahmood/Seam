@@ -1,5 +1,7 @@
 ![](http://s14.postimg.org/ll5smugr5/Logo.png)
 
+[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+
 <p align="center">
  <strong><i>"Simplicity is the ultimate sophistication."</i></strong>
   

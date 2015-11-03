@@ -13,7 +13,6 @@ import CoreData
 class CoreDataStack: NSObject {
 
     static let defaultStack = CoreDataStack()
-    var seamStore: SMStore?
     // MARK: - Core Data stack
     
     lazy var applicationDocumentsDirectory: NSURL = {
@@ -35,7 +34,7 @@ class CoreDataStack: NSObject {
         let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("SingleViewCoreData.sqlite")
         var failureReason = "There was an error creating or loading the application's saved data."
         do {
-            self.seamStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
+            try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil)
         } catch {
             // Report any error we got.
             var dict = [String: AnyObject]()

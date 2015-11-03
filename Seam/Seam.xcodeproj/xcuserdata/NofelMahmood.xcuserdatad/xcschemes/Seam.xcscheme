@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0700"
+   LastUpgradeVersion = "0710"
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -32,7 +32,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "3E8E26CA1B7B11BD009C47EA"
+               BlueprintIdentifier = "3EC07BF11BE6645500AAA747"
                BuildableName = "SeamTests.xctest"
                BlueprintName = "SeamTests"
                ReferencedContainer = "container:Seam.xcodeproj">

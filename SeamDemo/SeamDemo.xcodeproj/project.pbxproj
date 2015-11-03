@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3E0226401B7C62D20080F9AB /* Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02263C1B7C62D20080F9AB /* Task+CoreDataProperties.swift */; };
-		3E0226411B7C62D20080F9AB /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02263D1B7C62D20080F9AB /* Task.swift */; };
-		3E0226421B7C62D20080F9AB /* Tag+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02263E1B7C62D20080F9AB /* Tag+CoreDataProperties.swift */; };
-		3E0226431B7C62D20080F9AB /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E02263F1B7C62D20080F9AB /* Tag.swift */; };
+		3E0B27F81BE86B9B0002173B /* Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0B27F41BE86B9A0002173B /* Task+CoreDataProperties.swift */; };
+		3E0B27F91BE86B9B0002173B /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0B27F51BE86B9A0002173B /* Task.swift */; };
+		3E0B27FA1BE86B9B0002173B /* Tag+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0B27F61BE86B9A0002173B /* Tag+CoreDataProperties.swift */; };
+		3E0B27FB1BE86B9B0002173B /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0B27F71BE86B9B0002173B /* Tag.swift */; };
 		3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */; };
 		3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E351B7B6CD300BB9E71 /* ViewController.swift */; };
 		3E191E391B7B6CD300BB9E71 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E371B7B6CD300BB9E71 /* Main.storyboard */; };
@@ -29,9 +29,10 @@
 		3E96E9BB1B7CB9E000186E43 /* NSManagedObjectContext+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AE1B7CB9E000186E43 /* NSManagedObjectContext+Helpers.swift */; };
 		3E96E9BC1B7CB9E000186E43 /* SMServerStoreSetupOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AF1B7CB9E000186E43 /* SMServerStoreSetupOperation.swift */; };
 		3E96E9BD1B7CB9E000186E43 /* SMServerTokenHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B01B7CB9E000186E43 /* SMServerTokenHandler.swift */; };
-		3E96E9BE1B7CB9E000186E43 /* SMStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B11B7CB9E000186E43 /* SMStore.swift */; };
 		3E96E9BF1B7CB9E000186E43 /* SMStoreChangeSetHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B21B7CB9E000186E43 /* SMStoreChangeSetHandler.swift */; };
 		3E96E9C01B7CB9E000186E43 /* SMStoreSyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B31B7CB9E000186E43 /* SMStoreSyncOperation.swift */; };
+		3EC07C021BE771D200AAA747 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC07C011BE771D200AAA747 /* Store.swift */; };
+		3EC07C041BE771E100AAA747 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC07C031BE771E100AAA747 /* Error.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -58,10 +59,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3E02263C1B7C62D20080F9AB /* Task+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3E02263D1B7C62D20080F9AB /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
-		3E02263E1B7C62D20080F9AB /* Tag+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Tag+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3E02263F1B7C62D20080F9AB /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		3E0B27F41BE86B9A0002173B /* Task+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E0B27F51BE86B9A0002173B /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		3E0B27F61BE86B9A0002173B /* Tag+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Tag+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E0B27F71BE86B9B0002173B /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		3E191E301B7B6CD300BB9E71 /* SeamDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SeamDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3E191E351B7B6CD300BB9E71 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -85,9 +86,10 @@
 		3E96E9AE1B7CB9E000186E43 /* NSManagedObjectContext+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "NSManagedObjectContext+Helpers.swift"; path = "../../Seam/Seam/NSManagedObjectContext+Helpers.swift"; sourceTree = "<group>"; };
 		3E96E9AF1B7CB9E000186E43 /* SMServerStoreSetupOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMServerStoreSetupOperation.swift; path = ../../Seam/Seam/SMServerStoreSetupOperation.swift; sourceTree = "<group>"; };
 		3E96E9B01B7CB9E000186E43 /* SMServerTokenHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMServerTokenHandler.swift; path = ../../Seam/Seam/SMServerTokenHandler.swift; sourceTree = "<group>"; };
-		3E96E9B11B7CB9E000186E43 /* SMStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStore.swift; path = ../../Seam/Seam/SMStore.swift; sourceTree = "<group>"; };
 		3E96E9B21B7CB9E000186E43 /* SMStoreChangeSetHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStoreChangeSetHandler.swift; path = ../../Seam/Seam/SMStoreChangeSetHandler.swift; sourceTree = "<group>"; };
 		3E96E9B31B7CB9E000186E43 /* SMStoreSyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStoreSyncOperation.swift; path = ../../Seam/Seam/SMStoreSyncOperation.swift; sourceTree = "<group>"; };
+		3EC07C011BE771D200AAA747 /* Store.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Store.swift; path = ../../Seam/Seam/Store.swift; sourceTree = "<group>"; };
+		3EC07C031BE771E100AAA747 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Error.swift; path = ../../Seam/Seam/Error.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,10 +115,10 @@
 		3E02263B1B7C62C10080F9AB /* CoreData Models */ = {
 			isa = PBXGroup;
 			children = (
-				3E02263C1B7C62D20080F9AB /* Task+CoreDataProperties.swift */,
-				3E02263D1B7C62D20080F9AB /* Task.swift */,
-				3E02263E1B7C62D20080F9AB /* Tag+CoreDataProperties.swift */,
-				3E02263F1B7C62D20080F9AB /* Tag.swift */,
+				3E0B27F41BE86B9A0002173B /* Task+CoreDataProperties.swift */,
+				3E0B27F51BE86B9A0002173B /* Task.swift */,
+				3E0B27F61BE86B9A0002173B /* Tag+CoreDataProperties.swift */,
+				3E0B27F71BE86B9B0002173B /* Tag.swift */,
 			);
 			name = "CoreData Models";
 			sourceTree = "<group>";
@@ -171,15 +173,16 @@
 		3E96E9A61B7CB99B00186E43 /* SeamFramework Files */ = {
 			isa = PBXGroup;
 			children = (
+				3EC07C031BE771E100AAA747 /* Error.swift */,
+				3EC07C011BE771D200AAA747 /* Store.swift */,
+				3E96E9AC1B7CB9E000186E43 /* NSEntityDescription+Helpers.swift */,
 				3E96E9A81B7CB9E000186E43 /* CKRecord+NSManagedObject.swift */,
 				3E96E9AA1B7CB9E000186E43 /* CKRecordZone+Helpers.swift */,
 				3E96E9AB1B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift */,
-				3E96E9AC1B7CB9E000186E43 /* NSEntityDescription+Helpers.swift */,
 				3E96E9AD1B7CB9E000186E43 /* NSManagedObject+CKRecord.swift */,
 				3E96E9AE1B7CB9E000186E43 /* NSManagedObjectContext+Helpers.swift */,
 				3E96E9AF1B7CB9E000186E43 /* SMServerStoreSetupOperation.swift */,
 				3E96E9B01B7CB9E000186E43 /* SMServerTokenHandler.swift */,
-				3E96E9B11B7CB9E000186E43 /* SMStore.swift */,
 				3E96E9B21B7CB9E000186E43 /* SMStoreChangeSetHandler.swift */,
 				3E96E9B31B7CB9E000186E43 /* SMStoreSyncOperation.swift */,
 			);
@@ -296,24 +299,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E0226431B7C62D20080F9AB /* Tag.swift in Sources */,
 				3E96E9BF1B7CB9E000186E43 /* SMStoreChangeSetHandler.swift in Sources */,
-				3E96E9BE1B7CB9E000186E43 /* SMStore.swift in Sources */,
 				3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */,
+				3E0B27FA1BE86B9B0002173B /* Tag+CoreDataProperties.swift in Sources */,
 				3E96E9BC1B7CB9E000186E43 /* SMServerStoreSetupOperation.swift in Sources */,
 				3E96E9BA1B7CB9E000186E43 /* NSManagedObject+CKRecord.swift in Sources */,
 				3E96E9B81B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift in Sources */,
 				3E96E9BD1B7CB9E000186E43 /* SMServerTokenHandler.swift in Sources */,
 				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
-				3E0226401B7C62D20080F9AB /* Task+CoreDataProperties.swift in Sources */,
 				3E96E9BB1B7CB9E000186E43 /* NSManagedObjectContext+Helpers.swift in Sources */,
-				3E0226421B7C62D20080F9AB /* Tag+CoreDataProperties.swift in Sources */,
 				3E96E9B51B7CB9E000186E43 /* CKRecord+NSManagedObject.swift in Sources */,
+				3E0B27F81BE86B9B0002173B /* Task+CoreDataProperties.swift in Sources */,
+				3E0B27FB1BE86B9B0002173B /* Tag.swift in Sources */,
 				3E96E9C01B7CB9E000186E43 /* SMStoreSyncOperation.swift in Sources */,
+				3EC07C021BE771D200AAA747 /* Store.swift in Sources */,
 				3E96E9B71B7CB9E000186E43 /* CKRecordZone+Helpers.swift in Sources */,
-				3E0226411B7C62D20080F9AB /* Task.swift in Sources */,
 				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
+				3EC07C041BE771E100AAA747 /* Error.swift in Sources */,
+				3E0B27F91BE86B9B0002173B /* Task.swift in Sources */,
 				3E96E9B91B7CB9E000186E43 /* NSEntityDescription+Helpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

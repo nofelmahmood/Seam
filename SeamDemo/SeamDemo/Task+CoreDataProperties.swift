@@ -2,11 +2,11 @@
 //  Task+CoreDataProperties.swift
 //  SeamDemo
 //
-//  Created by Nofel Mahmood on 13/08/2015.
+//  Created by Nofel Mahmood on 03/11/2015.
 //  Copyright © 2015 CloudKitSpace. All rights reserved.
 //
-//  Delete this file and regenerate it using "Create NSManagedObject Subclass…"
-//  to keep your implementation up to date with your model.
+//  Choose "Create NSManagedObject Subclass…" from the Core Data editor menu
+//  to delete and recreate this implementation file for your updated model.
 //
 
 import Foundation

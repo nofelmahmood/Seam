@@ -27,28 +27,29 @@ import Foundation
 import CoreData
 
 extension NSEntityDescription {
-    
-    func attributesByNameByRemovingBackingStoreAttributes() -> [String:NSAttributeDescription] {
-        var attributesByName = self.attributesByName
-        attributesByName.removeValueForKey(SMLocalStoreRecordIDAttributeName)
-        attributesByName.removeValueForKey(SMLocalStoreRecordEncodedValuesAttributeName)
-        return attributesByName
+    var propertyNamesToFetch: [String] {
+        return attributeNames + toOneRelationshipNames
     }
     
-    func toOneRelationships() -> [NSRelationshipDescription] {
-        return Array(self.relationshipsByName.values).filter({ (relationshipDescription) -> Bool in
-            return relationshipDescription.toMany == false
-        })
+    var attributeNames: [String] {
+        return Array(attributesByName.keys)
     }
     
-    func toOneRelationshipsByName() -> [String:NSRelationshipDescription] {
-        var relationshipsByNameDictionary: Dictionary<String,NSRelationshipDescription> = Dictionary<String,NSRelationshipDescription>()
-        for (key,value) in self.relationshipsByName {
-            if value.toMany == true {
-                continue
+    var toOneRelationships: [NSRelationshipDescription] {
+        return Array(relationshipsByName.values).filter({ $0.toMany == false })
+    }
+    
+    var toOneRelationshipNames: [String] {
+        return Array(toOneRelationshipsByName.keys)
+    }
+    
+    var toOneRelationshipsByName: [String:NSRelationshipDescription] {
+        var dictionary = [String: NSRelationshipDescription]()
+        relationshipsByName.forEach({ (key,value) in
+            if value.toMany == false {
+                dictionary[key] = value
             }
-            relationshipsByNameDictionary[key] = value
-        }
-        return relationshipsByNameDictionary
+        })
+        return dictionary
     }
 }

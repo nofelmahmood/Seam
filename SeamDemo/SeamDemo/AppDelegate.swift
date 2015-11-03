@@ -33,7 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        {
 //            print("Error Tasks")
 //        }
-        CoreDataStack.defaultStack.seamStore!.triggerSync()
 
         return true
     }

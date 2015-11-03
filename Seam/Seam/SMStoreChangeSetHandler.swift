@@ -53,17 +53,23 @@ class SMStoreChangeSetHandler {
     }
     
     func addExtraBackingStoreAttributes(toEntity entity: NSEntityDescription) {
-        let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
-        recordIDAttribute.name = SMLocalStoreRecordIDAttributeName
-        recordIDAttribute.optional = false
-        recordIDAttribute.indexed = true
-        recordIDAttribute.attributeType = NSAttributeType.StringAttributeType
-        entity.properties.append(recordIDAttribute)
-        let recordEncodedValuesAttribute: NSAttributeDescription = NSAttributeDescription()
-        recordEncodedValuesAttribute.name = SMLocalStoreRecordEncodedValuesAttributeName
-        recordEncodedValuesAttribute.attributeType = NSAttributeType.BinaryDataAttributeType
-        recordEncodedValuesAttribute.optional = true
-        entity.properties.append(recordEncodedValuesAttribute)
+        let attributes = entity.attributesByName
+        
+        if attributes[SMLocalStoreRecordIDAttributeName] == nil {
+            let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
+            recordIDAttribute.name = SMLocalStoreRecordIDAttributeName
+            recordIDAttribute.optional = true
+            recordIDAttribute.indexed = true
+            recordIDAttribute.attributeType = NSAttributeType.StringAttributeType
+            entity.properties.append(recordIDAttribute)
+        }
+        if attributes[SMLocalStoreRecordEncodedValuesAttributeName] == nil {
+            let recordEncodedValuesAttribute: NSAttributeDescription = NSAttributeDescription()
+            recordEncodedValuesAttribute.name = SMLocalStoreRecordEncodedValuesAttributeName
+            recordEncodedValuesAttribute.attributeType = NSAttributeType.BinaryDataAttributeType
+            recordEncodedValuesAttribute.optional = true
+            entity.properties.append(recordEncodedValuesAttribute)
+        }
     }
     
     func changeSetEntity() -> NSEntityDescription {
@@ -103,9 +109,19 @@ class SMStoreChangeSetHandler {
     func modelForLocalStore(usingModel model: NSManagedObjectModel) -> NSManagedObjectModel {
         let backingModel: NSManagedObjectModel = model.copy() as! NSManagedObjectModel
         for entity in backingModel.entities {
+            
+            if entity.superentity != nil { // only add to super-entities, not the sub-entities
+                continue
+            }
+            if entity.name == SMLocalStoreChangeSetEntityName {
+                continue
+            }
+            
             self.addExtraBackingStoreAttributes(toEntity: entity)
         }
-        backingModel.entities.append(self.changeSetEntity())
+        if backingModel.entitiesByName[SMLocalStoreChangeSetEntityName] == nil {
+            backingModel.entities.append(self.changeSetEntity())
+        }
         return backingModel
     }
     

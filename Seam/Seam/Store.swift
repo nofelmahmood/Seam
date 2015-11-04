@@ -211,11 +211,11 @@ public class Store: NSIncrementalStore {
             if sourceObject.hasFaultForRelationshipNamed(relationship.name) || sourceObject.valueForKey(relationship.name) == nil {
                 continue
             }
-            if relationship.toMany == true {
-                let relationshipValue = sourceObject.valueForKey(relationship.name) as! Set<NSObject>
-                var backingRelationshipValue = Set<NSObject>()
+            if relationship.toMany {
+                let relationshipValue = sourceObject.valueForKey(relationship.name) as! Set<NSManagedObject>
+                var backingRelationshipValue = Set<NSManagedObject>()
                 for relationshipObject in relationshipValue {
-                    let relationshipManagedObject = relationshipObject as! NSManagedObject
+                    let relationshipManagedObject = relationshipObject
                     if relationshipManagedObject.objectID.temporaryID == false {
                         let referenceObject = uniqueIDForObjectID(relationshipManagedObject.objectID)
                         let backingRelationshipObjectID = try objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject)
@@ -251,7 +251,7 @@ public class Store: NSIncrementalStore {
             mainContext.willChangeValueForKey("objectID")
             try mainContext.obtainPermanentIDsForObjects([managedObject])
             mainContext.didChangeValueForKey("objectID")
-            try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: managedObject)
+            try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
             try self.backingMOC.saveIfHasChanges()
         })
     }
@@ -279,7 +279,6 @@ public class Store: NSIncrementalStore {
             let fetchRequest = NSFetchRequest(entityName: managedObject.entity.name!)
             let recordID = uniqueIDForObjectID(managedObject.objectID)
             fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([predicateObjectRecordIDKey:recordID])
-            fetchRequest.fetchLimit = 1
             let results = try backingMOC.executeFetchRequest(fetchRequest)
             let backingObject = results.last as! NSManagedObject
             let keys = Array(persistentStoreCoordinator!.managedObjectModel.entitiesByName[managedObject.entity.name!]!.attributesByName.keys)

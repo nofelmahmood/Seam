@@ -31,6 +31,7 @@
 		3E96E9BD1B7CB9E000186E43 /* SMServerTokenHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B01B7CB9E000186E43 /* SMServerTokenHandler.swift */; };
 		3E96E9BF1B7CB9E000186E43 /* SMStoreChangeSetHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B21B7CB9E000186E43 /* SMStoreChangeSetHandler.swift */; };
 		3E96E9C01B7CB9E000186E43 /* SMStoreSyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B31B7CB9E000186E43 /* SMStoreSyncOperation.swift */; };
+		3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */; };
 		3EC07C021BE771D200AAA747 /* Store.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC07C011BE771D200AAA747 /* Store.swift */; };
 		3EC07C041BE771E100AAA747 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC07C031BE771E100AAA747 /* Error.swift */; };
 /* End PBXBuildFile section */
@@ -88,6 +89,7 @@
 		3E96E9B01B7CB9E000186E43 /* SMServerTokenHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMServerTokenHandler.swift; path = ../../Seam/Seam/SMServerTokenHandler.swift; sourceTree = "<group>"; };
 		3E96E9B21B7CB9E000186E43 /* SMStoreChangeSetHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStoreChangeSetHandler.swift; path = ../../Seam/Seam/SMStoreChangeSetHandler.swift; sourceTree = "<group>"; };
 		3E96E9B31B7CB9E000186E43 /* SMStoreSyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStoreSyncOperation.swift; path = ../../Seam/Seam/SMStoreSyncOperation.swift; sourceTree = "<group>"; };
+		3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Helper.swift"; sourceTree = "<group>"; };
 		3EC07C011BE771D200AAA747 /* Store.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Store.swift; path = ../../Seam/Seam/Store.swift; sourceTree = "<group>"; };
 		3EC07C031BE771E100AAA747 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Error.swift; path = ../../Seam/Seam/Error.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -119,6 +121,7 @@
 				3E0B27F51BE86B9A0002173B /* Task.swift */,
 				3E0B27F61BE86B9A0002173B /* Tag+CoreDataProperties.swift */,
 				3E0B27F71BE86B9B0002173B /* Tag.swift */,
+				3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */,
 			);
 			name = "CoreData Models";
 			sourceTree = "<group>";
@@ -308,6 +311,7 @@
 				3E96E9BD1B7CB9E000186E43 /* SMServerTokenHandler.swift in Sources */,
 				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
+				3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */,
 				3E96E9BB1B7CB9E000186E43 /* NSManagedObjectContext+Helpers.swift in Sources */,
 				3E96E9B51B7CB9E000186E43 /* CKRecord+NSManagedObject.swift in Sources */,
 				3E0B27F81BE86B9B0002173B /* Task+CoreDataProperties.swift in Sources */,

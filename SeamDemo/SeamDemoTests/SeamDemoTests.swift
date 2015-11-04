@@ -131,6 +131,78 @@ class SeamDemoTests: XCTestCase {
         })
     }
     
+    func testAddingObjectsAndRelationships() {
+        let task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: CoreDataStack.defaultStack.managedObjectContext) as? Task
+        XCTAssertNotNil(task)
+        task!.name = "Test Task"
+        let tag = NSEntityDescription.insertNewObjectForEntityForName("Tag", inManagedObjectContext: CoreDataStack.defaultStack.managedObjectContext) as? Tag
+        XCTAssertNotNil(tag)
+        tag!.name = "Tag for Test Task"
+        var tags = task!.tags?.allObjects
+        XCTAssertNotNil(tags)
+        tags!.append(tag!)
+        task!.tags = Set(tags as! [NSManagedObject])
+        let saveResult = try? CoreDataStack.defaultStack.managedObjectContext.saveIfHasChanges()
+        XCTAssertNotNil(saveResult)
+        CoreDataStack.defaultStack.managedObjectContext.reset()
+        let fetchRequest = NSFetchRequest(entityName: "Task")
+        let fetchResult = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
+        XCTAssertNotNil(fetchResult)
+        let tasks = fetchResult as? [Task]
+        XCTAssertNotNil(tasks)
+        tasks!.forEach({ task in
+            print("Task \(task.name!)")
+            XCTAssertNotNil(task.tags)
+            task.tags!.forEach({ tag in
+                print("Tag \(tag.name!)")
+            })
+        })
+    }
+    
+    func testFetchingOfTagAndSettingItToNewTask() {
+        let tasks = Task.all(inContext: CoreDataStack.defaultStack.managedObjectContext) as? [Task]
+        XCTAssertNotNil(tasks)
+        let tags = Tag.all(inContext: CoreDataStack.defaultStack.managedObjectContext) as? [Tag]
+        XCTAssertNotNil(tags)
+        let newTask = Task.new(inContext: CoreDataStack.defaultStack.managedObjectContext) as? Task
+        XCTAssertNotNil(newTask)
+        newTask!.name = "Dagha Rora"
+        print("OLD VALUES")
+        tasks!.forEach({ task in
+            print("\(task.name!)")
+            XCTAssertNotNil(task.tags)
+            task.tags!.forEach({ tag in
+                print("\(tag.name!)")
+            })
+        })
+        tags!.forEach({ tag in
+            tag.task = newTask!
+        })
+        let saveResult = try? CoreDataStack.defaultStack.managedObjectContext.saveIfHasChanges()
+        XCTAssertNotNil(saveResult)
+        CoreDataStack.defaultStack.managedObjectContext.reset()
+    }
+    
+    func testAccessingOfToOneRelationship() {
+        let tag = Tag.all(inContext: CoreDataStack.defaultStack.managedObjectContext)?.first as? Tag
+        XCTAssertNotNil(tag)
+        print(tag!.name!)
+        print(tag!.task?.name)
+    }
+    
+    func testAccessingOfToManyRelationship() {
+        let task = Task.all(inContext: CoreDataStack.defaultStack.managedObjectContext, satisfyingPredicate: NSPredicate(format: "name = %@","Dagha Rora"))?.first as? Task
+        print(task?.name)
+        XCTAssertNotNil(task)
+        XCTAssertNotNil(task?.tags)
+        let tagsArray = task!.tags!.allObjects as? [Tag]
+        XCTAssertNotNil(tagsArray)
+        tagsArray!.forEach({ tag in
+            XCTAssertNotNil(tag.name)
+            print(tag.name)
+        })
+    }
+    
     func testPerformanceExample() {
         // This is an example of a performance test case.
         self.measureBlock {

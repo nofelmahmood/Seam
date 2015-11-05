@@ -21,6 +21,8 @@
 		3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */; };
 		3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E591B7B6D1D00BB9E71 /* CoreData.framework */; };
 		3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */; };
+		3E1C5E4A1BE9FAE400D3F3FF /* ChangeSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1C5E481BE9FAE400D3F3FF /* ChangeSet.swift */; };
+		3E1C5E4B1BE9FAE400D3F3FF /* Properties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1C5E491BE9FAE400D3F3FF /* Properties.swift */; };
 		3E96E9B51B7CB9E000186E43 /* CKRecord+NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9A81B7CB9E000186E43 /* CKRecord+NSManagedObject.swift */; };
 		3E96E9B71B7CB9E000186E43 /* CKRecordZone+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AA1B7CB9E000186E43 /* CKRecordZone+Helpers.swift */; };
 		3E96E9B81B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9AB1B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift */; };
@@ -79,6 +81,8 @@
 		3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3E191E591B7B6D1D00BB9E71 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		3E1C5E481BE9FAE400D3F3FF /* ChangeSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ChangeSet.swift; path = ../../Seam/Seam/ChangeSet.swift; sourceTree = "<group>"; };
+		3E1C5E491BE9FAE400D3F3FF /* Properties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Properties.swift; path = ../../Seam/Seam/Properties.swift; sourceTree = "<group>"; };
 		3E96E9A81B7CB9E000186E43 /* CKRecord+NSManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecord+NSManagedObject.swift"; path = "../../Seam/Seam/CKRecord+NSManagedObject.swift"; sourceTree = "<group>"; };
 		3E96E9AA1B7CB9E000186E43 /* CKRecordZone+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecordZone+Helpers.swift"; path = "../../Seam/Seam/CKRecordZone+Helpers.swift"; sourceTree = "<group>"; };
 		3E96E9AB1B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "CKRecordZoneID+Helpers.swift"; path = "../../Seam/Seam/CKRecordZoneID+Helpers.swift"; sourceTree = "<group>"; };
@@ -176,6 +180,8 @@
 		3E96E9A61B7CB99B00186E43 /* SeamFramework Files */ = {
 			isa = PBXGroup;
 			children = (
+				3E1C5E481BE9FAE400D3F3FF /* ChangeSet.swift */,
+				3E1C5E491BE9FAE400D3F3FF /* Properties.swift */,
 				3EC07C031BE771E100AAA747 /* Error.swift */,
 				3EC07C011BE771D200AAA747 /* Store.swift */,
 				3E96E9AC1B7CB9E000186E43 /* NSEntityDescription+Helpers.swift */,
@@ -322,6 +328,8 @@
 				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
 				3EC07C041BE771E100AAA747 /* Error.swift in Sources */,
 				3E0B27F91BE86B9B0002173B /* Task.swift in Sources */,
+				3E1C5E4B1BE9FAE400D3F3FF /* Properties.swift in Sources */,
+				3E1C5E4A1BE9FAE400D3F3FF /* ChangeSet.swift in Sources */,
 				3E96E9B91B7CB9E000186E43 /* NSEntityDescription+Helpers.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -400,7 +408,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -439,7 +447,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -455,7 +463,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = SeamDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -471,7 +479,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = SeamDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";

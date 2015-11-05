@@ -8,7 +8,16 @@
 
 import Foundation
 
-enum Error: ErrorType {
-    case BackingStoreCreationFailed
-    case InvalidRequest
+struct Error {
+    struct Store {
+        static let domain = "com.seam.error.store.errorDomain"
+        enum BackingStore: ErrorType {
+            case CreationFailed
+            case ModelCreationFailed
+            case PersistentStoreInitializationFailed
+        }
+        enum MainStore: ErrorType {
+            case InvalidRequest
+        }
+    }
 }

@@ -27,10 +27,21 @@
 		3E191DEF1B7B3DB500BB9E71 /* NSEntityDescription+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD11B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E191DF01B7B3DB600BB9E71 /* NSManagedObject+CKRecord.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD21B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E191DF11B7B3DB600BB9E71 /* NSManagedObjectContext+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD31B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
+		3E1C5E451BE9D44500D3F3FF /* Properties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1C5E441BE9D44500D3F3FF /* Properties.swift */; };
+		3E1C5E471BE9D49300D3F3FF /* ChangeSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E1C5E461BE9D49300D3F3FF /* ChangeSet.swift */; };
+		3E6F0AF71BEB49DA00F58F9A /* TestModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3E6F0AF51BEB49DA00F58F9A /* TestModel.xcdatamodeld */; };
+		3E6F0AFD1BEB4A3B00F58F9A /* Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6F0AF91BEB4A3B00F58F9A /* Task+CoreDataProperties.swift */; };
+		3E6F0AFE1BEB4A3B00F58F9A /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6F0AFA1BEB4A3B00F58F9A /* Task.swift */; };
+		3E6F0AFF1BEB4A3B00F58F9A /* Tag+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6F0AFB1BEB4A3B00F58F9A /* Tag+CoreDataProperties.swift */; };
+		3E6F0B001BEB4A3B00F58F9A /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6F0AFC1BEB4A3B00F58F9A /* Tag.swift */; };
+		3E6F0B031BEB4B5000F58F9A /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6F0B021BEB4B5000F58F9A /* CoreDataStack.swift */; };
+		3E6F0B061BEB4D4F00F58F9A /* NSManagedObject+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E6F0B051BEB4D4F00F58F9A /* NSManagedObject+Helper.swift */; };
 		3E8E26C51B7B11BD009C47EA /* Seam.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E26C41B7B11BD009C47EA /* Seam.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3EBBCD4E1BEB736500979D0C /* StoreRelationshipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBBCD4D1BEB736500979D0C /* StoreRelationshipTests.swift */; };
 		3EC07BF71BE6645600AAA747 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26C11B7B11BD009C47EA /* Seam.framework */; };
 		3EC07C001BE76A0900AAA747 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC07BFF1BE76A0900AAA747 /* Error.swift */; };
 		3EC07C061BE7815700AAA747 /* StoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC07C051BE7815700AAA747 /* StoreTests.swift */; };
+		3EEC39EB1BEB518C00037E96 /* StoreFetchingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EEC39EA1BEB518C00037E96 /* StoreFetchingTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,13 +66,24 @@
 		3E191DD11B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSEntityDescription+Helpers.swift"; sourceTree = "<group>"; };
 		3E191DD21B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+CKRecord.swift"; sourceTree = "<group>"; };
 		3E191DD31B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObjectContext+Helpers.swift"; sourceTree = "<group>"; };
+		3E1C5E441BE9D44500D3F3FF /* Properties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Properties.swift; sourceTree = "<group>"; };
+		3E1C5E461BE9D49300D3F3FF /* ChangeSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChangeSet.swift; sourceTree = "<group>"; };
+		3E6F0AF61BEB49DA00F58F9A /* TestModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestModel.xcdatamodel; sourceTree = "<group>"; };
+		3E6F0AF91BEB4A3B00F58F9A /* Task+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E6F0AFA1BEB4A3B00F58F9A /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		3E6F0AFB1BEB4A3B00F58F9A /* Tag+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Tag+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E6F0AFC1BEB4A3B00F58F9A /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		3E6F0B021BEB4B5000F58F9A /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		3E6F0B051BEB4D4F00F58F9A /* NSManagedObject+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Helper.swift"; sourceTree = "<group>"; };
 		3E8E26C11B7B11BD009C47EA /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E8E26C41B7B11BD009C47EA /* Seam.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Seam.h; sourceTree = "<group>"; };
 		3E8E26C61B7B11BD009C47EA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3EBBCD4D1BEB736500979D0C /* StoreRelationshipTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreRelationshipTests.swift; sourceTree = "<group>"; };
 		3EC07BF21BE6645500AAA747 /* SeamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SeamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EC07BF61BE6645600AAA747 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3EC07BFF1BE76A0900AAA747 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		3EC07C051BE7815700AAA747 /* StoreTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreTests.swift; sourceTree = "<group>"; };
+		3EEC39EA1BEB518C00037E96 /* StoreFetchingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoreFetchingTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,8 +108,10 @@
 		3E191DF31B7B52A400BB9E71 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				3E1C5E441BE9D44500D3F3FF /* Properties.swift */,
 				3EC07BFF1BE76A0900AAA747 /* Error.swift */,
 				3E191DCC1B7B3CAF00BB9E71 /* Store.swift */,
+				3E1C5E461BE9D49300D3F3FF /* ChangeSet.swift */,
 				3E191DCD1B7B3CAF00BB9E71 /* SMStoreChangeSetHandler.swift */,
 				3E191DCE1B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift */,
 				3E191DCF1B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift */,
@@ -107,6 +131,54 @@
 				3E0226371B7C43320080F9AB /* CKRecordZoneID+Helpers.swift */,
 			);
 			name = Extensions;
+			sourceTree = "<group>";
+		};
+		3E6F0AF81BEB4A2500F58F9A /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				3E6F0B071BEB4E6200F58F9A /* Model */,
+				3E6F0B041BEB4D3300F58F9A /* Helpers */,
+				3E6F0B011BEB4A4000F58F9A /* Models */,
+			);
+			name = CoreData;
+			sourceTree = "<group>";
+		};
+		3E6F0B011BEB4A4000F58F9A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				3E6F0AF91BEB4A3B00F58F9A /* Task+CoreDataProperties.swift */,
+				3E6F0AFA1BEB4A3B00F58F9A /* Task.swift */,
+				3E6F0AFB1BEB4A3B00F58F9A /* Tag+CoreDataProperties.swift */,
+				3E6F0AFC1BEB4A3B00F58F9A /* Tag.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		3E6F0B041BEB4D3300F58F9A /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				3E6F0B021BEB4B5000F58F9A /* CoreDataStack.swift */,
+				3E6F0B051BEB4D4F00F58F9A /* NSManagedObject+Helper.swift */,
+			);
+			name = Helpers;
+			sourceTree = "<group>";
+		};
+		3E6F0B071BEB4E6200F58F9A /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				3E6F0AF51BEB49DA00F58F9A /* TestModel.xcdatamodeld */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		3E6F0B081BEB4E6F00F58F9A /* StoreTests */ = {
+			isa = PBXGroup;
+			children = (
+				3EC07C051BE7815700AAA747 /* StoreTests.swift */,
+				3EEC39EA1BEB518C00037E96 /* StoreFetchingTests.swift */,
+				3EBBCD4D1BEB736500979D0C /* StoreRelationshipTests.swift */,
+			);
+			name = StoreTests;
 			sourceTree = "<group>";
 		};
 		3E8E26B71B7B11BD009C47EA = {
@@ -141,7 +213,8 @@
 		3EC07BF31BE6645600AAA747 /* SeamTests */ = {
 			isa = PBXGroup;
 			children = (
-				3EC07C051BE7815700AAA747 /* StoreTests.swift */,
+				3E6F0B081BEB4E6F00F58F9A /* StoreTests */,
+				3E6F0AF81BEB4A2500F58F9A /* CoreData */,
 				3EC07BF61BE6645600AAA747 /* Info.plist */,
 			);
 			path = SeamTests;
@@ -271,8 +344,10 @@
 				3EC07C001BE76A0900AAA747 /* Error.swift in Sources */,
 				3E191DDB1B7B3CAF00BB9E71 /* NSEntityDescription+Helpers.swift in Sources */,
 				3E191DDD1B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift in Sources */,
+				3E1C5E451BE9D44500D3F3FF /* Properties.swift in Sources */,
 				3E0226381B7C43320080F9AB /* CKRecordZoneID+Helpers.swift in Sources */,
 				3E191DD91B7B3CAF00BB9E71 /* SMStoreSyncOperation.swift in Sources */,
+				3E1C5E471BE9D49300D3F3FF /* ChangeSet.swift in Sources */,
 				3E191DD81B7B3CAF00BB9E71 /* SMServerStoreSetupOperation.swift in Sources */,
 				3E191DD61B7B3CAF00BB9E71 /* Store.swift in Sources */,
 				3E191DDC1B7B3CAF00BB9E71 /* NSManagedObject+CKRecord.swift in Sources */,
@@ -283,7 +358,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E6F0B031BEB4B5000F58F9A /* CoreDataStack.swift in Sources */,
+				3E6F0B001BEB4A3B00F58F9A /* Tag.swift in Sources */,
+				3E6F0AFE1BEB4A3B00F58F9A /* Task.swift in Sources */,
+				3E6F0AFF1BEB4A3B00F58F9A /* Tag+CoreDataProperties.swift in Sources */,
 				3EC07C061BE7815700AAA747 /* StoreTests.swift in Sources */,
+				3E6F0AFD1BEB4A3B00F58F9A /* Task+CoreDataProperties.swift in Sources */,
+				3EEC39EB1BEB518C00037E96 /* StoreFetchingTests.swift in Sources */,
+				3E6F0AF71BEB49DA00F58F9A /* TestModel.xcdatamodeld in Sources */,
+				3E6F0B061BEB4D4F00F58F9A /* NSManagedObject+Helper.swift in Sources */,
+				3EBBCD4E1BEB736500979D0C /* StoreRelationshipTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -335,7 +419,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -378,7 +462,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -489,6 +573,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		3E6F0AF51BEB49DA00F58F9A /* TestModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				3E6F0AF61BEB49DA00F58F9A /* TestModel.xcdatamodel */,
+			);
+			currentVersion = 3E6F0AF61BEB49DA00F58F9A /* TestModel.xcdatamodel */;
+			path = TestModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 3E8E26B81B7B11BD009C47EA /* Project object */;
 }

@@ -1,16 +1,17 @@
 //
 //  CoreDataStack.swift
-//  SeamDemo
+//  Seam
 //
-//  Created by Nofel Mahmood on 12/08/2015.
+//  Created by Nofel Mahmood on 05/11/2015.
 //  Copyright © 2015 CloudKitSpace. All rights reserved.
 //
 
-import UIKit
+import Foundation
 import CoreData
+import Seam
 
 class CoreDataStack: NSObject {
-
+    
     static let defaultStack = CoreDataStack()
     // MARK: - Core Data stack
     
@@ -18,19 +19,20 @@ class CoreDataStack: NSObject {
         // The directory the application uses to store the Core Data store file. This code uses a directory named "com.CloudKitSpace.SeamDemo" in the application's documents Application Support directory.
         let urls = NSFileManager.defaultManager().URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask)
         return urls[urls.count-1]
-        }()
+    }()
     
     lazy var managedObjectModel: NSManagedObjectModel = {
         // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
-        let modelURL = NSBundle.mainBundle().URLForResource("SeamDemo", withExtension: "momd")!
+        let modelURL = NSBundle(forClass: self.dynamicType).URLForResource("TestModel", withExtension: "momd")!
         return NSManagedObjectModel(contentsOfURL: modelURL)!
-        }()
+    }()
     
     lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
         // The persistent store coordinator for the application. This implementation creates and returns a coordinator, having added the store for the application to it. This property is optional since there are legitimate error conditions that could cause the creation of the store to fail.
         // Create the coordinator and store
         let coordinator = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-        let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("SingleViewCoreData.sqlite")
+        let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("SeamTestData.sqlite")
+        print("Store URL ",url)
         var failureReason = "There was an error creating or loading the application's saved data."
         do {
             try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil)
@@ -49,7 +51,7 @@ class CoreDataStack: NSObject {
         }
         
         return coordinator
-        }()
+    }()
     
     lazy var managedObjectContext: NSManagedObjectContext = {
         // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.) This property is optional since there are legitimate error conditions that could cause the creation of the context to fail.
@@ -57,7 +59,7 @@ class CoreDataStack: NSObject {
         var managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
         managedObjectContext.persistentStoreCoordinator = coordinator
         return managedObjectContext
-        }()
+    }()
     
     // MARK: - Core Data Saving support
     
@@ -74,5 +76,5 @@ class CoreDataStack: NSObject {
             }
         }
     }
-
+    
 }

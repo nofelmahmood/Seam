@@ -11,48 +11,6 @@ import CoreData
 @testable import Seam
 
 class StoreTests: XCTestCase {
-//    lazy var persistentStoreCoordinator: NSPersistentStoreCoordinator = {
-//        let psc = NSPersistentStoreCoordinator(managedObjectModel: self.managedObjectModel)
-//        let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("StoreTest.sqlite")
-//        let result = try? psc.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: url, options: nil)
-//        return psc
-//    }()
-//    lazy var managedObjectModel: NSManagedObjectModel = {
-//        let mom = NSManagedObjectModel()
-//        let taskEntity = NSEntityDescription()
-//        taskEntity.name = "Task"
-//        let tagEntity = NSEntityDescription()
-//        tagEntity.name = "Tag"
-//        let taskNameAttribute = NSAttributeDescription()
-//        taskNameAttribute.name = "name"
-//        taskEntity.properties.append(taskNameAttribute)
-//        let taskTagRelationship = NSRelationshipDescription()
-//        taskTagRelationship.name = "tags"
-//        taskTagRelationship.destinationEntity = tagEntity
-//        taskTagRelationship.maxCount = NSIntegerMax
-//        taskEntity.properties.append(taskTagRelationship)
-//        let tagNameAttribute = NSAttributeDescription()
-//        tagNameAttribute.name = "name"
-//        tagEntity.properties.append(tagNameAttribute)
-//        let tagTaskRelationship = NSRelationshipDescription()
-//        tagTaskRelationship.name = "task"
-//        tagTaskRelationship.maxCount = 1
-//        tagTaskRelationship.destinationEntity = taskEntity
-//        tagTaskRelationship.inverseRelationship = taskTagRelationship
-//        taskTagRelationship.inverseRelationship = tagTaskRelationship
-//        mom.entities.appendContentsOf([taskEntity, tagEntity])
-//        return mom
-//    }()
-//    lazy var managedObjectContext: NSManagedObjectContext = {
-//        let moc = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
-//        moc.persistentStoreCoordinator = self.persistentStoreCoordinator
-//        return moc
-//    }()
-//    lazy var applicationDocumentsDirectory: NSURL = {
-//        // The directory the application uses to store the Core Data store file. This code uses a directory named "com.CloudKitSpace.SeamDemo" in the application's documents Application Support directory.
-//        let urls = NSFileManager.defaultManager().URLsForDirectory(.ApplicationSupportDirectory, inDomains: .UserDomainMask)
-//        return urls[urls.count-1]
-//    }()
     
     override func setUp() {
         super.setUp()
@@ -64,6 +22,36 @@ class StoreTests: XCTestCase {
     }
     
     func testStoreCreation() {
+        let managedObjectContext = CoreDataStack.defaultStack.managedObjectContext
+        XCTAssertNotNil(managedObjectContext)
+    }
+    
+    func testCreationOfObjects() {
+        let task = Task.new(inContext: nil) as? Task
+        XCTAssertNotNil(task)
+        task!.name = "New Task"
+        let tag = Tag.new(inContext: nil) as? Tag
+        XCTAssertNotNil(tag)
+        tag!.name = "New Tag"
+        XCTAssertNotNil(try? CoreDataStack.defaultStack.managedObjectContext.save())
+    }
+    
+    func testFetchingOfTasks() {
+        let tasks = Task.all(inContext: nil) as? [Task]
+        XCTAssertNotNil(tasks)
+        tasks!.forEach { task in
+            XCTAssertNotNil(task.name)
+            print(task.name!)
+        }
+    }
+    
+    func testFetchingOfTags() {
+        let tags = Tag.all(inContext: nil) as? [Tag]
+        XCTAssertNotNil(tags)
+        tags!.forEach { tag in
+            XCTAssertNotNil(tag.name)
+            print(tag.name!)
+        }
     }
     
     func testPerformanceExample() {

@@ -31,8 +31,20 @@ extension NSEntityDescription {
         return attributeNames + toOneRelationshipNames
     }
     
+    var attributes: [NSAttributeDescription] {
+        return Array(attributesByName.values)
+    }
+    
     var attributeNames: [String] {
         return Array(attributesByName.keys)
+    }
+    
+    var relationships: [NSRelationshipDescription] {
+        return Array(relationshipsByName.values)
+    }
+    
+    var relationshipNames: [String] {
+        return Array(relationshipsByName.keys)
     }
     
     var toOneRelationships: [NSRelationshipDescription] {

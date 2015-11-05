@@ -103,19 +103,15 @@ class SeamDemoTests: XCTestCase {
     }
     
     func testSettingRelationshipsUsingANewObject() {
-        let tag = NSEntityDescription.insertNewObjectForEntityForName("Tag", inManagedObjectContext: CoreDataStack.defaultStack.managedObjectContext) as? Tag
-        XCTAssertNotNil(tag)
-        tag!.name = "New Tag for Task"
-        let fetchRequest = NSFetchRequest(entityName: "Task")
-        let result = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
-        XCTAssertNotNil(result)
-        let objects = result as? [Task]
-        XCTAssertNotNil(objects)
-        objects!.forEach({
-            tag!.task = $0
-        })
-        let saveResult = try? CoreDataStack.defaultStack.managedObjectContext.saveIfHasChanges()
-        XCTAssertNotNil(saveResult)
+        let tags = Tag.all(inContext: CoreDataStack.defaultStack.managedObjectContext) as? [Tag]
+        let task = Task.new(inContext: CoreDataStack.defaultStack.managedObjectContext) as? Task
+        task?.name = "NewTaskForSettingTags"
+        XCTAssertNotNil(tags)
+        XCTAssertNotNil(task)
+        tags!.forEach { tag in
+            tag.task = task!
+        }
+        XCTAssertNotNil(try? CoreDataStack.defaultStack.managedObjectContext.save())
     }
     
     func testFetchingOfObjectsWithRelationships() {

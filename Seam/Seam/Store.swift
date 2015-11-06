@@ -115,28 +115,25 @@ public class Store: NSIncrementalStore {
     }
     
     override public func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?) throws -> AnyObject {
-        let recordID = uniqueIDForObjectID(objectID)
-        let fetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
-        let predicate = NSPredicate.sm_UniqueIDEqualsToIDPredicate(recordID)
-        fetchRequest.predicate = predicate
-        let results = try backingMOC.executeFetchRequest(fetchRequest)
-        if let managedObject = results.first as? NSManagedObject {
+        let referenceObject = uniqueIDForObjectID(objectID)
+        guard let backingObjectID = try objectIDForBackingObjectForEntity(objectID.entity.name!, withReferenceObject: referenceObject) else {
             if relationship.toMany {
-                if let relationshipObjects = managedObject.valueForKey(relationship.name) as? Set<NSManagedObject> {
-                    var objectIDs = [NSManagedObjectID]()
-                    relationshipObjects.forEach({ object in
-                        let recordID = object.sm_uniqueID
-                        objectIDs.append(newObjectIDForEntity(object.entity, referenceObject: recordID))
-                    })
-                    return objectIDs
-                }
+                return []
             } else {
-                if let relationshipObject = managedObject.valueForKey(relationship.name) as? NSManagedObject {
-                    let recordID = uniqueIDForObjectID(relationshipObject.objectID)
-                    return newObjectIDForEntity(relationshipObject.entity, referenceObject: recordID)
-                }
                 return NSNull()
             }
+        }
+        let backingObject = try backingMOC.existingObjectWithID(backingObjectID)
+        if let relationshipManagedObjects = backingObject.valueForKey(relationship.name) as? Set<NSManagedObject> {
+            var relationshipManagedObjectIDs = Set<NSManagedObjectID>()
+            relationshipManagedObjects.forEach { object in
+                let uniqueID = object.sm_uniqueID
+                relationshipManagedObjectIDs.insert(newObjectIDForEntity(relationship.destinationEntity!, referenceObject: uniqueID))
+            }
+            return relationshipManagedObjectIDs
+        } else if let relationshipManagedObject = backingObject.valueForKey(relationship.name) as? NSManagedObject {
+            let uniqueID = relationshipManagedObject.sm_uniqueID
+            return newObjectIDForEntity(relationship.destinationEntity!, referenceObject: uniqueID)
         }
         return NSNull()
     }
@@ -146,8 +143,14 @@ public class Store: NSIncrementalStore {
     }
     
     // MARK: Attribute and Relationship Setters
-    func setAttributeValueForBackingObject(backingObject: NSManagedObject, sourceObject: NSManagedObject) {
-        
+    func setAttributeValuesForBackingObject(backingObject: NSManagedObject, sourceObject: NSManagedObject) {
+        if backingObject.valueForKey(EntityAttributes.UniqueID.name) == nil {
+            let uniqueID = uniqueIDForObjectID(sourceObject.objectID)
+            backingObject.setValue(uniqueID, forKey: EntityAttributes.UniqueID.name)
+        }
+        let keys = sourceObject.entity.attributeNames
+        let valuesForKeys = sourceObject.dictionaryWithValuesForKeys(keys)
+        backingObject.setValuesForKeysWithDictionary(valuesForKeys)
     }
     
     func setRelationshipValuesForBackingObject(backingObject: NSManagedObject,fromSourceObject sourceObject: NSManagedObject) throws {
@@ -161,7 +164,7 @@ public class Store: NSIncrementalStore {
             if let relationshipManagedObjects = sourceObject.valueForKey(relationship.name) as? Set<NSManagedObject> {
                 var backingRelationshipManagedObjects = Set<NSManagedObject>()
                 try relationshipManagedObjects.forEach { relationshipManagedObject in
-                    guard relationshipManagedObject.objectID.temporaryID == false else {
+                    guard !relationshipManagedObject.objectID.temporaryID else {
                         return
                     }
                     let referenceObject = uniqueIDForObjectID(relationshipManagedObject.objectID)
@@ -172,12 +175,13 @@ public class Store: NSIncrementalStore {
                 }
                 backingObject.setValue(backingRelationshipManagedObjects, forKey: relationship.name)
             } else if let relationshipManagedObject = sourceObject.valueForKey(relationship.name) as? NSManagedObject {
-                if relationshipManagedObject.objectID.temporaryID == false {
-                    let referenceObject = uniqueIDForObjectID(relationshipManagedObject.objectID)
-                    if let backingRelationshipObjectID = try objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject) {
-                        if let backingRelationshipObject = try? backingMOC.existingObjectWithID(backingRelationshipObjectID) {
-                            backingObject.setValue(backingRelationshipObject, forKey: relationship.name)
-                        }
+                guard !relationshipManagedObject.objectID.temporaryID else {
+                    return
+                }
+                let referenceObject = uniqueIDForObjectID(relationshipManagedObject.objectID)
+                if let backingRelationshipObjectID = try objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject) {
+                    if let backingRelationshipObject = try? backingMOC.existingObjectWithID(backingRelationshipObjectID) {
+                        backingObject.setValue(backingRelationshipObject, forKey: relationship.name)
                     }
                 }
             }
@@ -227,24 +231,35 @@ public class Store: NSIncrementalStore {
         let fetchRequest = NSFetchRequest(entityName: entityName)
         fetchRequest.resultType = .ManagedObjectIDResultType
         fetchRequest.predicate = NSPredicate.sm_UniqueIDEqualsToIDPredicate(referenceObject)
-        let results = try? backingMOC.executeFetchRequest(fetchRequest)
-        return results?.last as? NSManagedObjectID
+        let results = try backingMOC.executeFetchRequest(fetchRequest)
+        return results.last as? NSManagedObjectID
     }
     
     func insertObjectsInBackingStore(objectsToInsert objects:Set<NSManagedObject>, mainContext: NSManagedObjectContext) throws {
         try objects.forEach({ sourceObject in
             let managedObject = NSEntityDescription.insertNewObjectForEntityForName((sourceObject.entity.name)!, inManagedObjectContext: backingMOC) as NSManagedObject
-            let keys = Array(sourceObject.entity.attributeNames)
-            let dictionary = sourceObject.dictionaryWithValuesForKeys(keys)
-            managedObject.setValuesForKeysWithDictionary(dictionary)
             let referenceObject = uniqueIDForObjectID(sourceObject.objectID)
             managedObject.setValue(referenceObject, forKey: EntityAttributes.UniqueID.name)
             try backingMOC.obtainPermanentIDsForObjects([managedObject])
+            setAttributeValuesForBackingObject(managedObject, sourceObject: sourceObject)
             try setRelationshipValuesForBackingObject(managedObject, fromSourceObject: sourceObject)
-            try backingMOC.saveIfHasChanges()
             mainContext.willChangeValueForKey("objectID")
             try mainContext.obtainPermanentIDsForObjects([sourceObject])
             mainContext.didChangeValueForKey("objectID")
+            try backingMOC.saveIfHasChanges()
+        })
+    }
+    
+    private func updateObjectsInBackingStore(objectsToUpdate objects: Set<NSManagedObject>) throws {
+        try objects.forEach({ sourceObject in
+            let recordID = uniqueIDForObjectID(sourceObject.objectID)
+            if let backingObjectID = try objectIDForBackingObjectForEntity(sourceObject.entity.name!, withReferenceObject: recordID) {
+                if let backingObject = try? backingMOC.existingObjectWithID(backingObjectID) {
+                    setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
+                    try setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
+                    try backingMOC.saveIfHasChanges()
+                }
+            }
         })
     }
     
@@ -257,22 +272,7 @@ public class Store: NSIncrementalStore {
             let results = try backingMOC.executeFetchRequest(fetchRequest)
             if let backingObject = results.last as? NSManagedObject {
                 backingMOC.deleteObject(backingObject)
-            }
-            try backingMOC.saveIfHasChanges()
-        })
-    }
-    
-    private func updateObjectsInBackingStore(objectsToUpdate objects: Set<NSManagedObject>) throws {
-        try objects.forEach({ sourceObject in
-            let recordID = uniqueIDForObjectID(sourceObject.objectID)
-            if let backingObjectID = try objectIDForBackingObjectForEntity(sourceObject.entity.name!, withReferenceObject: recordID) {
-                if let backingObject = try? backingMOC.existingObjectWithID(backingObjectID) {
-                    let keys = Array(persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys)
-                    let sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
-                    backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
-                    try setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
-                    try backingMOC.saveIfHasChanges()
-                }
+                try backingMOC.saveIfHasChanges()
             }
         })
     }

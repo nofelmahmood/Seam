@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import CoreData
+@testable import Seam
 
 class StoreFetching: XCTestCase {
     var task: Task!
@@ -41,7 +43,20 @@ class StoreFetching: XCTestCase {
         tags!.forEach { t in
             XCTAssertNotNil(t.name)
             XCTAssertNotNil(tag?.name)
-            XCTAssertEqual(t.name!, tag!.name!)
+        }
+    }
+    
+    func testFetchingOfAllTasksAndThenTagsForEachTask() {
+        let tasks = Task.all(inContext: nil) as? [Task]
+        XCTAssertNotNil(tasks)
+        tasks!.forEach { task in
+            XCTAssertNotNil(task.name)
+            print(task.name!)
+            XCTAssertNotNil(task.tags)
+            task.tags!.forEach { tag in
+                XCTAssertNotNil(tag.name!)
+                print(tag.name!)
+            }
         }
     }
     

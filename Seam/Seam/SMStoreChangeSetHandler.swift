@@ -52,63 +52,6 @@
 //        })
 //    }
 //    
-//    func addExtraBackingStoreAttributes(toEntity entity: NSEntityDescription) {
-//        let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
-//        recordIDAttribute.name = SMLocalStoreRecordIDAttributeName
-//        recordIDAttribute.optional = false
-//        recordIDAttribute.indexed = true
-//        recordIDAttribute.attributeType = NSAttributeType.StringAttributeType
-//        entity.properties.append(recordIDAttribute)
-//        let recordEncodedValuesAttribute: NSAttributeDescription = NSAttributeDescription()
-//        recordEncodedValuesAttribute.name = SMLocalStoreRecordEncodedValuesAttributeName
-//        recordEncodedValuesAttribute.attributeType = NSAttributeType.BinaryDataAttributeType
-//        recordEncodedValuesAttribute.optional = true
-//        entity.properties.append(recordEncodedValuesAttribute)
-//    }
-//    
-//    func changeSetEntity() -> NSEntityDescription {
-//        let changeSetEntity: NSEntityDescription = NSEntityDescription()
-//        changeSetEntity.name = SMLocalStoreChangeSetEntityName
-//        let entityNameAttribute: NSAttributeDescription = NSAttributeDescription()
-//        entityNameAttribute.name = SMLocalStoreEntityNameAttributeName
-//        entityNameAttribute.attributeType = NSAttributeType.StringAttributeType
-//        entityNameAttribute.optional = true
-//        changeSetEntity.properties.append(entityNameAttribute)
-//        let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
-//        recordIDAttribute.name = SMLocalStoreRecordIDAttributeName
-//        recordIDAttribute.attributeType = NSAttributeType.StringAttributeType
-//        recordIDAttribute.optional = false
-//        recordIDAttribute.indexed = true
-//        changeSetEntity.properties.append(recordIDAttribute)
-//        let recordChangedPropertiesAttribute: NSAttributeDescription = NSAttributeDescription()
-//        recordChangedPropertiesAttribute.name = SMLocalStoreRecordChangedPropertiesAttributeName
-//        recordChangedPropertiesAttribute.attributeType = NSAttributeType.StringAttributeType
-//        recordChangedPropertiesAttribute.optional = true
-//        changeSetEntity.properties.append(recordChangedPropertiesAttribute)
-//        let recordChangeTypeAttribute: NSAttributeDescription = NSAttributeDescription()
-//        recordChangeTypeAttribute.name = SMLocalStoreChangeTypeAttributeName
-//        recordChangeTypeAttribute.attributeType = NSAttributeType.Integer16AttributeType
-//        recordChangeTypeAttribute.optional = false
-//        recordChangeTypeAttribute.defaultValue = NSNumber(short: SMLocalStoreRecordChangeType.RecordInserted.rawValue)
-//        changeSetEntity.properties.append(recordChangeTypeAttribute)
-//        let changeTypeQueuedAttribute: NSAttributeDescription = NSAttributeDescription()
-//        changeTypeQueuedAttribute.name = SMLocalStoreChangeQueuedAttributeName
-//        changeTypeQueuedAttribute.optional = false
-//        changeTypeQueuedAttribute.attributeType = NSAttributeType.BooleanAttributeType
-//        changeTypeQueuedAttribute.defaultValue = NSNumber(bool: false)
-//        changeSetEntity.properties.append(changeTypeQueuedAttribute)
-//        return changeSetEntity
-//    }
-//    
-//    func modelForLocalStore(usingModel model: NSManagedObjectModel) -> NSManagedObjectModel {
-//        let backingModel: NSManagedObjectModel = model.copy() as! NSManagedObjectModel
-//        for entity in backingModel.entities {
-//            self.addExtraBackingStoreAttributes(toEntity: entity)
-//        }
-//        backingModel.entities.append(self.changeSetEntity())
-//        return backingModel
-//    }
-//    
 //    // MARK: Creation
 //    func createChangeSet(ForInsertedObjectRecordID recordID: String, entityName: String, backingContext: NSManagedObjectContext) {
 //        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(SMLocalStoreChangeSetEntityName, inManagedObjectContext: backingContext)

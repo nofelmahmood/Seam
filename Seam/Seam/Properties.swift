@@ -40,11 +40,12 @@ struct EntityAttributes {
 
 // MARK: - ChangeSet
 
-struct ChangeSet {
+struct ChangeSetProperties {
+    static let separator = ","
     struct ChangeType {
-        static let Inserted = 0
-        static let Updated = 1
-        static let Deleted = 2
+        static let Inserted = NSNumber(int: 0)
+        static let Updated = NSNumber(int: 1)
+        static let Deleted = NSNumber(int: 2)
     }
     struct Entity {
         static let name = "sm_entity_ChangeSet"
@@ -54,6 +55,8 @@ struct ChangeSet {
             entityDescription.properties.append(Attributes.UniqueID.attributeDescription)
             entityDescription.properties.append(Attributes.ChangeType.attributeDescription)
             entityDescription.properties.append(Attributes.EntityName.attributeDescription)
+            entityDescription.properties.append(Attributes.ChangedProperties.attributeDescription)
+            entityDescription.properties.append(Attributes.ChangeQueued.attributeDescription)
             return entityDescription
         }
         struct Attributes {
@@ -80,6 +83,27 @@ struct ChangeSet {
                     attributeDescription.attributeType = .StringAttributeType
                     attributeDescription.optional = false
                     attributeDescription.indexed = true
+                    return attributeDescription
+                }
+            }
+            struct  ChangedProperties {
+                static let name = "sm_entity_ChangeSet_attribute_changedProperties"
+                static var attributeDescription: NSAttributeDescription {
+                    let attributeDescription = NSAttributeDescription()
+                    attributeDescription.name = name
+                    attributeDescription.attributeType = .StringAttributeType
+                    attributeDescription.optional = true
+                    return attributeDescription
+                }
+            }
+            struct ChangeQueued {
+                static let name = "sm_entity_ChangeSet_attribute_ChangeQueued"
+                static var attributeDescription: NSAttributeDescription {
+                    let attributeDescription = NSAttributeDescription()
+                    attributeDescription.name = name
+                    attributeDescription.attributeType = .BooleanAttributeType
+                    attributeDescription.optional = false
+                    attributeDescription.defaultValue = NSNumber(bool: false)
                     return attributeDescription
                 }
             }

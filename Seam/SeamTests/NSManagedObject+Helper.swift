@@ -9,13 +9,27 @@
 import Foundation
 import CoreData
 
+extension NSManagedObjectContext {
+    class var mainContext: NSManagedObjectContext {
+        return CoreDataStack.defaultStack.managedObjectContext
+    }
+}
+
 extension NSManagedObject {
-    class func all(inContext context: NSManagedObjectContext?) -> [NSManagedObject]? {
-        var managedObjectContext = CoreDataStack.defaultStack.managedObjectContext
-        if let context = context {
-            managedObjectContext = context
+    private class func mainContextIfContextIsNil(context: NSManagedObjectContext?) -> NSManagedObjectContext {
+        guard let context = context else {
+            return NSManagedObjectContext.mainContext
         }
-        let fetchRequest = NSFetchRequest(entityName: NSStringFromClass(self).componentsSeparatedByString(".").last!)
+        return context
+    }
+    
+    private class func className() -> String {
+        return NSStringFromClass(self).componentsSeparatedByString(".").last!
+    }
+    
+    class func all(inContext context: NSManagedObjectContext?) -> [NSManagedObject]? {
+        let managedObjectContext = mainContextIfContextIsNil(context)
+        let fetchRequest = NSFetchRequest(entityName: className())
         if let result = try? managedObjectContext.executeFetchRequest(fetchRequest) {
             return result as? [NSManagedObject]
         }
@@ -23,11 +37,8 @@ extension NSManagedObject {
     }
     
     class func all(inContext context: NSManagedObjectContext?, satisfyingPredicate predicate: NSPredicate) -> [NSManagedObject]? {
-        var managedObjectContext = CoreDataStack.defaultStack.managedObjectContext
-        if let context = context {
-            managedObjectContext = context
-        }
-        let fetchRequest = NSFetchRequest(entityName: NSStringFromClass(self).componentsSeparatedByString(".").last!)
+        let managedObjectContext = mainContextIfContextIsNil(context)
+        let fetchRequest = NSFetchRequest(entityName: className())
         fetchRequest.predicate = predicate
         if let result = try? managedObjectContext.executeFetchRequest(fetchRequest) {
             return result as? [NSManagedObject]
@@ -36,11 +47,8 @@ extension NSManagedObject {
     }
     
     class func all(inContext context: NSManagedObjectContext?, whereKey key: String, isEqualToValue value: NSObject) -> [NSManagedObject]? {
-        var managedObjectContext = CoreDataStack.defaultStack.managedObjectContext
-        if let context = context {
-            managedObjectContext = context
-        }
-        let fetchRequest = NSFetchRequest(entityName: NSStringFromClass(self).componentsSeparatedByString(".").last!)
+        let managedObjectContext = mainContextIfContextIsNil(context)
+        let fetchRequest = NSFetchRequest(entityName: className())
         fetchRequest.predicate = NSPredicate(format: "%K == %@", key,value)
         if let result = try? managedObjectContext.executeFetchRequest(fetchRequest) {
             return result as? [NSManagedObject]
@@ -49,24 +57,29 @@ extension NSManagedObject {
     }
     
     class func new(inContext context: NSManagedObjectContext?) -> NSManagedObject? {
-        var managedObjectContext = CoreDataStack.defaultStack.managedObjectContext
-        if let context = context {
-            managedObjectContext = context
-        }
-        return NSEntityDescription.insertNewObjectForEntityForName(NSStringFromClass(self).componentsSeparatedByString(".").last!, inManagedObjectContext: managedObjectContext)
+        let managedObjectContext = mainContextIfContextIsNil(context)
+        return NSEntityDescription.insertNewObjectForEntityForName(className(), inManagedObjectContext: managedObjectContext)
     }
     
     class func deleteAll(inContext context: NSManagedObjectContext?) throws {
-        var managedObjectContext = CoreDataStack.defaultStack.managedObjectContext
-        if let context = context {
-            managedObjectContext = context
-        }
-        let fetchRequest = NSFetchRequest(entityName: NSStringFromClass(self).componentsSeparatedByString(".").last!)
+        let managedObjectContext = mainContextIfContextIsNil(context)
+        let fetchRequest = NSFetchRequest(entityName: className())
         let objects = try managedObjectContext.executeFetchRequest(fetchRequest)
-        objects.forEach { object in
+        try objects.forEach { object in
             managedObjectContext.deleteObject(object as! NSManagedObject)
+            try managedObjectContext.save()
         }
-        try managedObjectContext.save()
+    }
+    
+    class func deleteAll(inContext context: NSManagedObjectContext?, whereKey key:String, isEqualToValue value: NSObject) throws {
+        let managedObjectContext = mainContextIfContextIsNil(context)
+        let fetchRequest = NSFetchRequest(entityName: className())
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", key,value)
+        let objects = try managedObjectContext.executeFetchRequest(fetchRequest)
+        try objects.forEach { object in
+            managedObjectContext.deleteObject(object as! NSManagedObject)
+            try managedObjectContext.save()
+        }
     }
     
     func addObject(value: NSManagedObject, forKey: String) {

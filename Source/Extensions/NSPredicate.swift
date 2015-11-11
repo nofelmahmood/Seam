@@ -1,4 +1,4 @@
-//    CKRecord+NSManagedObject.swift
+//    NSPredicate.swift
 //
 //    The MIT License (MIT)
 //
@@ -22,41 +22,16 @@
 //    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //    SOFTWARE.
 
-
 import Foundation
-import CoreData
-import CloudKit
 
-extension CKRecord {
-    var encodedSystemFields: NSData {
-        let data = NSMutableData()
-        let coder = NSKeyedArchiver(forWritingWithMutableData: data)
-        encodeSystemFieldsWithCoder(coder)
-        coder.finishEncoding()
-        return data
-    }
-    
-    class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord {
-        let coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)
-        let record = CKRecord(coder: coder)!
-        coder.finishDecoding()
-        return record
-    }
-    
-    class func recordWithChange(change: Change) -> CKRecord? {
-        guard !change.isDeletedType else {
-            return nil
-        }
-        var record: CKRecord?
-        if let encodedFields = change.changedObjectEncodedValues {
-            record = CKRecord.recordWithEncodedFields(encodedFields)
-        } else {
-            let recordID = CKRecordID(change: change)
-            record = CKRecord(recordType: change.entityName, recordID: recordID)
-        }
-        if let valuesDictionary = change.changedPropertyValuesDictionary {
-            record?.setValuesForKeysWithDictionary(valuesDictionary)
-        }
-        return record
-    }
+extension NSPredicate {
+  convenience init(equalsToUniqueID id: String) {
+    self.init(format: "%K == %@", UniqueID.name,id)
+  }
+  convenience init(inUniqueIDs ids: [String]) {
+    self.init(format: "%K IN %@",UniqueID.name,ids)
+  }
+  convenience init(changeIsQueued queued: Bool) {
+    self.init(format: "%K == %@", Change.Properties.ChangeQueued.name,queued)
+  }
 }

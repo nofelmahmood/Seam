@@ -1,4 +1,4 @@
-//    NSManagedObjectContext+Helpers.swift
+//    NSEntityDescription+Helpers.swift
 //
 //    The MIT License (MIT)
 //
@@ -26,11 +26,42 @@
 import Foundation
 import CoreData
 
-extension NSManagedObjectContext {
-    
-    func saveIfHasChanges() throws {
-        if self.hasChanges {
-            try self.save()
-        }
-    }
+extension NSEntityDescription {
+  var propertyNamesToFetch: [String] {
+    return attributeNames + toOneRelationshipNames
+  }
+  
+  var attributes: [NSAttributeDescription] {
+    return Array(attributesByName.values)
+  }
+  
+  var attributeNames: [String] {
+    return Array(attributesByName.keys)
+  }
+  
+  var relationships: [NSRelationshipDescription] {
+    return Array(relationshipsByName.values)
+  }
+  
+  var relationshipNames: [String] {
+    return Array(relationshipsByName.keys)
+  }
+  
+  var toOneRelationships: [NSRelationshipDescription] {
+    return Array(relationshipsByName.values).filter({ $0.toMany == false })
+  }
+  
+  var toOneRelationshipNames: [String] {
+    return Array(toOneRelationshipsByName.keys)
+  }
+  
+  var toOneRelationshipsByName: [String:NSRelationshipDescription] {
+    var dictionary = [String: NSRelationshipDescription]()
+    relationshipsByName.forEach({ (key,value) in
+      if value.toMany == false {
+        dictionary[key] = value
+      }
+    })
+    return dictionary
+  }
 }

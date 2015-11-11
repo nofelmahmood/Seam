@@ -1,4 +1,4 @@
-//    Properties.swift
+//    Token.swift
 //
 //    The MIT License (MIT)
 //
@@ -23,33 +23,42 @@
 //    SOFTWARE.
 
 import Foundation
-import CoreData
+import CloudKit
 
-public let SeamStoreType = Store.type
-
-struct Options {
-  static let ConflictResolutionPolicy = "SMConflictResolutionPolicy"
-}
-
-struct UniqueID {
-  static let name = "sm_recordID_Attribute"
-  static var attributeDescription: NSAttributeDescription {
-    let attributeDescription = NSAttributeDescription()
-    attributeDescription.name = name
-    attributeDescription.attributeType = .StringAttributeType
-    attributeDescription.optional = false
-    attributeDescription.indexed = true
-    return attributeDescription
+class Token {
+  static let Key = "com.seam.syncToken.key"
+  private var newToken: CKServerChangeToken?
+  static let sharedToken = Token()
+  
+  func rawToken() -> CKServerChangeToken? {
+    guard let rawToken = NSUserDefaults.standardUserDefaults().objectForKey(Token.Key) as? NSData else {
+      return nil
+    }
+    return NSKeyedUnarchiver.unarchiveObjectWithData(rawToken) as? CKServerChangeToken
   }
-}
-
-struct EncodedValues {
-  static let name = "sm_encodedValues_Attribute"
-  static var attributeDescription: NSAttributeDescription {
-    let attributeDescription = NSAttributeDescription()
-    attributeDescription.name = name
-    attributeDescription.attributeType = .BinaryDataAttributeType
-    attributeDescription.optional = true
-    return attributeDescription
+  
+  func save(token: CKServerChangeToken) {
+    newToken = token
+  }
+  
+  func discard() {
+    newToken = nil
+  }
+  
+  func unCommittedToken() -> CKServerChangeToken? {
+    return newToken
+  }
+  
+  func commit() {
+    guard let newToken = newToken else {
+      return
+    }
+    let archivedToken = NSKeyedArchiver.archivedDataWithRootObject(newToken)
+    NSUserDefaults.standardUserDefaults().setObject(archivedToken, forKey: Token.Key)
+  }
+  
+  func reset() {
+    discard()
+    NSUserDefaults.standardUserDefaults().setObject(nil, forKey: Token.Key)
   }
 }

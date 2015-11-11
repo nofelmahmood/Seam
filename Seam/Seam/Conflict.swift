@@ -1,4 +1,4 @@
-//    Properties.swift
+//    Conflict.swift
 //
 //    The MIT License (MIT)
 //
@@ -23,33 +23,19 @@
 //    SOFTWARE.
 
 import Foundation
+import CloudKit
 import CoreData
 
-public let SeamStoreType = Store.type
-
-struct Options {
-  static let ConflictResolutionPolicy = "SMConflictResolutionPolicy"
-}
-
-struct UniqueID {
-  static let name = "sm_recordID_Attribute"
-  static var attributeDescription: NSAttributeDescription {
-    let attributeDescription = NSAttributeDescription()
-    attributeDescription.name = name
-    attributeDescription.attributeType = .StringAttributeType
-    attributeDescription.optional = false
-    attributeDescription.indexed = true
-    return attributeDescription
-  }
-}
-
-struct EncodedValues {
-  static let name = "sm_encodedValues_Attribute"
-  static var attributeDescription: NSAttributeDescription {
-    let attributeDescription = NSAttributeDescription()
-    attributeDescription.name = name
-    attributeDescription.attributeType = .BinaryDataAttributeType
-    attributeDescription.optional = true
-    return attributeDescription
+class Conflict {
+  var entity: NSEntityDescription!
+  var serverRecordID: CKRecordID!
+  var clientVersion: [String: AnyObject]!
+  var serverVersion: [String: AnyObject]!
+  
+  init(serverRecordID: CKRecordID,entity: NSEntityDescription,clientVersion: [String: AnyObject], serverVersion: [String: AnyObject]) {
+    self.serverRecordID = serverRecordID
+    self.entity = entity
+    self.clientVersion = clientVersion
+    self.serverVersion = serverVersion
   }
 }

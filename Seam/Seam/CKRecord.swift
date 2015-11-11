@@ -1,4 +1,4 @@
-//    NSEntityDescription+Helpers.swift
+//    CKRecord+NSManagedObject.swift
 //
 //    The MIT License (MIT)
 //
@@ -25,43 +25,38 @@
 
 import Foundation
 import CoreData
+import CloudKit
 
-extension NSEntityDescription {
-    var propertyNamesToFetch: [String] {
-        return attributeNames + toOneRelationshipNames
+extension CKRecord {
+    var encodedSystemFields: NSData {
+        let data = NSMutableData()
+        let coder = NSKeyedArchiver(forWritingWithMutableData: data)
+        encodeSystemFieldsWithCoder(coder)
+        coder.finishEncoding()
+        return data
     }
     
-    var attributes: [NSAttributeDescription] {
-        return Array(attributesByName.values)
+    class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord {
+        let coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)
+        let record = CKRecord(coder: coder)!
+        coder.finishDecoding()
+        return record
     }
     
-    var attributeNames: [String] {
-        return Array(attributesByName.keys)
-    }
-    
-    var relationships: [NSRelationshipDescription] {
-        return Array(relationshipsByName.values)
-    }
-    
-    var relationshipNames: [String] {
-        return Array(relationshipsByName.keys)
-    }
-    
-    var toOneRelationships: [NSRelationshipDescription] {
-        return Array(relationshipsByName.values).filter({ $0.toMany == false })
-    }
-    
-    var toOneRelationshipNames: [String] {
-        return Array(toOneRelationshipsByName.keys)
-    }
-    
-    var toOneRelationshipsByName: [String:NSRelationshipDescription] {
-        var dictionary = [String: NSRelationshipDescription]()
-        relationshipsByName.forEach({ (key,value) in
-            if value.toMany == false {
-                dictionary[key] = value
-            }
-        })
-        return dictionary
+    class func recordWithChange(change: Change) -> CKRecord? {
+        guard !change.isDeletedType else {
+            return nil
+        }
+        var record: CKRecord?
+        if let encodedFields = change.changedObjectEncodedValues {
+            record = CKRecord.recordWithEncodedFields(encodedFields)
+        } else {
+            let recordID = CKRecordID(change: change)
+            record = CKRecord(recordType: change.entityName, recordID: recordID)
+        }
+        if let valuesDictionary = change.changedPropertyValuesDictionary {
+            record?.setValuesForKeysWithDictionary(valuesDictionary)
+        }
+        return record
     }
 }

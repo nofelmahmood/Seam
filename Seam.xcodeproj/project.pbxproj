@@ -34,6 +34,8 @@
 		3E8252141BF3534A008B3E86 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E82520D1BF3534A008B3E86 /* Token.swift */; };
 		3E8252151BF3534A008B3E86 /* Zone.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E82520E1BF3534A008B3E86 /* Zone.swift */; };
 		3E82521D1BF353E6008B3E86 /* Seam.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E82521B1BF353E6008B3E86 /* Seam.h */; };
+		3EBF6BC01BF37CB300A8B7C3 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6BBF1BF37CB300A8B7C3 /* CloudKit.framework */; };
+		3EBF6BC21BF37CB900A8B7C3 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6BC11BF37CB900A8B7C3 /* CoreData.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +79,8 @@
 		3E82520E1BF3534A008B3E86 /* Zone.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Zone.swift; path = Source/Core/Zone.swift; sourceTree = SOURCE_ROOT; };
 		3E82521B1BF353E6008B3E86 /* Seam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Seam.h; path = /Users/NofelMahmood/Dropbox/Code/Organizations/CloudKitSpace/Seam/Seam/Seam/Seam.h; sourceTree = "<absolute>"; };
 		3E8E26C11B7B11BD009C47EA /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3EBF6BBF1BF37CB300A8B7C3 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		3EBF6BC11BF37CB900A8B7C3 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +96,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3EBF6BC21BF37CB900A8B7C3 /* CoreData.framework in Frameworks */,
+				3EBF6BC01BF37CB300A8B7C3 /* CloudKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -179,6 +185,8 @@
 		3E8E26B71B7B11BD009C47EA = {
 			isa = PBXGroup;
 			children = (
+				3EBF6BC11BF37CB900A8B7C3 /* CoreData.framework */,
+				3EBF6BBF1BF37CB300A8B7C3 /* CloudKit.framework */,
 				3E8E26C31B7B11BD009C47EA /* Seam */,
 				3E3CE27D1BF36B6D00C7F66D /* Info.plist */,
 				3E3CE27E1BF36B6D00C7F66D /* Seam.h */,
@@ -476,6 +484,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -501,6 +510,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -531,6 +541,7 @@
 				3E3CE2BF1BF36F1800C7F66D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3E8E26BB1B7B11BD009C47EA /* Build configuration list for PBXProject "Seam" */ = {
 			isa = XCConfigurationList;

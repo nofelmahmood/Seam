@@ -25,7 +25,7 @@
 import Foundation
 import CoreData
 
-public let SeamStoreType = Store.type
+public  let SeamStoreType = Store.type
 
 struct Options {
   static let ConflictResolutionPolicy = "SMConflictResolutionPolicy"

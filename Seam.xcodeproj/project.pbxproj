@@ -36,13 +36,8 @@
 		3E82521D1BF353E6008B3E86 /* Seam.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E82521B1BF353E6008B3E86 /* Seam.h */; };
 		3EBF6BC01BF37CB300A8B7C3 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6BBF1BF37CB300A8B7C3 /* CloudKit.framework */; };
 		3EBF6BC21BF37CB900A8B7C3 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6BC11BF37CB900A8B7C3 /* CoreData.framework */; };
-		3EBF6BCD1BF3836D00A8B7C3 /* Seam tvOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 3EBF6BCC1BF3836D00A8B7C3 /* Seam tvOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3EBF6BD41BF3836D00A8B7C3 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6BCA1BF3836C00A8B7C3 /* Seam.framework */; };
-		3EBF6BD91BF3836D00A8B7C3 /* Seam_tvOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBF6BD81BF3836D00A8B7C3 /* Seam_tvOSTests.swift */; };
-		3EBF6BE91BF3838700A8B7C3 /* Seam OSX.h in Headers */ = {isa = PBXBuildFile; fileRef = 3EBF6BE81BF3838700A8B7C3 /* Seam OSX.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3EBF6BF01BF3838700A8B7C3 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6BE61BF3838700A8B7C3 /* Seam.framework */; };
-		3EBF6BF51BF3838700A8B7C3 /* Seam_OSXTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBF6BF41BF3838700A8B7C3 /* Seam_OSXTests.swift */; };
-		3EBF6C051BF383AD00A8B7C3 /* Seam watchOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 3EBF6C041BF383AD00A8B7C3 /* Seam watchOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,20 +98,10 @@
 		3EBF6BBF1BF37CB300A8B7C3 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3EBF6BC11BF37CB900A8B7C3 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3EBF6BCA1BF3836C00A8B7C3 /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3EBF6BCC1BF3836D00A8B7C3 /* Seam tvOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Seam tvOS.h"; sourceTree = "<group>"; };
-		3EBF6BCE1BF3836D00A8B7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3EBF6BD31BF3836D00A8B7C3 /* Seam tvOS Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Seam tvOS Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3EBF6BD81BF3836D00A8B7C3 /* Seam_tvOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seam_tvOSTests.swift; sourceTree = "<group>"; };
-		3EBF6BDA1BF3836D00A8B7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3EBF6BE61BF3838700A8B7C3 /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3EBF6BE81BF3838700A8B7C3 /* Seam OSX.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Seam OSX.h"; sourceTree = "<group>"; };
-		3EBF6BEA1BF3838700A8B7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3EBF6BEF1BF3838700A8B7C3 /* Seam OSX Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Seam OSX Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3EBF6BF41BF3838700A8B7C3 /* Seam_OSXTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Seam_OSXTests.swift; sourceTree = "<group>"; };
-		3EBF6BF61BF3838700A8B7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		3EBF6C021BF383AD00A8B7C3 /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		3EBF6C041BF383AD00A8B7C3 /* Seam watchOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Seam watchOS.h"; sourceTree = "<group>"; };
-		3EBF6C061BF383AD00A8B7C3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -264,11 +249,6 @@
 				3E3CE27D1BF36B6D00C7F66D /* Info.plist */,
 				3E3CE27E1BF36B6D00C7F66D /* Seam.h */,
 				3E3CE2B61BF36F1800C7F66D /* Tests */,
-				3EBF6BCB1BF3836D00A8B7C3 /* Seam tvOS */,
-				3EBF6BD71BF3836D00A8B7C3 /* Seam tvOSTests */,
-				3EBF6BE71BF3838700A8B7C3 /* Seam OSX */,
-				3EBF6BF31BF3838700A8B7C3 /* Seam OSXTests */,
-				3EBF6C031BF383AD00A8B7C3 /* Seam watchOS */,
 				3E8E26C21B7B11BD009C47EA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -296,51 +276,6 @@
 			path = Seam;
 			sourceTree = "<group>";
 		};
-		3EBF6BCB1BF3836D00A8B7C3 /* Seam tvOS */ = {
-			isa = PBXGroup;
-			children = (
-				3EBF6BCC1BF3836D00A8B7C3 /* Seam tvOS.h */,
-				3EBF6BCE1BF3836D00A8B7C3 /* Info.plist */,
-			);
-			path = "Seam tvOS";
-			sourceTree = "<group>";
-		};
-		3EBF6BD71BF3836D00A8B7C3 /* Seam tvOSTests */ = {
-			isa = PBXGroup;
-			children = (
-				3EBF6BD81BF3836D00A8B7C3 /* Seam_tvOSTests.swift */,
-				3EBF6BDA1BF3836D00A8B7C3 /* Info.plist */,
-			);
-			path = "Seam tvOSTests";
-			sourceTree = "<group>";
-		};
-		3EBF6BE71BF3838700A8B7C3 /* Seam OSX */ = {
-			isa = PBXGroup;
-			children = (
-				3EBF6BE81BF3838700A8B7C3 /* Seam OSX.h */,
-				3EBF6BEA1BF3838700A8B7C3 /* Info.plist */,
-			);
-			path = "Seam OSX";
-			sourceTree = "<group>";
-		};
-		3EBF6BF31BF3838700A8B7C3 /* Seam OSXTests */ = {
-			isa = PBXGroup;
-			children = (
-				3EBF6BF41BF3838700A8B7C3 /* Seam_OSXTests.swift */,
-				3EBF6BF61BF3838700A8B7C3 /* Info.plist */,
-			);
-			path = "Seam OSXTests";
-			sourceTree = "<group>";
-		};
-		3EBF6C031BF383AD00A8B7C3 /* Seam watchOS */ = {
-			isa = PBXGroup;
-			children = (
-				3EBF6C041BF383AD00A8B7C3 /* Seam watchOS.h */,
-				3EBF6C061BF383AD00A8B7C3 /* Info.plist */,
-			);
-			path = "Seam watchOS";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -357,7 +292,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3EBF6BCD1BF3836D00A8B7C3 /* Seam tvOS.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,7 +299,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3EBF6BE91BF3838700A8B7C3 /* Seam OSX.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -373,7 +306,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3EBF6C051BF383AD00A8B7C3 /* Seam watchOS.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -664,7 +596,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3EBF6BD91BF3836D00A8B7C3 /* Seam_tvOSTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -679,7 +610,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3EBF6BF51BF3838700A8B7C3 /* Seam_OSXTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -882,7 +812,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Seam tvOS/Info.plist";
+				INFOPLIST_FILE = Source/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudkitspace.Seam-tvOS";
@@ -901,7 +831,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Seam tvOS/Info.plist";
+				INFOPLIST_FILE = Source/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudkitspace.Seam-tvOS";
@@ -916,7 +846,7 @@
 		3EBF6BDF1BF3836D00A8B7C3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = "Seam tvOSTests/Info.plist";
+				INFOPLIST_FILE = Seam/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudkitspace.Seam-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -928,7 +858,7 @@
 		3EBF6BE01BF3836D00A8B7C3 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = "Seam tvOSTests/Info.plist";
+				INFOPLIST_FILE = Seam/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudkitspace.Seam-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -947,7 +877,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "Seam OSX/Info.plist";
+				INFOPLIST_FILE = Source/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -968,7 +898,7 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				INFOPLIST_FILE = "Seam OSX/Info.plist";
+				INFOPLIST_FILE = Source/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -984,7 +914,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "Seam OSXTests/Info.plist";
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudkitspace.Seam-OSXTests";
@@ -998,7 +928,7 @@
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "-";
 				COMBINE_HIDPI_IMAGES = YES;
-				INFOPLIST_FILE = "Seam OSXTests/Info.plist";
+				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudkitspace.Seam-OSXTests";
@@ -1015,7 +945,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Seam watchOS/Info.plist";
+				INFOPLIST_FILE = Source/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudkitspace.Seam-watchOS";
@@ -1035,7 +965,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "Seam watchOS/Info.plist";
+				INFOPLIST_FILE = Source/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cloudkitspace.Seam-watchOS";
@@ -1084,6 +1014,7 @@
 				3EBF6BDD1BF3836D00A8B7C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3EBF6BDE1BF3836D00A8B7C3 /* Build configuration list for PBXNativeTarget "Seam tvOS Tests" */ = {
 			isa = XCConfigurationList;
@@ -1092,6 +1023,7 @@
 				3EBF6BE01BF3836D00A8B7C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3EBF6BF71BF3838700A8B7C3 /* Build configuration list for PBXNativeTarget "Seam OSX" */ = {
 			isa = XCConfigurationList;
@@ -1100,6 +1032,7 @@
 				3EBF6BF91BF3838700A8B7C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3EBF6BFA1BF3838700A8B7C3 /* Build configuration list for PBXNativeTarget "Seam OSX Tests" */ = {
 			isa = XCConfigurationList;
@@ -1108,6 +1041,7 @@
 				3EBF6BFC1BF3838700A8B7C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		3EBF6C071BF383AD00A8B7C3 /* Build configuration list for PBXNativeTarget "Seam watchOS" */ = {
 			isa = XCConfigurationList;
@@ -1116,6 +1050,7 @@
 				3EBF6C091BF383AD00A8B7C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

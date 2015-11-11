@@ -4,6 +4,21 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>Seam OSX.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>3</integer>
+		</dict>
+		<key>Seam tvOS.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
+		<key>Seam watchOS.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
 		<key>Seam.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -48,6 +63,31 @@
 			<true/>
 		</dict>
 		<key>3EBF6B921BF37C1100A8B7C3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3EBF6BC91BF3836C00A8B7C3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3EBF6BD21BF3836D00A8B7C3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3EBF6BE51BF3838700A8B7C3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3EBF6BEE1BF3838700A8B7C3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>3EBF6C011BF383AD00A8B7C3</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -34,6 +34,7 @@ class Store: NSIncrementalStore {
     case PersistentStoreInitializationFailed
     case InvalidRequest
   }
+  
   private var backingPSC: NSPersistentStoreCoordinator?
   private lazy var backingMOC: NSManagedObjectContext = {
     var backingMOC = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
@@ -190,6 +191,10 @@ class Store: NSIncrementalStore {
         return try executeFetchRequest(fetchRequest, context: context)
       } else if let saveChangesRequest = request as? NSSaveChangesRequest {
         return try executeSaveChangesRequest(saveChangesRequest, context: context)
+      } else if let batchUpdateRequest = request as? NSBatchUpdateRequest {
+        return try executeBatchUpdateRequest(batchUpdateRequest, context: context)
+      } else if let batchDeleteRequest = request as? NSBatchDeleteRequest {
+        return try executeBatchDeleteRequest(batchDeleteRequest, context: context)
       } else {
         throw Error.InvalidRequest
       }
@@ -234,12 +239,12 @@ class Store: NSIncrementalStore {
   
   func insertObjectsInBackingStore(objectsToInsert objects:Set<NSManagedObject>, mainContext: NSManagedObjectContext) throws {
     try objects.forEach { sourceObject in
-      let managedObject = NSEntityDescription.insertNewObjectForEntityForName((sourceObject.entity.name)!, inManagedObjectContext: backingMOC) as NSManagedObject
+      let backingObject = NSEntityDescription.insertNewObjectForEntityForName((sourceObject.entity.name)!, inManagedObjectContext: backingMOC) as NSManagedObject
       let referenceObject = uniqueIDForObjectID(sourceObject.objectID)
-      managedObject.setValue(referenceObject, forKey: UniqueID.name)
-      try backingMOC.obtainPermanentIDsForObjects([managedObject])
-      setAttributeValuesForBackingObject(managedObject, sourceObject: sourceObject)
-      try setRelationshipValuesForBackingObject(managedObject, fromSourceObject: sourceObject)
+      backingObject.setValue(referenceObject, forKey: UniqueID.name)
+      try backingMOC.obtainPermanentIDsForObjects([backingObject])
+      setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
+      try setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
       mainContext.willChangeValueForKey("objectID")
       try mainContext.obtainPermanentIDsForObjects([sourceObject])
       mainContext.didChangeValueForKey("objectID")
@@ -275,5 +280,20 @@ class Store: NSIncrementalStore {
         try backingMOC.save()
       }
     }
+  }
+  
+  // MARK: BatchUpdateRequest
+  
+  func executeBatchUpdateRequest(batchUpdateRequest: NSBatchUpdateRequest, context: NSManagedObjectContext) throws -> AnyObject {
+    let request = NSBatchUpdateRequest(entityName: batchUpdateRequest.entityName)
+    request.predicate = batchUpdateRequest.predicate
+    request.propertiesToUpdate = batchUpdateRequest.propertiesToUpdate
+    return try context.executeRequest(request)
+  }
+  
+  // MARK: BatchDeleteRequest
+  
+  func executeBatchDeleteRequest(batchDeleteRequest: NSBatchDeleteRequest, context: NSManagedObjectContext) throws -> AnyObject {
+    return try context.executeRequest(batchDeleteRequest)
   }
 }

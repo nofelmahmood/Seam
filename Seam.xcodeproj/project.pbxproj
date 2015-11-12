@@ -282,11 +282,10 @@
 		3E8E26B71B7B11BD009C47EA = {
 			isa = PBXGroup;
 			children = (
-				3EBF6BC11BF37CB900A8B7C3 /* CoreData.framework */,
-				3EBF6BBF1BF37CB300A8B7C3 /* CloudKit.framework */,
 				3E8E26C31B7B11BD009C47EA /* Seam */,
 				3E3CE27D1BF36B6D00C7F66D /* Info.plist */,
 				3E3CE27E1BF36B6D00C7F66D /* Seam.h */,
+				3EBF6C4D1BF397F900A8B7C3 /* Frameworks */,
 				3E3CE2B61BF36F1800C7F66D /* Tests */,
 				3E8E26C21B7B11BD009C47EA /* Products */,
 			);
@@ -312,6 +311,16 @@
 				3E191DF41B7B52A900BB9E71 /* Extensions */,
 				3E191DF31B7B52A400BB9E71 /* Core */,
 			);
+			path = Seam;
+			sourceTree = "<group>";
+		};
+		3EBF6C4D1BF397F900A8B7C3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3EBF6BC11BF37CB900A8B7C3 /* CoreData.framework */,
+				3EBF6BBF1BF37CB300A8B7C3 /* CloudKit.framework */,
+			);
+			name = Frameworks;
 			path = Seam;
 			sourceTree = "<group>";
 		};

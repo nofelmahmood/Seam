@@ -248,7 +248,7 @@ class Store: NSIncrementalStore {
       mainContext.willChangeValueForKey("objectID")
       try mainContext.obtainPermanentIDsForObjects([sourceObject])
       mainContext.didChangeValueForKey("objectID")
-      try changeManager.new(managedObject)
+      try changeManager.new(backingObject)
       try backingMOC.save()
     }
   }
@@ -275,8 +275,8 @@ class Store: NSIncrementalStore {
       fetchRequest.includesPropertyValues = false
       let results = try backingMOC.executeFetchRequest(fetchRequest)
       if let backingObject = results.last as? NSManagedObject {
-        try changeManager.new(backingObject)
         backingMOC.deleteObject(backingObject)
+        try changeManager.new(backingObject)
         try backingMOC.save()
       }
     }

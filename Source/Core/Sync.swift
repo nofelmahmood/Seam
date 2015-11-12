@@ -123,8 +123,10 @@ class Sync: NSOperation {
       fetchRequest.predicate = NSPredicate(equalsToUniqueID: record.recordID.recordName)
       if let managedObject = try context.executeFetchRequest(fetchRequest).first as? NSManagedObject {
         managedObject.setValue(record.encodedSystemFields, forKey: EncodedValues.name)
-        try context.save()
       }
+    }
+    if context.hasChanges {
+      try context.save()
     }
   }
   
@@ -219,8 +221,10 @@ class Sync: NSOperation {
               }
             }
           }
+          if context.hasChanges {
+            try context.save()
+          }
         }
-        try context.save()
       }
     }
   }

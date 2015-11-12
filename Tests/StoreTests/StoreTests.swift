@@ -33,6 +33,7 @@ class StoreTests: XCTestCase {
     let tag = Tag.new(inContext: nil) as? Tag
     XCTAssertNotNil(tag)
     tag!.name = "New Tag"
+    tag!.task = task
     XCTAssertNotNil(try? CoreDataStack.defaultStack.managedObjectContext.save())
   }
   

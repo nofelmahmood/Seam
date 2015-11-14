@@ -26,8 +26,15 @@ import Foundation
 import CloudKit
 
 struct Zone {
+  static let errorDomain = "com.seam.error.zone.errorDomain"
+  enum Error: ErrorType {
+    case ZoneCreationFailed
+    case ZoneSubscriptionCreationFailed
+  }
   static let name = "Seam_CustomZone"
   static let subscriptionName = "Seam_CustomZone_Subscription"
+  static let nameKey = "com.seam.zone"
+  static let subscriptionNameKey = "com.seam.zone.subscription"
   static var zone: CKRecordZone {
     return CKRecordZone(zoneID: zoneID)
   }
@@ -35,28 +42,42 @@ struct Zone {
     return CKRecordZoneID(zoneName: name, ownerName: CKOwnerDefaultName)
   }
   private static var zoneExists: Bool {
-    return NSUserDefaults.standardUserDefaults().objectForKey("com.seam.zone") != nil ? true: false
+    return NSUserDefaults.standardUserDefaults().objectForKey(nameKey) != nil ? true: false
   }
   private static var zoneSubscriptionExists: Bool {
-    return NSUserDefaults.standardUserDefaults().objectForKey("com.seam.zone.subscription") != nil ? true : false
+    return NSUserDefaults.standardUserDefaults().objectForKey(subscriptionNameKey) != nil ? true : false
+  }
+  static func createZone(operationQueue: NSOperationQueue) throws {
+    var error: NSError?
+    let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
+    modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = { (_,_,operationError) in
+      error = operationError
+    }
+    operationQueue.addOperation(modifyRecordZonesOperation)
+    operationQueue.waitUntilAllOperationsAreFinished()
+    guard error == nil else {
+      throw Error.ZoneCreationFailed
+    }
+    NSUserDefaults.standardUserDefaults().setBool(true, forKey: nameKey)
   }
   
-  static func createZone(completionBlock: ((error: NSError?)->())?) {
-    CKContainer.defaultContainer().privateCloudDatabase.saveRecordZone(zone, completionHandler: {
-      zone,error in
-      completionBlock?(error: error)
-    })
-  }
-  
-  static func createSubscription(completionBlock: ((error: NSError?) -> ())?) {
+  static func createSubscription(operationQueue: NSOperationQueue) throws {
+    var error: NSError?
     let subscription = CKSubscription(zoneID: zoneID, subscriptionID: name, options: CKSubscriptionOptions(rawValue: 0))
     let subscriptionNotificationInfo = CKNotificationInfo()
     subscriptionNotificationInfo.alertBody = ""
     subscriptionNotificationInfo.shouldSendContentAvailable = true
     subscription.notificationInfo = subscriptionNotificationInfo
     subscriptionNotificationInfo.shouldBadge = false
-    CKContainer.defaultContainer().privateCloudDatabase.saveSubscription(subscription, completionHandler: { subscription,error in
-      completionBlock?(error: error)
-    })
+    let modifyZoneSubscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
+    modifyZoneSubscriptionsOperation.modifySubscriptionsCompletionBlock = { (_,_,operationError) in
+      error = operationError
+    }
+    operationQueue.addOperation(modifyZoneSubscriptionsOperation)
+    operationQueue.waitUntilAllOperationsAreFinished()
+    guard error == nil else {
+      throw Error.ZoneSubscriptionCreationFailed
+    }
+    NSUserDefaults.standardUserDefaults().setBool(true, forKey: subscriptionNameKey)
   }
 }

@@ -62,27 +62,6 @@
 			remoteGlobalIDString = 3EBF6BEF1BF3838700A8B7C3;
 			remoteInfo = "Seam OSX Tests";
 		};
-		3EBF6C471BF397C600A8B7C3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3EBF6BCA1BF3836C00A8B7C3;
-			remoteInfo = "Seam tvOS";
-		};
-		3EBF6C491BF397C600A8B7C3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3EBF6BD31BF3836D00A8B7C3;
-			remoteInfo = "Seam tvOS Tests";
-		};
-		3EBF6C4B1BF397C600A8B7C3 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3EBF6C021BF383AD00A8B7C3;
-			remoteInfo = "Seam watchOS";
-		};
 		3EBF6C501BF3989B00A8B7C3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
@@ -158,7 +137,6 @@
 				3E0B27F51BE86B9A0002173B /* Task.swift */,
 				3E0B27F61BE86B9A0002173B /* Tag+CoreDataProperties.swift */,
 				3E0B27F71BE86B9B0002173B /* Tag.swift */,
-				3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */,
 			);
 			name = "CoreData Models";
 			sourceTree = "<group>";
@@ -191,6 +169,7 @@
 				3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */,
 				3E191E351B7B6CD300BB9E71 /* ViewController.swift */,
 				3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */,
+				3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */,
 				3E191E371B7B6CD300BB9E71 /* Main.storyboard */,
 				3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */,
 				3E191E3F1B7B6CD300BB9E71 /* LaunchScreen.storyboard */,
@@ -226,9 +205,6 @@
 				3EBF6C421BF397C600A8B7C3 /* Seam iOS Tests.xctest */,
 				3EBF6C441BF397C600A8B7C3 /* Seam.framework */,
 				3EBF6C461BF397C600A8B7C3 /* Seam OSX Tests.xctest */,
-				3EBF6C481BF397C600A8B7C3 /* Seam.framework */,
-				3EBF6C4A1BF397C600A8B7C3 /* Seam tvOS Tests.xctest */,
-				3EBF6C4C1BF397C600A8B7C3 /* Seam.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -352,27 +328,6 @@
 			fileType = wrapper.cfbundle;
 			path = "Seam OSX Tests.xctest";
 			remoteRef = 3EBF6C451BF397C600A8B7C3 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3EBF6C481BF397C600A8B7C3 /* Seam.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Seam.framework;
-			remoteRef = 3EBF6C471BF397C600A8B7C3 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3EBF6C4A1BF397C600A8B7C3 /* Seam tvOS Tests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = "Seam tvOS Tests.xctest";
-			remoteRef = 3EBF6C491BF397C600A8B7C3 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		3EBF6C4C1BF397C600A8B7C3 /* Seam.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = Seam.framework;
-			remoteRef = 3EBF6C4B1BF397C600A8B7C3 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

@@ -48,7 +48,7 @@ class Store: NSIncrementalStore {
     NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: type)
   }
   
-  class internal var type:String {
+  class internal var type: String {
     return NSStringFromClass(self)
   }
   
@@ -68,6 +68,13 @@ class Store: NSIncrementalStore {
       throw Error.CreationFailed
     }
     changeManager = Change.Manager(managedObjectContext: backingMOC)
+    sync()
+  }
+  
+  func sync() {
+    let sync = Sync(backingPersistentStoreCoordinator: backingPSC!, persistentStoreCoordinator: persistentStoreCoordinator!)
+    let operationQueue = NSOperationQueue()
+    operationQueue.addOperation(sync)
   }
   
   // MARK: - Translation

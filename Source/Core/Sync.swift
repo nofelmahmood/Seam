@@ -53,12 +53,19 @@ class Sync: NSOperation {
   override func main() {
     context = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
     context.persistentStoreCoordinator = backingPersistentStoreCoordinator
+    changeManager = Change.Manager(managedObjectContext: context)
     do {
-      try self.perform()
+      try setup()
+      try perform()
       syncCompletionBlock?(syncError: nil)
     } catch {
       syncCompletionBlock?(syncError: error)
     }
+  }
+  
+  func setup() throws {
+    try Zone.createZone(operationQueue)
+    try Zone.createSubscription(operationQueue)
   }
   
   func perform() throws {
@@ -99,20 +106,18 @@ class Sync: NSOperation {
     var recordsWithConflict = [CKRecord]()
     var allSavedRecords = [CKRecord]()
     let modifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: changes.insertedOrUpdatedCKRecords, recordIDsToDelete: changes.deletedCKRecordIDs)
-    modifyRecordsOperation.perRecordCompletionBlock = ({(record, error)->Void in
-      if let error = error {
-        if error.code == CKErrorCode.ServerRecordChanged.rawValue {
-          if let record = record {
-            recordsWithConflict.append(record)
-          }
+    modifyRecordsOperation.perRecordCompletionBlock = { (record, error) in
+      if let error = error where error.code == CKErrorCode.ServerRecordChanged.rawValue {
+        if let record = record {
+          recordsWithConflict.append(record)
         }
       }
-    })
-    modifyRecordsOperation.modifyRecordsCompletionBlock = ({(savedRecords,deletedRecordIDs,error) -> Void in
+    }
+    modifyRecordsOperation.modifyRecordsCompletionBlock =  { (savedRecords,deletedRecordIDs,error) in
       if let savedRecords = savedRecords {
         allSavedRecords.appendContentsOf(savedRecords)
       }
-    })
+    }
     operationQueue.addOperation(modifyRecordsOperation)
     operationQueue.waitUntilAllOperationsAreFinished()
     guard recordsWithConflict.count == 0 else {
@@ -125,6 +130,7 @@ class Sync: NSOperation {
         managedObject.setValue(record.encodedSystemFields, forKey: EncodedValues.name)
       }
     }
+    try changeManager.removeAllQueued()
     if context.hasChanges {
       try context.save()
     }
@@ -140,12 +146,12 @@ class Sync: NSOperation {
     }
     var fetchedRecordsByRecordIDs: [CKRecordID: CKRecord]?
     let fetchRecordsOperation = CKFetchRecordsOperation(recordIDs: recordIDs)
-    fetchRecordsOperation.fetchRecordsCompletionBlock = ({ (recordsByRecordIDs, error) in
+    fetchRecordsOperation.fetchRecordsCompletionBlock = { (recordsByRecordIDs, error) in
       guard error == nil else {
         return
       }
       fetchedRecordsByRecordIDs = recordsByRecordIDs
-    })
+    }
     operationQueue.addOperation(fetchRecordsOperation)
     operationQueue.waitUntilAllOperationsAreFinished()
     var conflicts = [Conflict]()
@@ -205,6 +211,7 @@ class Sync: NSOperation {
       var managedObject = try context.executeFetchRequest(fetchRequest).first as? NSManagedObject
       if managedObject == nil {
         managedObject = NSEntityDescription.insertNewObjectForEntityForName(record.recordType, inManagedObjectContext: context)
+        managedObject?.setValue(record.recordID.recordName, forKey: UniqueID.name)
       }
       if let managedObject = managedObject {
         if let entity = persistentStoreCoordinator.managedObjectModel.entitiesByName[managedObject.entity.name!] {

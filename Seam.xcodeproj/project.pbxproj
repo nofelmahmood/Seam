@@ -21,6 +21,8 @@
 		3E3CE2D81BF36F4C00C7F66D /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3CE2CF1BF36F4C00C7F66D /* Task.swift */; };
 		3E3CE2D91BF36F4C00C7F66D /* TestModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3E3CE2D01BF36F4C00C7F66D /* TestModel.xcdatamodeld */; };
 		3E3CE2DA1BF36F4C00C7F66D /* NSManagedObject+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3CE2D31BF36F4C00C7F66D /* NSManagedObject+Helper.swift */; };
+		3E42D3C01BF9E0E300E290C2 /* NSManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E42D3BF1BF9E0E300E290C2 /* NSManagedObjectContext.swift */; };
+		3E42D3C11BF9E0E300E290C2 /* NSManagedObjectContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E42D3BF1BF9E0E300E290C2 /* NSManagedObjectContext.swift */; };
 		3E8252031BF35340008B3E86 /* CKRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8251FE1BF35340008B3E86 /* CKRecord.swift */; };
 		3E8252041BF35340008B3E86 /* CKRecordID.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8251FF1BF35340008B3E86 /* CKRecordID.swift */; };
 		3E8252051BF35340008B3E86 /* NSEntityDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8252001BF35340008B3E86 /* NSEntityDescription.swift */; };
@@ -86,6 +88,7 @@
 		3E3CE2CF1BF36F4C00C7F66D /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		3E3CE2D11BF36F4C00C7F66D /* TestModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestModel.xcdatamodel; sourceTree = "<group>"; };
 		3E3CE2D31BF36F4C00C7F66D /* NSManagedObject+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Helper.swift"; sourceTree = "<group>"; };
+		3E42D3BF1BF9E0E300E290C2 /* NSManagedObjectContext.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSManagedObjectContext.swift; path = Source/Extensions/NSManagedObjectContext.swift; sourceTree = SOURCE_ROOT; };
 		3E8251FE1BF35340008B3E86 /* CKRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKRecord.swift; path = Source/Extensions/CKRecord.swift; sourceTree = SOURCE_ROOT; };
 		3E8251FF1BF35340008B3E86 /* CKRecordID.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CKRecordID.swift; path = Source/Extensions/CKRecordID.swift; sourceTree = SOURCE_ROOT; };
 		3E8252001BF35340008B3E86 /* NSEntityDescription.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = NSEntityDescription.swift; path = Source/Extensions/NSEntityDescription.swift; sourceTree = SOURCE_ROOT; };
@@ -164,6 +167,7 @@
 				3E8252001BF35340008B3E86 /* NSEntityDescription.swift */,
 				3E8252011BF35340008B3E86 /* NSManagedObject.swift */,
 				3E8252021BF35340008B3E86 /* NSPredicate.swift */,
+				3E42D3BF1BF9E0E300E290C2 /* NSManagedObjectContext.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -465,6 +469,7 @@
 				3E8252131BF3534A008B3E86 /* Sync.swift in Sources */,
 				3E8252141BF3534A008B3E86 /* Token.swift in Sources */,
 				3E8252101BF3534A008B3E86 /* Conflict.swift in Sources */,
+				3E42D3C01BF9E0E300E290C2 /* NSManagedObjectContext.swift in Sources */,
 				3E8252071BF35340008B3E86 /* NSPredicate.swift in Sources */,
 				3E8252051BF35340008B3E86 /* NSEntityDescription.swift in Sources */,
 				3E8252041BF35340008B3E86 /* CKRecordID.swift in Sources */,
@@ -484,6 +489,7 @@
 				3EBF6C1A1BF3894700A8B7C3 /* Token.swift in Sources */,
 				3EBF6C231BF3894F00A8B7C3 /* CKRecordID.swift in Sources */,
 				3EBF6C161BF3894700A8B7C3 /* Change.swift in Sources */,
+				3E42D3C11BF9E0E300E290C2 /* NSManagedObjectContext.swift in Sources */,
 				3EBF6C251BF3894F00A8B7C3 /* NSManagedObject.swift in Sources */,
 				3EBF6C221BF3894F00A8B7C3 /* CKRecord.swift in Sources */,
 				3EBF6C181BF3894700A8B7C3 /* Store.swift in Sources */,

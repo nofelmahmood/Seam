@@ -25,9 +25,15 @@
 import Foundation
 import CoreData
 
+extension NSAttributeDescription {
+  var isAsset: Bool {
+    return userInfo?[SpecialAttribute.Asset.key] != nil
+  }
+}
+
 extension NSEntityDescription {
   var propertyNamesToFetch: [String] {
-    return attributeNames + toOneRelationshipNames
+    return attributeNames + toOneRelationshipNames + assetAttributeNames
   }
   
   var attributes: [NSAttributeDescription] {
@@ -35,7 +41,23 @@ extension NSEntityDescription {
   }
   
   var attributeNames: [String] {
-    return Array(attributesByName.keys)
+   return attributesByName.filter { $0.1.isAsset == false }.map { $0.0 }
+  }
+  
+  var assetAttributes: [NSAttributeDescription] {
+    return attributes.filter { $0.userInfo?[SpecialAttribute.Asset.key] != nil }
+  }
+  
+  var assetAttributeNames: [String] {
+    return assetAttributes.map { $0.name }
+  }
+  
+  var assetAttributesByName: [String: NSAttributeDescription] {
+    var assetAttributesByName = [String: NSAttributeDescription]()
+    assetAttributes.forEach { attribute in
+      assetAttributesByName[attribute.name] = attribute
+    }
+    return assetAttributesByName
   }
   
   var relationships: [NSRelationshipDescription] {

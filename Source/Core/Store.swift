@@ -42,6 +42,11 @@ class Store: NSIncrementalStore {
     backingMOC.retainsRegisteredObjects = true
     return backingMOC
   }()
+  private lazy var operationQueue: NSOperationQueue = {
+    let operationQueue = NSOperationQueue()
+    operationQueue.maxConcurrentOperationCount = 1
+    return operationQueue
+  }()
   var changeManager: Change.Manager!
   
   override internal class func initialize() {
@@ -68,12 +73,20 @@ class Store: NSIncrementalStore {
       throw Error.CreationFailed
     }
     changeManager = Change.Manager(managedObjectContext: backingMOC)
-    sync()
   }
   
-  func sync() {
+  func performSync() {
+    guard operationQueue.operationCount == 0 else {
+      return
+    }
     let sync = Sync(backingPersistentStoreCoordinator: backingPSC!, persistentStoreCoordinator: persistentStoreCoordinator!)
-    let operationQueue = NSOperationQueue()
+    sync.syncCompletionBlock = { (changes, error) in
+      if error == nil {
+        print("Sync Operation Completed")
+      } else {
+        print("Sync Operation Completed with Error")
+      }
+    }
     operationQueue.addOperation(sync)
   }
   
@@ -238,9 +251,7 @@ class Store: NSIncrementalStore {
     if let updatedObjects = request.updatedObjects {
       try updateObjectsInBackingStore(objectsToUpdate: updatedObjects)
     }
-    if backingMOC.hasChanges {
-      try backingMOC.save()
-    }
+    sync()
     return []
   }
   

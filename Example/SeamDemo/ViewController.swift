@@ -25,6 +25,9 @@ class ViewController: UIViewController {
       allTasks?.forEach { task in
         print(task.name)
       }
+//      let newTask = Task.new(inContext: context) as? Task
+//      newTask?.name = "NewTaskSendToServer"
+//      try! context.save()
     }
 
     override func didReceiveMemoryWarning() {

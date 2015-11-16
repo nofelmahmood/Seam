@@ -133,10 +133,10 @@ class Change {
     guard let model = model.copy() as? NSManagedObjectModel else {
       return nil
     }
-    model.entities.forEach({ entity in
+    model.entities.forEach { entity in
       entity.properties.append(UniqueID.attributeDescription)
       entity.properties.append(EncodedValues.attributeDescription)
-    })
+    }
     model.entities.append(Entity.entityDescription)
     return model
   }
@@ -210,9 +210,15 @@ class Change {
     init(managedObjectContext: NSManagedObjectContext) {
       context = managedObjectContext
     }
+
+    func hasChanges() -> Bool {
+      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+      var error: NSError?
+      return context.countForFetchRequest(fetchRequest, error: &error) > 0 ? true: false
+    }
     
     func new(uniqueID: String,type: NSNumber, entityName: String,inContext context: NSManagedObjectContext) throws -> Change {
-      let object = NSEntityDescription.insertNewObjectForEntityForName(Change.Entity.name, inManagedObjectContext: context)
+      let object = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context)
       object.setValue(uniqueID, forKey: UniqueID.name)
       object.setValue(type, forKey: Properties.ChangeType.name)
       object.setValue(entityName, forKey: Properties.EntityName.name)

@@ -27,35 +27,44 @@ import CoreData
 import CloudKit
 
 extension CKRecord {
-    var encodedSystemFields: NSData {
-        let data = NSMutableData()
-        let coder = NSKeyedArchiver(forWritingWithMutableData: data)
-        encodeSystemFieldsWithCoder(coder)
-        coder.finishEncoding()
-        return data
+  var encodedSystemFields: NSData {
+    let data = NSMutableData()
+    let coder = NSKeyedArchiver(forWritingWithMutableData: data)
+    encodeSystemFieldsWithCoder(coder)
+    coder.finishEncoding()
+    return data
+  }
+  
+  class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord {
+    let coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)
+    let record = CKRecord(coder: coder)!
+    coder.finishDecoding()
+    return record
+  }
+  
+  class func recordWithChange(change: Change) -> CKRecord? {
+    guard !change.isDeletedType else {
+      return nil
     }
-    
-    class func recordWithEncodedFields(encodedFields: NSData) -> CKRecord {
-        let coder = NSKeyedUnarchiver(forReadingWithData: encodedFields)
-        let record = CKRecord(coder: coder)!
-        coder.finishDecoding()
-        return record
+    var record: CKRecord?
+    if let encodedFields = change.changedObjectEncodedValues {
+      record = CKRecord.recordWithEncodedFields(encodedFields)
+    } else {
+      let recordID = CKRecordID(change: change)
+      record = CKRecord(recordType: change.entityName, recordID: recordID)
     }
-    
-    class func recordWithChange(change: Change) -> CKRecord? {
-        guard !change.isDeletedType else {
-            return nil
+    if let valuesDictionary = change.changedPropertyValuesDictionary {
+      valuesDictionary.forEach { (key, value) in
+        guard let referenceManagedObject = value as? NSManagedObject else {
+          record?.setValue(value, forKey: key)
+          return
         }
-        var record: CKRecord?
-        if let encodedFields = change.changedObjectEncodedValues {
-            record = CKRecord.recordWithEncodedFields(encodedFields)
-        } else {
-            let recordID = CKRecordID(change: change)
-            record = CKRecord(recordType: change.entityName, recordID: recordID)
-        }
-        if let valuesDictionary = change.changedPropertyValuesDictionary {
-            record?.setValuesForKeysWithDictionary(valuesDictionary)
-        }
-        return record
+        let referenceUniqueID = referenceManagedObject.uniqueID
+        let referenceRecordID = CKRecordID(recordName: referenceUniqueID, zoneID: Zone.zoneID)
+        let reference = CKReference(recordID: referenceRecordID, action: CKReferenceAction.DeleteSelf)
+        record?.setObject(reference, forKey: key)
+      }
     }
+    return record
+  }
 }

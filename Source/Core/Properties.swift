@@ -27,8 +27,15 @@ import CoreData
 
 public  let SeamStoreType = Store.type
 
-struct Options {
+struct Option {
   static let ConflictResolutionPolicy = "SMConflictResolutionPolicy"
+}
+
+struct SpecialAttribute {
+  struct Asset {
+    static let key = "Asset"
+    static let valueTransformerName = "AssetURLTransformer"
+  }
 }
 
 struct UniqueID {

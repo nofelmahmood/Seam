@@ -26,6 +26,8 @@ import Foundation
 import CloudKit
 import CoreData
 
+typealias Changes = (insertedObjectIDs: [NSManagedObjectID]?, updatedObjectIDs: [NSManagedObjectID]?, deletedObjectIDs: [NSManagedObjectID])
+
 class Sync: NSOperation {
   static let errorDomain = "com.seam.error.sync.errorDomain"
   enum Error: ErrorType {
@@ -42,7 +44,7 @@ class Sync: NSOperation {
   private var persistentStoreCoordinator: NSPersistentStoreCoordinator!
   private var context: NSManagedObjectContext!
   private var changeManager: Change.Manager!
-  var syncCompletionBlock: ((syncError: ErrorType?) -> ())?
+  var syncCompletionBlock: ((changes: Changes?,syncError: ErrorType?) -> ())?
   
   init(backingPersistentStoreCoordinator: NSPersistentStoreCoordinator, persistentStoreCoordinator: NSPersistentStoreCoordinator) {
     self.persistentStoreCoordinator = persistentStoreCoordinator
@@ -57,9 +59,9 @@ class Sync: NSOperation {
     do {
       try setup()
       try perform()
-      syncCompletionBlock?(syncError: nil)
+      syncCompletionBlock?(changes: nil, syncError: nil)
     } catch {
-      syncCompletionBlock?(syncError: error)
+      syncCompletionBlock?(changes: nil, syncError: error)
     }
   }
   
@@ -198,41 +200,12 @@ class Sync: NSOperation {
   func applyServerChanges() throws {
     let changes = serverChanges()
     let deletedObjectUniqueIDs = changes.deletedRecordIDs.map({ $0.recordName })
-    try persistentStoreCoordinator.managedObjectModel.entities.forEach { entity in
-      let fetchRequest = NSFetchRequest(entityName: entity.name!)
-      fetchRequest.predicate = NSPredicate(inUniqueIDs: deletedObjectUniqueIDs)
-      let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-      try context.executeRequest(batchDeleteRequest)
-    }
-    let insertedOrUpdatedCKRecords = changes.insertedOrUpdatedCKRecords
-    try insertedOrUpdatedCKRecords.forEach { record in
-      let fetchRequest = NSFetchRequest(entityName: record.recordType)
-      fetchRequest.predicate = NSPredicate(equalsToUniqueID: record.recordID.recordName)
-      var managedObject = try context.executeFetchRequest(fetchRequest).first as? NSManagedObject
-      if managedObject == nil {
-        managedObject = NSEntityDescription.insertNewObjectForEntityForName(record.recordType, inManagedObjectContext: context)
-        managedObject?.setValue(record.recordID.recordName, forKey: UniqueID.name)
-      }
-      if let managedObject = managedObject {
-        if let entity = persistentStoreCoordinator.managedObjectModel.entitiesByName[managedObject.entity.name!] {
-          let attributeValues = record.dictionaryWithValuesForKeys(entity.attributeNames)
-          managedObject.setValuesForKeysWithDictionary(attributeValues)
-          managedObject.setValue(record.encodedSystemFields, forKey: EncodedValues.name)
-          let relationshipReferences = record.dictionaryWithValuesForKeys(entity.toOneRelationshipNames) as! [String: CKReference]
-          try relationshipReferences.forEach { (name,reference) in
-            if let referenceDestinationEntityName = entity.relationshipsByName[name]!.destinationEntity?.name {
-              let fetchRequest = NSFetchRequest(entityName: referenceDestinationEntityName)
-              fetchRequest.predicate = NSPredicate(equalsToUniqueID: reference.recordID.recordName)
-              if let relationshipManagedObject = try context.executeFetchRequest(fetchRequest).first as? NSManagedObject {
-                managedObject.setValue(relationshipManagedObject, forKey: name)
-              }
-            }
-          }
-          if context.hasChanges {
-            try context.save()
-          }
-        }
-      }
+    let entityNames = Array(persistentStoreCoordinator.managedObjectModel.entitiesByName.keys)
+    let entitiesByName = persistentStoreCoordinator.managedObjectModel.entitiesByName
+    try context.deleteObjectsWithUniqueIDs(deletedObjectUniqueIDs, inEntities: entityNames)
+    try context.createOrUpdateObjects(fromRecords: changes.insertedOrUpdatedCKRecords, inEntities: entitiesByName)
+    if context.hasChanges {
+      try context.save()
     }
   }
 }

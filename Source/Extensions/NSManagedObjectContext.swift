@@ -27,6 +27,7 @@ import CoreData
 import CloudKit
 
 extension NSManagedObjectContext {
+  
   func objectWithUniqueID(id: String, inEntity entityName: String) throws -> NSManagedObject? {
     let fetchRequest = NSFetchRequest(entityName: entityName)
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: id)

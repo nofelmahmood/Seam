@@ -80,11 +80,14 @@ class Store: NSIncrementalStore {
       return
     }
     let sync = Sync(backingPersistentStoreCoordinator: backingPSC!, persistentStoreCoordinator: persistentStoreCoordinator!)
-    sync.syncCompletionBlock = { (changes, error) in
+    sync.syncCompletionBlock = { (notifications, error) in
       if error == nil {
-        print("Sync Operation Completed")
-      } else {
-        print("Sync Operation Completed with Error")
+        notifications.forEach { notification in
+          print("Got Notification ",notification)
+          NSOperationQueue.mainQueue().addOperationWithBlock {
+            self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
+          }
+        }
       }
     }
     operationQueue.addOperation(sync)

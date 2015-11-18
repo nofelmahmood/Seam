@@ -43,9 +43,10 @@ class Sync: NSOperation {
   private var backingPersistentStoreCoordinator: NSPersistentStoreCoordinator!
   private var persistentStoreCoordinator: NSPersistentStoreCoordinator!
   private var context: NSManagedObjectContext!
+  private var saveNotifications = [NSNotification]()
   private var changeManager: Change.Manager!
-  var syncCompletionBlock: ((changes: Changes?,syncError: ErrorType?) -> ())?
-  
+  var syncCompletionBlock: ((saveNotifications: [NSNotification],syncError: ErrorType?) -> ())?
+
   init(backingPersistentStoreCoordinator: NSPersistentStoreCoordinator, persistentStoreCoordinator: NSPersistentStoreCoordinator) {
     self.persistentStoreCoordinator = persistentStoreCoordinator
     self.backingPersistentStoreCoordinator = backingPersistentStoreCoordinator
@@ -53,21 +54,26 @@ class Sync: NSOperation {
   
   // MARK: - Sync
   override func main() {
-    context = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
-    context.persistentStoreCoordinator = backingPersistentStoreCoordinator
-    changeManager = Change.Manager(managedObjectContext: context)
     do {
       try setup()
       try perform()
-      syncCompletionBlock?(changes: nil, syncError: nil)
+      syncCompletionBlock?(saveNotifications: saveNotifications, syncError: nil)
     } catch {
-      syncCompletionBlock?(changes: nil, syncError: error)
+      syncCompletionBlock?(saveNotifications: saveNotifications, syncError: error)
     }
   }
   
   func setup() throws {
+    context = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+    context.persistentStoreCoordinator = backingPersistentStoreCoordinator
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: "contextDidSave:", name: NSManagedObjectContextDidSaveNotification, object: context)
+    changeManager = Change.Manager(managedObjectContext: context)
     try Zone.createZone(operationQueue)
     try Zone.createSubscription(operationQueue)
+  }
+  
+  func contextDidSave(notification: NSNotification) {
+    saveNotifications.append(notification)
   }
   
   func perform() throws {

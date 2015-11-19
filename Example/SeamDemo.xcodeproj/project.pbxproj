@@ -7,10 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3E0B27F81BE86B9B0002173B /* Task+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0B27F41BE86B9A0002173B /* Task+CoreDataProperties.swift */; };
-		3E0B27F91BE86B9B0002173B /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0B27F51BE86B9A0002173B /* Task.swift */; };
-		3E0B27FA1BE86B9B0002173B /* Tag+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0B27F61BE86B9A0002173B /* Tag+CoreDataProperties.swift */; };
-		3E0B27FB1BE86B9B0002173B /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E0B27F71BE86B9B0002173B /* Tag.swift */; };
 		3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */; };
 		3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E351B7B6CD300BB9E71 /* ViewController.swift */; };
 		3E191E391B7B6CD300BB9E71 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E371B7B6CD300BB9E71 /* Main.storyboard */; };
@@ -21,6 +17,16 @@
 		3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */; };
 		3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E591B7B6D1D00BB9E71 /* CoreData.framework */; };
 		3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */; };
+		3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */; };
+		3E75DC221BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC211BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift */; };
+		3E75DC241BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC231BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift */; };
+		3E75DC261BFC84F800FB5E40 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC251BFC84F800FB5E40 /* DetailViewController.swift */; };
+		3E75DC2A1BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC291BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift */; };
+		3E75DC321BFCA57000FB5E40 /* Note+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC2E1BFCA57000FB5E40 /* Note+CoreDataProperties.swift */; };
+		3E75DC331BFCA57000FB5E40 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC2F1BFCA57000FB5E40 /* Note.swift */; };
+		3E75DC341BFCA57000FB5E40 /* Tag+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC301BFCA57000FB5E40 /* Tag+CoreDataProperties.swift */; };
+		3E75DC351BFCA57000FB5E40 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC311BFCA57000FB5E40 /* Tag.swift */; };
+		3E75DC371BFCA5D500FB5E40 /* Size Classes.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E75DC361BFCA5D500FB5E40 /* Size Classes.png */; };
 		3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */; };
 		3EBF6C4E1BF3989B00A8B7C3 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; };
 		3EBF6C4F1BF3989B00A8B7C3 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -86,10 +92,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3E0B27F41BE86B9A0002173B /* Task+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Task+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3E0B27F51BE86B9A0002173B /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
-		3E0B27F61BE86B9A0002173B /* Tag+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Tag+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3E0B27F71BE86B9B0002173B /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
 		3E191E301B7B6CD300BB9E71 /* SeamDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SeamDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3E191E351B7B6CD300BB9E71 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -105,6 +107,16 @@
 		3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3E191E591B7B6D1D00BB9E71 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
+		3E75DC211BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
+		3E75DC231BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
+		3E75DC251BFC84F800FB5E40 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		3E75DC291BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DetailViewController+UITextViewDelegate.swift"; sourceTree = "<group>"; };
+		3E75DC2E1BFCA57000FB5E40 /* Note+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Note+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E75DC2F1BFCA57000FB5E40 /* Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		3E75DC301BFCA57000FB5E40 /* Tag+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Tag+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E75DC311BFCA57000FB5E40 /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		3E75DC361BFCA5D500FB5E40 /* Size Classes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Size Classes.png"; path = "../../../../../../Desktop/Size Classes.png"; sourceTree = "<group>"; };
 		3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Helper.swift"; sourceTree = "<group>"; };
 		3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Seam.xcodeproj; path = ../Seam.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -133,10 +145,10 @@
 		3E02263B1B7C62C10080F9AB /* CoreData Models */ = {
 			isa = PBXGroup;
 			children = (
-				3E0B27F41BE86B9A0002173B /* Task+CoreDataProperties.swift */,
-				3E0B27F51BE86B9A0002173B /* Task.swift */,
-				3E0B27F61BE86B9A0002173B /* Tag+CoreDataProperties.swift */,
-				3E0B27F71BE86B9B0002173B /* Tag.swift */,
+				3E75DC2E1BFCA57000FB5E40 /* Note+CoreDataProperties.swift */,
+				3E75DC2F1BFCA57000FB5E40 /* Note.swift */,
+				3E75DC301BFCA57000FB5E40 /* Tag+CoreDataProperties.swift */,
+				3E75DC311BFCA57000FB5E40 /* Tag.swift */,
 			);
 			name = "CoreData Models";
 			sourceTree = "<group>";
@@ -144,6 +156,7 @@
 		3E191E271B7B6CD300BB9E71 = {
 			isa = PBXGroup;
 			children = (
+				3E75DC361BFCA5D500FB5E40 /* Size Classes.png */,
 				3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */,
 				3E191E321B7B6CD300BB9E71 /* SeamDemo */,
 				3EBF6C331BF3940400A8B7C3 /* Frameworks */,
@@ -164,10 +177,12 @@
 		3E191E321B7B6CD300BB9E71 /* SeamDemo */ = {
 			isa = PBXGroup;
 			children = (
+				3E75DC091BFC7CFD00FB5E40 /* Custom Cells */,
 				3E02263B1B7C62C10080F9AB /* CoreData Models */,
 				3E191E561B7B6CF100BB9E71 /* SeamDemo.entitlements */,
 				3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */,
-				3E191E351B7B6CD300BB9E71 /* ViewController.swift */,
+				3E75DC271BFC850100FB5E40 /* DetailViewController */,
+				3E75DC1F1BFC80E400FB5E40 /* ViewController */,
 				3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */,
 				3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */,
 				3E191E371B7B6CD300BB9E71 /* Main.storyboard */,
@@ -186,6 +201,49 @@
 				3E191E4D1B7B6CD300BB9E71 /* Info.plist */,
 			);
 			path = SeamDemoTests;
+			sourceTree = "<group>";
+		};
+		3E75DC091BFC7CFD00FB5E40 /* Custom Cells */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */,
+			);
+			name = "Custom Cells";
+			sourceTree = "<group>";
+		};
+		3E75DC1F1BFC80E400FB5E40 /* ViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3E191E351B7B6CD300BB9E71 /* ViewController.swift */,
+				3E75DC201BFC80EC00FB5E40 /* Extensions */,
+			);
+			name = ViewController;
+			sourceTree = "<group>";
+		};
+		3E75DC201BFC80EC00FB5E40 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC211BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift */,
+				3E75DC231BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		3E75DC271BFC850100FB5E40 /* DetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC281BFC8BC800FB5E40 /* Extensions */,
+				3E75DC251BFC84F800FB5E40 /* DetailViewController.swift */,
+			);
+			name = DetailViewController;
+			sourceTree = "<group>";
+		};
+		3E75DC281BFC8BC800FB5E40 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC291BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift */,
+			);
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 		3EBF6C331BF3940400A8B7C3 /* Frameworks */ = {
@@ -337,6 +395,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E75DC371BFCA5D500FB5E40 /* Size Classes.png in Resources */,
 				3E191E411B7B6CD300BB9E71 /* LaunchScreen.storyboard in Resources */,
 				3E191E3E1B7B6CD300BB9E71 /* Assets.xcassets in Resources */,
 				3E191E391B7B6CD300BB9E71 /* Main.storyboard in Resources */,
@@ -357,15 +416,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3E75DC341BFCA57000FB5E40 /* Tag+CoreDataProperties.swift in Sources */,
+				3E75DC321BFCA57000FB5E40 /* Note+CoreDataProperties.swift in Sources */,
+				3E75DC261BFC84F800FB5E40 /* DetailViewController.swift in Sources */,
+				3E75DC2A1BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift in Sources */,
 				3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */,
-				3E0B27FA1BE86B9B0002173B /* Tag+CoreDataProperties.swift in Sources */,
+				3E75DC221BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift in Sources */,
 				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
 				3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */,
-				3E0B27F81BE86B9B0002173B /* Task+CoreDataProperties.swift in Sources */,
-				3E0B27FB1BE86B9B0002173B /* Tag.swift in Sources */,
+				3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */,
+				3E75DC351BFCA57000FB5E40 /* Tag.swift in Sources */,
+				3E75DC241BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift in Sources */,
 				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
-				3E0B27F91BE86B9B0002173B /* Task.swift in Sources */,
+				3E75DC331BFCA57000FB5E40 /* Note.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

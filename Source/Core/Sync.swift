@@ -26,7 +26,7 @@ import Foundation
 import CloudKit
 import CoreData
 
-typealias Changes = (insertedObjectIDs: [NSManagedObjectID]?, updatedObjectIDs: [NSManagedObjectID]?, deletedObjectIDs: [NSManagedObjectID])
+public typealias Changes = (insertedOrUpdatedObjectsInfo: [(uniqueID: String, entityName: String)], deletedObjectsInfo: [(uniqueID: String, entityName: String)])
 
 class Sync: NSOperation {
   static let errorDomain = "com.seam.error.sync.errorDomain"
@@ -44,8 +44,9 @@ class Sync: NSOperation {
   private var persistentStoreCoordinator: NSPersistentStoreCoordinator!
   private var context: NSManagedObjectContext!
   private var saveNotifications = [NSNotification]()
+  private var changesFromServerInfo: Changes?
   private var changeManager: Change.Manager!
-  var syncCompletionBlock: ((saveNotifications: [NSNotification],syncError: ErrorType?) -> ())?
+  var syncCompletionBlock: ((saveNotifications: [NSNotification], changesFromServerInfo: Changes? ,syncError: ErrorType?) -> ())?
 
   init(backingPersistentStoreCoordinator: NSPersistentStoreCoordinator, persistentStoreCoordinator: NSPersistentStoreCoordinator) {
     self.persistentStoreCoordinator = persistentStoreCoordinator
@@ -57,9 +58,9 @@ class Sync: NSOperation {
     do {
       try setup()
       try perform()
-      syncCompletionBlock?(saveNotifications: saveNotifications, syncError: nil)
+      syncCompletionBlock?(saveNotifications: saveNotifications, changesFromServerInfo: changesFromServerInfo, syncError: nil)
     } catch {
-      syncCompletionBlock?(saveNotifications: saveNotifications, syncError: error)
+      syncCompletionBlock?(saveNotifications: saveNotifications, changesFromServerInfo: changesFromServerInfo, syncError: error)
     }
   }
   
@@ -208,10 +209,13 @@ class Sync: NSOperation {
     let deletedObjectUniqueIDs = changes.deletedRecordIDs.map({ $0.recordName })
     let entityNames = Array(persistentStoreCoordinator.managedObjectModel.entitiesByName.keys)
     let entitiesByName = persistentStoreCoordinator.managedObjectModel.entitiesByName
-    try context.deleteObjectsWithUniqueIDs(deletedObjectUniqueIDs, inEntities: entityNames)
+    let deletedObjectsInfo = try context.deleteObjectsWithUniqueIDs(deletedObjectUniqueIDs, inEntities: entityNames)
     try context.createOrUpdateObjects(fromRecords: changes.insertedOrUpdatedCKRecords, inEntities: entitiesByName)
     if context.hasChanges {
       try context.save()
     }
+    let insertedOrUpdatedObjectsInfo = changes.insertedOrUpdatedCKRecords.map {
+      (uniqueID: $0.recordID.recordName, entityName: $0.recordType) }
+    changesFromServerInfo = (insertedOrUpdatedObjectsInfo, deletedObjectsInfo)
   }
 }

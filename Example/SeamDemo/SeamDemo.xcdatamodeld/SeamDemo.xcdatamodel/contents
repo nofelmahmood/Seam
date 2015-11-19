@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="14F1021" minimumToolsVersion="Automatic">
+    <entity name="Note" representedClassName=".Note" syncable="YES">
+        <attribute name="photo" optional="YES" attributeType="Transformable" valueTransformerName="AssetURLTransformer" syncable="YES">
+            <userInfo>
+                <entry key="Asset" value="YES"/>
+            </userInfo>
+        </attribute>
+        <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="note" inverseEntity="Tag" syncable="YES"/>
+    </entity>
     <entity name="Tag" representedClassName=".Tag" syncable="YES">
         <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="task" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Task" inverseName="tags" inverseEntity="Task" syncable="YES"/>
-    </entity>
-    <entity name="Task" representedClassName=".Task" syncable="YES">
-        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="task" inverseEntity="Tag" syncable="YES"/>
+        <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="tags" inverseEntity="Note" syncable="YES"/>
     </entity>
     <elements>
         <element name="Tag" positionX="-54" positionY="-9" width="128" height="75"/>
-        <element name="Task" positionX="-63" positionY="-18" width="128" height="75"/>
+        <element name="Note" positionX="-63" positionY="-18" width="128" height="90"/>
     </elements>
 </model>

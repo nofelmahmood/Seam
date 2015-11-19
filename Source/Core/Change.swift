@@ -50,6 +50,9 @@ class Change {
       managedObject.setValue(newValue, forKey: Properties.EntityName.name)
     }
   }
+  var entity: NSEntityDescription {
+    return managedObject.entity.managedObjectModel.entitiesByName[entityName]!
+  }
   var type: NSNumber {
     get {
       return managedObject.valueForKey(Properties.ChangeType.name) as! NSNumber
@@ -101,7 +104,8 @@ class Change {
       if let properties = properties?.componentsSeparatedByString(Change.propertySeparator) where isUpdatedType == true {
         return changedObject.dictionaryWithValuesForKeys(properties)
       } else  {
-        var dictionary = changedObject.dictionaryWithValuesForKeys(changedObject.entity.attributeNames + changedObject.entity.toOneRelationshipNames)
+        let keys = changedObject.entity.attributeNames + changedObject.entity.toOneRelationshipNames + changedObject.entity.assetAttributeNames
+        var dictionary = changedObject.dictionaryWithValuesForKeys(keys)
         dictionary[EncodedValues.name] = nil
         dictionary[UniqueID.name] = nil
         return dictionary

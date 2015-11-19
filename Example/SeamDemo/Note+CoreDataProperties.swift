@@ -1,5 +1,5 @@
 //
-//  Tag+CoreDataProperties.swift
+//  Note+CoreDataProperties.swift
 //  SeamDemo
 //
 //  Created by Nofel Mahmood on 18/11/2015.
@@ -12,9 +12,10 @@
 import Foundation
 import CoreData
 
-extension Tag {
+extension Note {
 
-    @NSManaged var name: String?
-    @NSManaged var note: Note?
+    @NSManaged var text: String?
+    @NSManaged var photo: NSObject?
+    @NSManaged var tags: NSSet?
 
 }

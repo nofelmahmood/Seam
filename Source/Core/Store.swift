@@ -26,7 +26,7 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
-class Store: NSIncrementalStore {
+public class Store: NSIncrementalStore {
   static let errorDomain = "com.seam.error.store.errorDomain"
   enum Error: ErrorType {
     case CreationFailed
@@ -34,7 +34,6 @@ class Store: NSIncrementalStore {
     case PersistentStoreInitializationFailed
     case InvalidRequest
   }
-  
   private var backingPSC: NSPersistentStoreCoordinator?
   private lazy var backingMOC: NSManagedObjectContext = {
     var backingMOC = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
@@ -49,15 +48,21 @@ class Store: NSIncrementalStore {
   }()
   var changeManager: Change.Manager!
   
-  override internal class func initialize() {
+  override public class func initialize() {
     NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: type)
+    registerTransformers()
   }
   
   class internal var type: String {
     return NSStringFromClass(self)
   }
   
-  override internal func loadMetadata() throws {
+  class func registerTransformers() {
+    let valueTransformer = AssetURLTransformer()
+    NSValueTransformer.setValueTransformer(valueTransformer, forName: SpecialAttribute.Asset.valueTransformerName)
+  }
+  
+  override public func loadMetadata() throws {
     metadata = [
       NSStoreUUIDKey: NSProcessInfo().globallyUniqueString,
       NSStoreTypeKey: self.dynamicType.type
@@ -75,19 +80,54 @@ class Store: NSIncrementalStore {
     changeManager = Change.Manager(managedObjectContext: backingMOC)
   }
   
-  func performSync() {
+  public func performContextBasedSync(completionBlock: ((insertedOrUpdatedObjectIDs: [NSManagedObjectID]?, deletedObjectIDs: [NSManagedObjectID]?, successful: Bool) -> ())?) {
     guard operationQueue.operationCount == 0 else {
+      print("Already Syncing")
+      completionBlock?(insertedOrUpdatedObjectIDs: nil, deletedObjectIDs: nil, successful: false)
       return
     }
     let sync = Sync(backingPersistentStoreCoordinator: backingPSC!, persistentStoreCoordinator: persistentStoreCoordinator!)
-    sync.syncCompletionBlock = { (notifications, error) in
+    sync.syncCompletionBlock = { (notifications, changesFromServerInfo, error) in
       if error == nil {
         notifications.forEach { notification in
-          print("Got Notification ",notification)
-          NSOperationQueue.mainQueue().addOperationWithBlock {
-            self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
-          }
+          self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
         }
+        var insertedOrUpdatedObjectIDs = [NSManagedObjectID]()
+        var deletedObjectIDs = [NSManagedObjectID]()
+        changesFromServerInfo?.insertedOrUpdatedObjectsInfo.forEach { (uniqueID, entityName) in
+          let entity = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[entityName]!
+          let objectID = self.newObjectIDForEntity(entity, referenceObject: uniqueID)
+          insertedOrUpdatedObjectIDs.append(objectID)
+        }
+        changesFromServerInfo?.deletedObjectsInfo.forEach { (uniqueID, entityName) in
+          let entity = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[entityName]!
+          let objectID = self.newObjectIDForEntity(entity, referenceObject: uniqueID)
+          deletedObjectIDs.append(objectID)
+        }
+        completionBlock?(insertedOrUpdatedObjectIDs: insertedOrUpdatedObjectIDs, deletedObjectIDs: deletedObjectIDs, successful: true)
+      } else {
+        completionBlock?(insertedOrUpdatedObjectIDs: nil, deletedObjectIDs: nil, successful: false)
+      }
+    }
+    operationQueue.addOperation(sync)
+  }
+  
+  public func performSync(completionBlock: ((successful: Bool)->())?) {
+    guard operationQueue.operationCount == 0 else {
+      print("Already Syncing")
+      completionBlock?(successful: false)
+      return
+    }
+    let sync = Sync(backingPersistentStoreCoordinator: backingPSC!, persistentStoreCoordinator: persistentStoreCoordinator!)
+    sync.syncCompletionBlock = { (notifications, changesFromServerInfo, error) in
+      if error == nil {
+        notifications.forEach { notification in
+          print("Notification ",notification)
+          self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
+        }
+        completionBlock?(successful: true)
+      } else {
+        completionBlock?(successful: false)
       }
     }
     operationQueue.addOperation(sync)
@@ -114,7 +154,7 @@ class Store: NSIncrementalStore {
       let uniqueID = uniqueIDForObjectID(sourceObject.objectID)
       backingObject.setValue(uniqueID, forKey: UniqueID.name)
     }
-    let keys = sourceObject.entity.attributeNames
+    let keys = sourceObject.entity.attributeNames + sourceObject.entity.assetAttributeNames
     let valuesForKeys = sourceObject.dictionaryWithValuesForKeys(keys)
     backingObject.setValuesForKeysWithDictionary(valuesForKeys)
   }
@@ -156,7 +196,7 @@ class Store: NSIncrementalStore {
   
   // MARK: - Faulting
   
-  override func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
+  override public func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
     let recordID = uniqueIDForObjectID(objectID)
     let fetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: recordID)
@@ -178,7 +218,7 @@ class Store: NSIncrementalStore {
     return incrementalStoreNode
   }
   
-  override func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?) throws -> AnyObject {
+  override public func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?) throws -> AnyObject {
     let referenceObject = uniqueIDForObjectID(objectID)
     guard let backingObjectID = try objectIDForBackingObjectForEntity(objectID.entity.name!, withReferenceObject: referenceObject) else {
       if relationship.toMany {
@@ -202,13 +242,13 @@ class Store: NSIncrementalStore {
     return NSNull()
   }
   
-  override func obtainPermanentIDsForObjects(array: [NSManagedObject]) throws -> [NSManagedObjectID] {
+  override public func obtainPermanentIDsForObjects(array: [NSManagedObject]) throws -> [NSManagedObjectID] {
     return array.map { newObjectIDForEntity($0.entity, referenceObject: NSUUID().UUIDString) }
   }
   
   // MARK: - Requests
   
-  override func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
+  override public func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
     if let context = context {
       if let fetchRequest = request as? NSFetchRequest {
         return try executeFetchRequest(fetchRequest, context: context)

@@ -55,14 +55,21 @@ extension CKRecord {
     }
     if let valuesDictionary = change.changedPropertyValuesDictionary {
       valuesDictionary.forEach { (key, value) in
-        guard let referenceManagedObject = value as? NSManagedObject else {
-          record?.setValue(value, forKey: key)
+        guard value as! NSObject != NSNull() else {
+          record?.setObject(nil, forKey: key)
           return
         }
-        let referenceUniqueID = referenceManagedObject.uniqueID
-        let referenceRecordID = CKRecordID(recordName: referenceUniqueID, zoneID: Zone.zoneID)
-        let reference = CKReference(recordID: referenceRecordID, action: CKReferenceAction.DeleteSelf)
-        record?.setObject(reference, forKey: key)
+        if let referenceManagedObject = value as? NSManagedObject {
+          let referenceUniqueID = referenceManagedObject.uniqueID
+          let referenceRecordID = CKRecordID(recordName: referenceUniqueID, zoneID: Zone.zoneID)
+          let reference = CKReference(recordID: referenceRecordID, action: CKReferenceAction.DeleteSelf)
+          record?.setObject(reference, forKey: key)
+        } else if change.entity.assetAttributesByName[key] != nil {
+          let asset = CKAsset(fileURL: value as! NSURL)
+          record?.setObject(asset, forKey: key)
+        } else {
+          record?.setValue(value, forKey: key)
+        }
       }
     }
     return record

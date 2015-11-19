@@ -1,5 +1,5 @@
 //
-//  Tag.swift
+//  Note.swift
 //  SeamDemo
 //
 //  Created by Nofel Mahmood on 18/11/2015.
@@ -10,8 +10,14 @@ import Foundation
 import CoreData
 
 
-class Tag: NSManagedObject {
+class Note: NSManagedObject {
 
 // Insert code here to add functionality to your managed object subclass
-
+  var photoURL: NSURL? {
+    get {
+      return self.photo as? NSURL
+    } set {
+      self.photo = newValue
+    }
+  }
 }

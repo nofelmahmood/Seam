@@ -8,31 +8,43 @@
 
 import UIKit
 import CoreData
+import Seam
 
 class ViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-      let context = CoreDataStack.defaultStack.managedObjectContext
-//      if let task = Task.new(inContext: context) as? Task {
-//        task.name = "Task that must be synced"
-//        try! context.save()
-//      }
-      
-      let allTasks = Task.all(inContext: context) as? [Task]
-      print("Tasks")
-      allTasks?.forEach { task in
-        print(task.name)
+  @IBOutlet var tableView: UITableView!
+  var notes: [Note]!
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    prepareDataSource()
+    tableView.reloadData()
+  }
+  
+  override func viewWillAppear(animated: Bool) {
+    super.viewWillAppear(animated)
+    let context = CoreDataStack.defaultStack.managedObjectContext
+    try! context.save()
+    context.performSyncAndMerge {
+      NSOperationQueue.mainQueue().addOperationWithBlock {
+        self.prepareDataSource()
+        self.tableView.reloadData()
       }
-//      let newTask = Task.new(inContext: context) as? Task
-//      newTask?.name = "NewTaskSendToServer"
-//      try! context.save()
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+  }
+  
+  func prepareDataSource() {
+    let context = CoreDataStack.defaultStack.managedObjectContext
+    notes = Note.all(inContext: context) as! [Note]
+  }
+  
+  override func didReceiveMemoryWarning() {
+    super.didReceiveMemoryWarning()
+    // Dispose of any resources that can be recreated.
+  }
+  
+  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    if segue.identifier == "Detail" {
+      
     }
+  }
 }
 

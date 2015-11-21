@@ -143,8 +143,7 @@ public class Store: NSIncrementalStore {
     let fetchRequest = NSFetchRequest(entityName: entityName)
     fetchRequest.resultType = .ManagedObjectIDResultType
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: referenceObject)
-    let results = try backingMOC.executeFetchRequest(fetchRequest)
-    return results.last as? NSManagedObjectID
+    return try backingMOC.executeFetchRequest(fetchRequest).last as? NSManagedObjectID
   }
   
   // MARK: Attribute and Relationship Setters
@@ -200,21 +199,22 @@ public class Store: NSIncrementalStore {
     let recordID = uniqueIDForObjectID(objectID)
     let fetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: recordID)
-    fetchRequest.resultType = .DictionaryResultType
-    fetchRequest.propertiesToFetch = objectID.entity.propertyNamesToFetch
-    let results = try backingMOC.executeFetchRequest(fetchRequest)
-    var backingObjectValues = results.last as! [String: NSObject]
-    backingObjectValues.forEach { (key, value) in
+    guard let managedObject = try backingMOC.executeFetchRequest(fetchRequest).last as? NSManagedObject else {
+      throw Error.CreationFailed
+    }
+    let propertiesToReturn = objectID.entity.propertyNamesToFetch
+    var valuesDictionary = managedObject.dictionaryWithValuesForKeys(propertiesToReturn)
+    valuesDictionary.forEach { (key, value) in
       if let managedObject = value as? NSManagedObject {
         let recordID  = managedObject.uniqueID
         let entities = persistentStoreCoordinator!.managedObjectModel.entitiesByName
         let entityName = managedObject.entity.name!
         let entity = entities[entityName]! as NSEntityDescription
         let objectID = newObjectIDForEntity(entity, referenceObject: recordID)
-        backingObjectValues[key] = objectID
+        valuesDictionary[key] = objectID
       }
     }
-    let incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: backingObjectValues, version: 1)
+    let incrementalStoreNode = NSIncrementalStoreNode(objectID: objectID, withValues: valuesDictionary, version: 1)
     return incrementalStoreNode
   }
   
@@ -232,7 +232,8 @@ public class Store: NSIncrementalStore {
       var relationshipManagedObjectIDs = Set<NSManagedObjectID>()
       relationshipManagedObjects.forEach { object in
         let uniqueID = object.uniqueID
-        relationshipManagedObjectIDs.insert(newObjectIDForEntity(relationship.destinationEntity!, referenceObject: uniqueID))
+        let objectID = newObjectIDForEntity(relationship.destinationEntity!, referenceObject: uniqueID)
+        relationshipManagedObjectIDs.insert(objectID)
       }
       return relationshipManagedObjectIDs
     } else if let relationshipManagedObject = backingObject.valueForKey(relationship.name) as? NSManagedObject {

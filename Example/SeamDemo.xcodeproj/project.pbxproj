@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */; };
-		3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E351B7B6CD300BB9E71 /* ViewController.swift */; };
+		3E191E361B7B6CD300BB9E71 /* NotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E351B7B6CD300BB9E71 /* NotesViewController.swift */; };
 		3E191E391B7B6CD300BB9E71 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E371B7B6CD300BB9E71 /* Main.storyboard */; };
 		3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E3A1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld */; };
 		3E191E3E1B7B6CD300BB9E71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */; };
@@ -17,19 +17,25 @@
 		3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */; };
 		3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E591B7B6D1D00BB9E71 /* CoreData.framework */; };
 		3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */; };
+		3E3775B51BFF62860092770D /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3775B21BFF62860092770D /* Photo+CoreDataProperties.swift */; };
+		3E3775B61BFF62860092770D /* Folder+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3775B31BFF62860092770D /* Folder+CoreDataProperties.swift */; };
+		3E3775B71BFF62860092770D /* Note+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3775B41BFF62860092770D /* Note+CoreDataProperties.swift */; };
 		3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */; };
-		3E75DC221BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC211BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift */; };
-		3E75DC241BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC231BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift */; };
-		3E75DC261BFC84F800FB5E40 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC251BFC84F800FB5E40 /* DetailViewController.swift */; };
-		3E75DC2A1BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC291BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift */; };
-		3E75DC321BFCA57000FB5E40 /* Note+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC2E1BFCA57000FB5E40 /* Note+CoreDataProperties.swift */; };
-		3E75DC331BFCA57000FB5E40 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC2F1BFCA57000FB5E40 /* Note.swift */; };
-		3E75DC341BFCA57000FB5E40 /* Tag+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC301BFCA57000FB5E40 /* Tag+CoreDataProperties.swift */; };
-		3E75DC351BFCA57000FB5E40 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC311BFCA57000FB5E40 /* Tag.swift */; };
+		3E75DC221BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC211BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift */; };
+		3E75DC241BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */; };
+		3E75DC261BFC84F800FB5E40 /* NoteDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC251BFC84F800FB5E40 /* NoteDetailViewController.swift */; };
+		3E75DC2A1BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC291BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift */; };
 		3E75DC371BFCA5D500FB5E40 /* Size Classes.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E75DC361BFCA5D500FB5E40 /* Size Classes.png */; };
 		3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */; };
 		3EBF6C4E1BF3989B00A8B7C3 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; };
 		3EBF6C4F1BF3989B00A8B7C3 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3EDA41111BFDE44C00A3EF78 /* FoldersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */; };
+		3EDA41141BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41131BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift */; };
+		3EDA41161BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41151BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift */; };
+		3EDA41191BFDE4E100A3EF78 /* FolderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41181BFDE4E100A3EF78 /* FolderTableViewCell.swift */; };
+		3EDA412D1BFDE57E00A3EF78 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41271BFDE57E00A3EF78 /* Folder.swift */; };
+		3EDA412F1BFDE57E00A3EF78 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41291BFDE57E00A3EF78 /* Photo.swift */; };
+		3EDA41311BFDE57E00A3EF78 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA412B1BFDE57E00A3EF78 /* Note.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -94,7 +100,7 @@
 /* Begin PBXFileReference section */
 		3E191E301B7B6CD300BB9E71 /* SeamDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SeamDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		3E191E351B7B6CD300BB9E71 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		3E191E351B7B6CD300BB9E71 /* NotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesViewController.swift; sourceTree = "<group>"; };
 		3E191E381B7B6CD300BB9E71 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		3E191E3B1B7B6CD300BB9E71 /* SeamDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SeamDemo.xcdatamodel; sourceTree = "<group>"; };
 		3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -107,18 +113,24 @@
 		3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3E191E591B7B6D1D00BB9E71 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		3E3775B21BFF62860092770D /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E3775B31BFF62860092770D /* Folder+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Folder+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E3775B41BFF62860092770D /* Note+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Note+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
-		3E75DC211BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
-		3E75DC231BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
-		3E75DC251BFC84F800FB5E40 /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
-		3E75DC291BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DetailViewController+UITextViewDelegate.swift"; sourceTree = "<group>"; };
-		3E75DC2E1BFCA57000FB5E40 /* Note+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Note+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3E75DC2F1BFCA57000FB5E40 /* Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
-		3E75DC301BFCA57000FB5E40 /* Tag+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Tag+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3E75DC311BFCA57000FB5E40 /* Tag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		3E75DC211BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NotesViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
+		3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NotesViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
+		3E75DC251BFC84F800FB5E40 /* NoteDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteDetailViewController.swift; sourceTree = "<group>"; };
+		3E75DC291BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NoteDetailViewController+UITextViewDelegate.swift"; sourceTree = "<group>"; };
 		3E75DC361BFCA5D500FB5E40 /* Size Classes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Size Classes.png"; path = "../../../../../../Desktop/Size Classes.png"; sourceTree = "<group>"; };
 		3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Helper.swift"; sourceTree = "<group>"; };
 		3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Seam.xcodeproj; path = ../Seam.xcodeproj; sourceTree = "<group>"; };
+		3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FoldersViewController.swift; sourceTree = "<group>"; };
+		3EDA41131BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FoldersViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
+		3EDA41151BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FoldersViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
+		3EDA41181BFDE4E100A3EF78 /* FolderTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderTableViewCell.swift; sourceTree = "<group>"; };
+		3EDA41271BFDE57E00A3EF78 /* Folder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
+		3EDA41291BFDE57E00A3EF78 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		3EDA412B1BFDE57E00A3EF78 /* Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,10 +157,12 @@
 		3E02263B1B7C62C10080F9AB /* CoreData Models */ = {
 			isa = PBXGroup;
 			children = (
-				3E75DC2E1BFCA57000FB5E40 /* Note+CoreDataProperties.swift */,
-				3E75DC2F1BFCA57000FB5E40 /* Note.swift */,
-				3E75DC301BFCA57000FB5E40 /* Tag+CoreDataProperties.swift */,
-				3E75DC311BFCA57000FB5E40 /* Tag.swift */,
+				3EDA41271BFDE57E00A3EF78 /* Folder.swift */,
+				3EDA41291BFDE57E00A3EF78 /* Photo.swift */,
+				3EDA412B1BFDE57E00A3EF78 /* Note.swift */,
+				3E3775B21BFF62860092770D /* Photo+CoreDataProperties.swift */,
+				3E3775B31BFF62860092770D /* Folder+CoreDataProperties.swift */,
+				3E3775B41BFF62860092770D /* Note+CoreDataProperties.swift */,
 			);
 			name = "CoreData Models";
 			sourceTree = "<group>";
@@ -181,8 +195,9 @@
 				3E02263B1B7C62C10080F9AB /* CoreData Models */,
 				3E191E561B7B6CF100BB9E71 /* SeamDemo.entitlements */,
 				3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */,
-				3E75DC271BFC850100FB5E40 /* DetailViewController */,
-				3E75DC1F1BFC80E400FB5E40 /* ViewController */,
+				3EDA410C1BFDE43600A3EF78 /* FolderViewController */,
+				3E75DC1F1BFC80E400FB5E40 /* NotesViewController */,
+				3E75DC271BFC850100FB5E40 /* NoteDetailViewController */,
 				3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */,
 				3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */,
 				3E191E371B7B6CD300BB9E71 /* Main.storyboard */,
@@ -211,37 +226,37 @@
 			name = "Custom Cells";
 			sourceTree = "<group>";
 		};
-		3E75DC1F1BFC80E400FB5E40 /* ViewController */ = {
+		3E75DC1F1BFC80E400FB5E40 /* NotesViewController */ = {
 			isa = PBXGroup;
 			children = (
-				3E191E351B7B6CD300BB9E71 /* ViewController.swift */,
+				3E191E351B7B6CD300BB9E71 /* NotesViewController.swift */,
 				3E75DC201BFC80EC00FB5E40 /* Extensions */,
 			);
-			name = ViewController;
+			name = NotesViewController;
 			sourceTree = "<group>";
 		};
 		3E75DC201BFC80EC00FB5E40 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				3E75DC211BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift */,
-				3E75DC231BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift */,
+				3E75DC211BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift */,
+				3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
 		};
-		3E75DC271BFC850100FB5E40 /* DetailViewController */ = {
+		3E75DC271BFC850100FB5E40 /* NoteDetailViewController */ = {
 			isa = PBXGroup;
 			children = (
+				3E75DC251BFC84F800FB5E40 /* NoteDetailViewController.swift */,
 				3E75DC281BFC8BC800FB5E40 /* Extensions */,
-				3E75DC251BFC84F800FB5E40 /* DetailViewController.swift */,
 			);
-			name = DetailViewController;
+			name = NoteDetailViewController;
 			sourceTree = "<group>";
 		};
 		3E75DC281BFC8BC800FB5E40 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				3E75DC291BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift */,
+				3E75DC291BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -265,6 +280,33 @@
 				3EBF6C461BF397C600A8B7C3 /* Seam OSX Tests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		3EDA410C1BFDE43600A3EF78 /* FolderViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */,
+				3EDA41171BFDE4D100A3EF78 /* CustomCell */,
+				3EDA41121BFDE47300A3EF78 /* Extensions */,
+			);
+			name = FolderViewController;
+			sourceTree = "<group>";
+		};
+		3EDA41121BFDE47300A3EF78 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				3EDA41131BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift */,
+				3EDA41151BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		3EDA41171BFDE4D100A3EF78 /* CustomCell */ = {
+			isa = PBXGroup;
+			children = (
+				3EDA41181BFDE4E100A3EF78 /* FolderTableViewCell.swift */,
+			);
+			name = CustomCell;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -416,20 +458,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E75DC341BFCA57000FB5E40 /* Tag+CoreDataProperties.swift in Sources */,
-				3E75DC321BFCA57000FB5E40 /* Note+CoreDataProperties.swift in Sources */,
-				3E75DC261BFC84F800FB5E40 /* DetailViewController.swift in Sources */,
-				3E75DC2A1BFC8BE900FB5E40 /* DetailViewController+UITextViewDelegate.swift in Sources */,
-				3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */,
-				3E75DC221BFC810A00FB5E40 /* ViewController+UITableViewDataSource.swift in Sources */,
+				3EDA41141BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift in Sources */,
+				3E75DC261BFC84F800FB5E40 /* NoteDetailViewController.swift in Sources */,
+				3E75DC2A1BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift in Sources */,
+				3EDA412D1BFDE57E00A3EF78 /* Folder.swift in Sources */,
+				3EDA41191BFDE4E100A3EF78 /* FolderTableViewCell.swift in Sources */,
+				3EDA41161BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift in Sources */,
+				3E3775B51BFF62860092770D /* Photo+CoreDataProperties.swift in Sources */,
+				3E191E361B7B6CD300BB9E71 /* NotesViewController.swift in Sources */,
+				3E75DC221BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift in Sources */,
+				3E3775B71BFF62860092770D /* Note+CoreDataProperties.swift in Sources */,
 				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
 				3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */,
+				3EDA412F1BFDE57E00A3EF78 /* Photo.swift in Sources */,
 				3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */,
-				3E75DC351BFCA57000FB5E40 /* Tag.swift in Sources */,
-				3E75DC241BFC812500FB5E40 /* ViewController+UITableViewDelegate.swift in Sources */,
+				3EDA41311BFDE57E00A3EF78 /* Note.swift in Sources */,
+				3EDA41111BFDE44C00A3EF78 /* FoldersViewController.swift in Sources */,
+				3E3775B61BFF62860092770D /* Folder+CoreDataProperties.swift in Sources */,
+				3E75DC241BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift in Sources */,
 				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
-				3E75DC331BFCA57000FB5E40 /* Note.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,7 +10,6 @@ import UIKit
 
 class CustomTableViewCell: UITableViewCell {
   @IBOutlet var noteLabel: UILabel!
-  @IBOutlet var tagsLabel: UILabel!
   
   func configureWithNote(note: Note) {
     noteLabel.text = note.text
@@ -19,6 +18,5 @@ class CustomTableViewCell: UITableViewCell {
   override func prepareForReuse() {
     super.prepareForReuse()
     noteLabel.text = ""
-    tagsLabel.text = ""
   }
 }

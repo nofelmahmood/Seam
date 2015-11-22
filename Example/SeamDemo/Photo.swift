@@ -1,5 +1,5 @@
 //
-//  Note.swift
+//  Photo.swift
 //  SeamDemo
 //
 //  Created by Nofel Mahmood on 19/11/2015.
@@ -10,7 +10,7 @@ import Foundation
 import CoreData
 
 
-class Note: NSManagedObject {
+class Photo: NSManagedObject {
 
 // Insert code here to add functionality to your managed object subclass
 

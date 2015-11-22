@@ -27,57 +27,12 @@ import CoreData
 import CloudKit
 
 extension NSManagedObject {
-    var uniqueID: String {
-        return valueForKey(UniqueID.name) as! String
-    }
-    
-    var changedPropertiesForChangeRecording: String {
-        let changedProperties = Array(self.changedValues().keys).filter { propertyName in
-            guard let relationshipDescription = entity.propertiesByName[propertyName] as? NSRelationshipDescription else {
-                return true
-            }
-            return !relationshipDescription.toMany
-        }
-        return changedProperties.joinWithSeparator(Change.propertySeparator)
-    }
-//    private func setAttributesValues(ofCKRecord ckRecord:CKRecord, withValuesOfAttributeWithKeys keys: [String]?) {
-//        var attributes: [String] = [String]()
-//        if keys != nil {
-//            attributes = keys!
-//        } else {
-//            attributes = Array(self.entity.attributesByNameByRemovingBackingStoreAttributes().keys)
-//        }
-//        let valuesDictionary = self.dictionaryWithValuesForKeys(attributes)
-//        for (key,_) in valuesDictionary {
-//            let attributeDescription = self.entity.attributesByName[key]
-//            if attributeDescription != nil && self.valueForKey(attributeDescription!.name) != nil {
-//                switch(attributeDescription!.attributeType) {
-//                case .StringAttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! String, forKey: attributeDescription!.name)
-//                case .DateAttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSDate, forKey: attributeDescription!.name)
-//                case .BinaryDataAttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSData, forKey: attributeDescription!.name)
-//                case .BooleanAttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-//                case .DecimalAttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-//                case .DoubleAttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-//                case .FloatAttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-//                case .Integer16AttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-//                case .Integer32AttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-//                case .Integer64AttributeType:
-//                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-//                default:
-//                    break
-//                }
-//            } else if attributeDescription != nil && self.valueForKey(attributeDescription!.name) == nil {
-//                ckRecord.setObject(nil, forKey: attributeDescription!.name)
-//            }
-//        }
-//    }
+  var uniqueID: String {
+    return valueForKey(UniqueID.name) as! String
+  }
+  
+  var changedValueKeys: Set<String> {
+    let propertiesToTrack = self.entity.attributeNames + self.entity.assetAttributeNames + self.entity.toOneRelationshipNames
+    return Set(changedValues().keys.filter { propertiesToTrack.contains($0) })
+  }
 }

@@ -33,12 +33,14 @@ public class Store: NSIncrementalStore {
     case ModelCreationFailed
     case PersistentStoreInitializationFailed
     case InvalidRequest
+    case BackingObjectFetchFailed
   }
   private var backingPSC: NSPersistentStoreCoordinator?
   private lazy var backingMOC: NSManagedObjectContext = {
     var backingMOC = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
     backingMOC.persistentStoreCoordinator = self.backingPSC
     backingMOC.retainsRegisteredObjects = true
+    backingMOC.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
     return backingMOC
   }()
   private lazy var operationQueue: NSOperationQueue = {
@@ -92,6 +94,7 @@ public class Store: NSIncrementalStore {
         notifications.forEach { notification in
           self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
         }
+        let _ = try? self.backingMOC.save()
         var insertedOrUpdatedObjectIDs = [NSManagedObjectID]()
         var deletedObjectIDs = [NSManagedObjectID]()
         changesFromServerInfo?.insertedOrUpdatedObjectsInfo.forEach { (uniqueID, entityName) in
@@ -122,7 +125,6 @@ public class Store: NSIncrementalStore {
     sync.syncCompletionBlock = { (notifications, changesFromServerInfo, error) in
       if error == nil {
         notifications.forEach { notification in
-          print("Notification ",notification)
           self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
         }
         completionBlock?(successful: true)
@@ -200,7 +202,7 @@ public class Store: NSIncrementalStore {
     let fetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: recordID)
     guard let managedObject = try backingMOC.executeFetchRequest(fetchRequest).last as? NSManagedObject else {
-      throw Error.CreationFailed
+      throw Error.BackingObjectFetchFailed
     }
     let propertiesToReturn = objectID.entity.propertyNamesToFetch
     var valuesDictionary = managedObject.dictionaryWithValuesForKeys(propertiesToReturn)
@@ -295,7 +297,6 @@ public class Store: NSIncrementalStore {
     if let updatedObjects = request.updatedObjects {
       try updateObjectsInBackingStore(objectsToUpdate: updatedObjects)
     }
-    sync()
     return []
   }
   

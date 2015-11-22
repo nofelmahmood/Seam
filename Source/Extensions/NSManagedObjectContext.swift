@@ -27,7 +27,6 @@ import CoreData
 import CloudKit
 
 extension NSManagedObjectContext {
-  
   public func performSyncAndMerge(completionBlock: (()->())?) {
     var store: Store?
     persistentStoreCoordinator?.persistentStores.forEach { persistentStore in
@@ -41,7 +40,7 @@ extension NSManagedObjectContext {
           self.performBlock {
             insertedOrUpdatedObjectIDs?.forEach { objectID in
               let object = self.objectWithID(objectID)
-              self.refreshObject(object, mergeChanges: false)
+              self.refreshObject(object, mergeChanges: true)
             }
             deletedObjectIDs?.forEach { objectID in
               let object = self.objectWithID(objectID)

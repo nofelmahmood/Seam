@@ -1,5 +1,5 @@
 //
-//  Note+CoreDataProperties.swift
+//  Folder+CoreDataProperties.swift
 //  SeamDemo
 //
 //  Created by Nofel Mahmood on 20/11/2015.
@@ -12,10 +12,9 @@
 import Foundation
 import CoreData
 
-extension Note {
+extension Folder {
 
-    @NSManaged var text: String?
-    @NSManaged var folder: Folder?
-    @NSManaged var photos: NSOrderedSet?
+    @NSManaged var name: String?
+    @NSManaged var notes: NSSet?
 
 }

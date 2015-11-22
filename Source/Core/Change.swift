@@ -60,24 +60,19 @@ class Change {
       managedObject.setValue(newValue, forKey: Properties.ChangeType.name)
     }
   }
-  var properties: String? {
+  var properties: Set<String>? {
     get {
-      return managedObject.valueForKey(Properties.ChangedProperties.name) as? String
+      guard let properties = managedObject.valueForKey(Properties.ChangedProperties.name) as? String else {
+        return nil
+      }
+      return Set(properties.componentsSeparatedByString(Change.propertySeparator))
     } set {
       guard let newValue = newValue else {
         managedObject.setValue(nil, forKey: Properties.ChangedProperties.name)
         return
       }
-      if let oldProperties = managedObject.valueForKey(Properties.ChangedProperties.name) as? String {
-        let newPropertiesArray = newValue.componentsSeparatedByString(Change.propertySeparator)
-        let newPropertiesSet = Set(newPropertiesArray)
-        let oldPropertiesArray = oldProperties.componentsSeparatedByString(Change.propertySeparator)
-        let oldPropertiesSet = Set(oldPropertiesArray)
-        let properties = Array(oldPropertiesSet.union(newPropertiesSet)).joinWithSeparator(Change.propertySeparator)
-        managedObject.setValue(properties, forKey: Properties.ChangedProperties.name)
-      } else {
-        managedObject.setValue(newValue, forKey: Properties.ChangedProperties.name)
-      }
+      let properties = newValue.joinWithSeparator(Change.propertySeparator)
+      managedObject.setValue(properties, forKey: Properties.ChangedProperties.name)
     }
   }
   var queued: Bool {
@@ -88,21 +83,19 @@ class Change {
     }
   }
   var isDeletedType: Bool {
-    let isDeletedType = type == Change.ChangeType.Deleted
-    return isDeletedType
+    return type == ChangeType.Deleted
   }
   var isInsertedType: Bool {
-    let isInsertedType = type == Change.ChangeType.Inserted
-    return isInsertedType
+    return type == ChangeType.Inserted
   }
   var isUpdatedType: Bool {
-    let isUpdatedType = type == Change.ChangeType.Updated
-    return isUpdatedType
+   return type == ChangeType.Updated
   }
   var changedPropertyValuesDictionary: [String: AnyObject]? {
     if let changedObject = changedObject {
-      if let properties = properties?.componentsSeparatedByString(Change.propertySeparator) where isUpdatedType == true {
-        return changedObject.dictionaryWithValuesForKeys(properties)
+      if let properties = properties where isUpdatedType {
+        print("ENTITYNAME ",self.entityName)
+        return changedObject.dictionaryWithValuesForKeys(Array(properties))
       } else  {
         let keys = changedObject.entity.attributeNames + changedObject.entity.toOneRelationshipNames + changedObject.entity.assetAttributeNames
         var dictionary = changedObject.dictionaryWithValuesForKeys(keys)
@@ -234,28 +227,28 @@ class Change {
       let context = changedObject.managedObjectContext!
       if changedObject.deleted {
         if let change = try changeFor(changedObject.uniqueID) {
-          let insertedType = change.isInsertedType
-          try remove(change)
-          guard insertedType == false else {
+          guard change.isInsertedType == false else {
+            try remove(change)
             return nil
           }
         }
-        try new(changedObject.uniqueID,type: Change.ChangeType.Deleted,
+        try new(changedObject.uniqueID,type: ChangeType.Deleted,
           entityName: changedObject.entity.name!,inContext: context)
       } else if changedObject.inserted {
-        try new(changedObject.uniqueID,type: Change.ChangeType.Inserted,
+        try new(changedObject.uniqueID,type: ChangeType.Inserted,
           entityName: changedObject.entity.name!,inContext: context)
       } else if changedObject.updated {
         if let change =  try changeFor(changedObject.uniqueID) {
-          guard change.type == Change.ChangeType.Updated else {
+          guard change.isUpdatedType else {
             return nil
           }
-          change.properties = changedObject.changedPropertiesForChangeRecording
+          print("Setting UP Changed Properties ",changedObject.changedValueKeys)
+          change.properties = change.properties!.union(changedObject.changedValueKeys)
           try context.save()
           return change
         }  else {
           let change = try new(changedObject.uniqueID, type: Change.ChangeType.Updated, entityName: changedObject.entity.name!, inContext: context)
-          change.properties = changedObject.changedPropertiesForChangeRecording
+          change.properties = Set(changedObject.changedValueKeys)
           try context.save()
           return change
         }
@@ -287,7 +280,7 @@ class Change {
       let changes = try context.executeFetchRequest(fetchRequest) as? [NSManagedObject]
       return changes?.map({ Change(managedObject: $0) })
     }
-    
+
     func removeAllQueued() throws {
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate(changeIsQueued: true)

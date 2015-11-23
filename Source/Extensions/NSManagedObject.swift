@@ -28,11 +28,21 @@ import CloudKit
 
 extension NSManagedObject {
   var uniqueID: String {
-    return valueForKey(UniqueID.name) as! String
+    get {
+      return valueForKey(UniqueID.name) as! String
+    } set {
+      setValue(newValue, forKey: UniqueID.name)
+    }
   }
-  
-  var changedValueKeys: Set<String> {
+  var encodedFields: NSData? {
+    get {
+      return valueForKey(EncodedValues.name) as? NSData
+    } set {
+      setValue(newValue, forKey: EncodedValues.name)
+    }
+  }
+  var changedValueKeys: [String] {
     let propertiesToTrack = self.entity.attributeNames + self.entity.assetAttributeNames + self.entity.toOneRelationshipNames
-    return Set(changedValues().keys.filter { propertiesToTrack.contains($0) })
+    return changedValues().keys.filter { propertiesToTrack.contains($0) }
   }
 }

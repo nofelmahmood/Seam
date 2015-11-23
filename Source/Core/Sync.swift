@@ -140,8 +140,14 @@ class Sync: NSOperation {
       }
     }
     try changeManager.removeAllQueued()
-    if context.hasChanges {
-      try context.save()
+    context.performBlockAndWait {
+      if self.context.hasChanges {
+        do {
+          try self.context.save()
+        } catch {
+          print(error)
+        }
+      }
     }
   }
   
@@ -211,8 +217,16 @@ class Sync: NSOperation {
     let entitiesByName = persistentStoreCoordinator.managedObjectModel.entitiesByName
     let deletedObjectsInfo = try context.deleteObjectsWithUniqueIDs(deletedObjectUniqueIDs, inEntities: entityNames)
     try context.createOrUpdateObjects(fromRecords: changes.insertedOrUpdatedCKRecords, inEntities: entitiesByName)
-    if context.hasChanges {
-      try context.save()
+    context.performBlockAndWait {
+      if self.context.hasChanges {
+        do {
+          if self.context.hasChanges {
+            try self.context.save()
+          }
+        } catch {
+          print(error)
+        }
+      }
     }
     let insertedOrUpdatedObjectsInfo = changes.insertedOrUpdatedCKRecords.map {
       (uniqueID: $0.recordID.recordName, entityName: $0.recordType) }

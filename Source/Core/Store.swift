@@ -82,34 +82,36 @@ public class Store: NSIncrementalStore {
     changeManager = Change.Manager(managedObjectContext: backingMOC)
   }
   
-  public func performContextBasedSync(completionBlock: ((insertedOrUpdatedObjectIDs: [NSManagedObjectID]?, deletedObjectIDs: [NSManagedObjectID]?, successful: Bool) -> ())?) {
+  public func performContextBasedSync(completionBlock: ((insertedOrUpdatedObjectIDs: [NSManagedObjectID]?, deletedObjectIDs: [NSManagedObjectID]?) -> ())?) {
     guard operationQueue.operationCount == 0 else {
       print("Already Syncing")
-      completionBlock?(insertedOrUpdatedObjectIDs: nil, deletedObjectIDs: nil, successful: false)
+      completionBlock?(insertedOrUpdatedObjectIDs: nil, deletedObjectIDs: nil)
       return
     }
     let sync = Sync(backingPersistentStoreCoordinator: backingPSC!, persistentStoreCoordinator: persistentStoreCoordinator!)
     sync.syncCompletionBlock = { (notifications, changesFromServerInfo, error) in
       if error == nil {
-        notifications.forEach { notification in
-          self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
+          self.backingMOC.performBlock {
+          notifications.forEach { notification in
+            self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
+          }
+          let _ = try? self.backingMOC.save()
+          var insertedOrUpdatedObjectIDs = [NSManagedObjectID]()
+          var deletedObjectIDs = [NSManagedObjectID]()
+          changesFromServerInfo?.insertedOrUpdatedObjectsInfo.forEach { (uniqueID, entityName) in
+            let entity = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[entityName]!
+            let objectID = self.newObjectIDForEntity(entity, referenceObject: uniqueID)
+            insertedOrUpdatedObjectIDs.append(objectID)
+          }
+          changesFromServerInfo?.deletedObjectsInfo.forEach { (uniqueID, entityName) in
+            let entity = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[entityName]!
+            let objectID = self.newObjectIDForEntity(entity, referenceObject: uniqueID)
+            deletedObjectIDs.append(objectID)
+          }
+          completionBlock?(insertedOrUpdatedObjectIDs: insertedOrUpdatedObjectIDs, deletedObjectIDs: deletedObjectIDs)
         }
-        let _ = try? self.backingMOC.save()
-        var insertedOrUpdatedObjectIDs = [NSManagedObjectID]()
-        var deletedObjectIDs = [NSManagedObjectID]()
-        changesFromServerInfo?.insertedOrUpdatedObjectsInfo.forEach { (uniqueID, entityName) in
-          let entity = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[entityName]!
-          let objectID = self.newObjectIDForEntity(entity, referenceObject: uniqueID)
-          insertedOrUpdatedObjectIDs.append(objectID)
-        }
-        changesFromServerInfo?.deletedObjectsInfo.forEach { (uniqueID, entityName) in
-          let entity = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[entityName]!
-          let objectID = self.newObjectIDForEntity(entity, referenceObject: uniqueID)
-          deletedObjectIDs.append(objectID)
-        }
-        completionBlock?(insertedOrUpdatedObjectIDs: insertedOrUpdatedObjectIDs, deletedObjectIDs: deletedObjectIDs, successful: true)
       } else {
-        completionBlock?(insertedOrUpdatedObjectIDs: nil, deletedObjectIDs: nil, successful: false)
+        completionBlock?(insertedOrUpdatedObjectIDs: nil, deletedObjectIDs: nil)
       }
     }
     operationQueue.addOperation(sync)
@@ -117,7 +119,6 @@ public class Store: NSIncrementalStore {
   
   public func performSync(completionBlock: ((successful: Bool)->())?) {
     guard operationQueue.operationCount == 0 else {
-      print("Already Syncing")
       completionBlock?(successful: false)
       return
     }
@@ -301,46 +302,55 @@ public class Store: NSIncrementalStore {
   }
   
   func insertObjectsInBackingStore(objectsToInsert objects:Set<NSManagedObject>, mainContext: NSManagedObjectContext) throws {
-    try objects.forEach { sourceObject in
-      let backingObject = NSEntityDescription.insertNewObjectForEntityForName((sourceObject.entity.name)!, inManagedObjectContext: backingMOC) as NSManagedObject
-      let referenceObject = uniqueIDForObjectID(sourceObject.objectID)
-      backingObject.setValue(referenceObject, forKey: UniqueID.name)
-      try backingMOC.obtainPermanentIDsForObjects([backingObject])
-      setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
-      try setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
-      mainContext.willChangeValueForKey("objectID")
-      try mainContext.obtainPermanentIDsForObjects([sourceObject])
-      mainContext.didChangeValueForKey("objectID")
-      try changeManager.new(backingObject)
-      try backingMOC.save()
+    try backingMOC.performBlockAndWait {
+      try objects.forEach { sourceObject in
+        let backingObject = NSEntityDescription.insertNewObjectForEntityForName((sourceObject.entity.name)!, inManagedObjectContext: self.backingMOC) as NSManagedObject
+        let referenceObject = self.uniqueIDForObjectID(sourceObject.objectID)
+        backingObject.setValue(referenceObject, forKey: UniqueID.name)
+        try self.backingMOC.obtainPermanentIDsForObjects([backingObject])
+        self.setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
+        try self.setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
+        mainContext.willChangeValueForKey("objectID")
+        try mainContext.obtainPermanentIDsForObjects([sourceObject])
+        mainContext.didChangeValueForKey("objectID")
+        try self.changeManager.new(referenceObject, changedObject: sourceObject)
+        try self.backingMOC.save()
+      }
     }
   }
   
   private func updateObjectsInBackingStore(objectsToUpdate objects: Set<NSManagedObject>) throws {
-    try objects.forEach { sourceObject in
-      let recordID = uniqueIDForObjectID(sourceObject.objectID)
-      if let backingObjectID = try objectIDForBackingObjectForEntity(sourceObject.entity.name!, withReferenceObject: recordID) {
-        if let backingObject = try? backingMOC.existingObjectWithID(backingObjectID) {
-          setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
-          try setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
-          try changeManager.new(backingObject)
-          try backingMOC.save()
+    try backingMOC.performBlockAndWait {
+      try objects.forEach { sourceObject in
+        let referenceObject = self.uniqueIDForObjectID(sourceObject.objectID)
+        if let backingObjectID = try self.objectIDForBackingObjectForEntity(sourceObject.entity.name!, withReferenceObject: referenceObject) {
+          if let backingObject = try? self.backingMOC.existingObjectWithID(backingObjectID) {
+            self.setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
+            try self.setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
+            let changedValueKeys = sourceObject.changedValueKeys
+            if changedValueKeys.count > 0 {
+              try self.changeManager.new(referenceObject, changedObject: sourceObject)
+            }
+            try self.backingMOC.save()
+          }
         }
       }
     }
   }
   
   private func deleteObjectsFromBackingStore(objectsToDelete objects: Set<NSManagedObject>, mainContext: NSManagedObjectContext) throws {
-    try objects.forEach { managedObject in
-      let fetchRequest = NSFetchRequest(entityName: managedObject.entity.name!)
-      let recordID = uniqueIDForObjectID(managedObject.objectID)
-      fetchRequest.predicate = NSPredicate(equalsToUniqueID: recordID)
-      fetchRequest.includesPropertyValues = false
-      let results = try backingMOC.executeFetchRequest(fetchRequest)
-      if let backingObject = results.last as? NSManagedObject {
-        backingMOC.deleteObject(backingObject)
-        try changeManager.new(backingObject)
-        try backingMOC.save()
+    try backingMOC.performBlockAndWait {
+      try objects.forEach { sourceObject in
+        let fetchRequest = NSFetchRequest(entityName: sourceObject.entity.name!)
+        let referenceObject = self.uniqueIDForObjectID(sourceObject.objectID)
+        fetchRequest.predicate = NSPredicate(equalsToUniqueID: referenceObject)
+        fetchRequest.includesPropertyValues = false
+        let results = try self.backingMOC.executeFetchRequest(fetchRequest)
+        if let backingObject = results.last as? NSManagedObject {
+          self.backingMOC.deleteObject(backingObject)
+          try self.changeManager.new(referenceObject, changedObject: sourceObject)
+          try self.backingMOC.save()
+        }
       }
     }
   }
@@ -348,15 +358,21 @@ public class Store: NSIncrementalStore {
   // MARK: BatchUpdateRequest
   
   func executeBatchUpdateRequest(batchUpdateRequest: NSBatchUpdateRequest, context: NSManagedObjectContext) throws -> AnyObject {
-    let request = NSBatchUpdateRequest(entityName: batchUpdateRequest.entityName)
-    request.predicate = batchUpdateRequest.predicate
-    request.propertiesToUpdate = batchUpdateRequest.propertiesToUpdate
-    return try context.executeRequest(request)
+    try backingMOC.performBlockAndWait {
+      let request = NSBatchUpdateRequest(entityName: batchUpdateRequest.entityName)
+      request.predicate = batchUpdateRequest.predicate
+      request.propertiesToUpdate = batchUpdateRequest.propertiesToUpdate
+      try self.backingMOC.executeRequest(request)
+    }
+    return []
   }
   
   // MARK: BatchDeleteRequest
   
   func executeBatchDeleteRequest(batchDeleteRequest: NSBatchDeleteRequest, context: NSManagedObjectContext) throws -> AnyObject {
-    return try context.executeRequest(batchDeleteRequest)
+    try backingMOC.performBlockAndWait {
+      try self.backingMOC.executeRequest(batchDeleteRequest)
+    }
+    return []
   }
 }

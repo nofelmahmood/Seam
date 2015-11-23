@@ -29,6 +29,10 @@ extension NSPredicate {
     self.init(format: "%K == %@", UniqueID.name,id)
   }
   
+  convenience init(changeIsNotQueuedAndEqualsToID id: String) {
+    self.init(format: "%K == %@ AND %K == %@", Change.Properties.ChangeQueued.name, NSNumber(bool: false), UniqueID.name, id)
+  }
+  
   convenience init(inUniqueIDs ids: [String]) {
     self.init(format: "%K IN %@",UniqueID.name,ids)
   }

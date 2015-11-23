@@ -47,11 +47,11 @@ extension CKRecord {
       return nil
     }
     var record: CKRecord?
-    if let encodedFields = change.changedObjectEncodedValues {
+    if let encodedFields = change.changedObject?.encodedFields {
       record = CKRecord.recordWithEncodedFields(encodedFields)
     } else {
       let recordID = CKRecordID(change: change)
-      record = CKRecord(recordType: change.entityName, recordID: recordID)
+      record = CKRecord(recordType: change.entityName!, recordID: recordID)
     }
     if let valuesDictionary = change.changedPropertyValuesDictionary {
       valuesDictionary.forEach { (key, value) in

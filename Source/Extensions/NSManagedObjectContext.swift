@@ -35,25 +35,33 @@ extension NSManagedObjectContext {
       }
     }
     if let store = store {
-      store.performContextBasedSync { (insertedOrUpdatedObjectIDs, deletedObjectIDs, successful) in
-        if successful {
-          self.performBlock {
-            insertedOrUpdatedObjectIDs?.forEach { objectID in
-              let object = self.objectWithID(objectID)
-              self.refreshObject(object, mergeChanges: true)
-            }
-            deletedObjectIDs?.forEach { objectID in
-              let object = self.objectWithID(objectID)
-              self.deleteObject(object)
-            }
-            completionBlock?()
+      store.performContextBasedSync { (insertedOrUpdatedObjectIDs, deletedObjectIDs) in
+        self.performBlockAndWait {
+          insertedOrUpdatedObjectIDs?.forEach { objectID in
+            let object = self.objectWithID(objectID)
+            self.refreshObject(object, mergeChanges: true)
           }
-        } else {
-          completionBlock?()
+          deletedObjectIDs?.forEach { objectID in
+            let object = self.objectWithID(objectID)
+            self.deleteObject(object)
+          }
         }
+        completionBlock?()
       }
-    } else {
-      completionBlock?()
+    }
+  }
+  
+  func performBlockAndWait(block: () throws -> ()) throws {
+    var blockError: ErrorType?
+    performBlockAndWait {
+      do {
+        try block()
+      } catch {
+        blockError = error
+      }
+    }
+    if let blockError = blockError {
+      throw blockError
     }
   }
   

@@ -117,25 +117,6 @@ public class Store: NSIncrementalStore {
     operationQueue.addOperation(sync)
   }
   
-  public func performSync(completionBlock: ((successful: Bool)->())?) {
-    guard operationQueue.operationCount == 0 else {
-      completionBlock?(successful: false)
-      return
-    }
-    let sync = Sync(backingPersistentStoreCoordinator: backingPSC!, persistentStoreCoordinator: persistentStoreCoordinator!)
-    sync.syncCompletionBlock = { (notifications, changesFromServerInfo, error) in
-      if error == nil {
-        notifications.forEach { notification in
-          self.backingMOC.mergeChangesFromContextDidSaveNotification(notification)
-        }
-        completionBlock?(successful: true)
-      } else {
-        completionBlock?(successful: false)
-      }
-    }
-    operationQueue.addOperation(sync)
-  }
-  
   // MARK: - Translation
   
   func uniqueIDForObjectID(objectID: NSManagedObjectID) -> String {

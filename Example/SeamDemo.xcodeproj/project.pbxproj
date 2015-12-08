@@ -17,9 +17,6 @@
 		3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */; };
 		3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E591B7B6D1D00BB9E71 /* CoreData.framework */; };
 		3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */; };
-		3E3775B51BFF62860092770D /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3775B21BFF62860092770D /* Photo+CoreDataProperties.swift */; };
-		3E3775B61BFF62860092770D /* Folder+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3775B31BFF62860092770D /* Folder+CoreDataProperties.swift */; };
-		3E3775B71BFF62860092770D /* Note+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E3775B41BFF62860092770D /* Note+CoreDataProperties.swift */; };
 		3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */; };
 		3E75DC221BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC211BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift */; };
 		3E75DC241BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */; };
@@ -29,6 +26,9 @@
 		3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */; };
 		3EBF6C4E1BF3989B00A8B7C3 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; };
 		3EBF6C4F1BF3989B00A8B7C3 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3EC65C7B1C0F3BBF00109FBA /* Folder+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC65C781C0F3BBF00109FBA /* Folder+CoreDataProperties.swift */; };
+		3EC65C7C1C0F3BBF00109FBA /* Note+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC65C791C0F3BBF00109FBA /* Note+CoreDataProperties.swift */; };
+		3EC65C7D1C0F3BBF00109FBA /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC65C7A1C0F3BBF00109FBA /* Photo+CoreDataProperties.swift */; };
 		3EDA41111BFDE44C00A3EF78 /* FoldersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */; };
 		3EDA41141BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41131BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift */; };
 		3EDA41161BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41151BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift */; };
@@ -113,9 +113,6 @@
 		3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3E191E591B7B6D1D00BB9E71 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
-		3E3775B21BFF62860092770D /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3E3775B31BFF62860092770D /* Folder+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Folder+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		3E3775B41BFF62860092770D /* Note+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Note+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		3E75DC211BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NotesViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
 		3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NotesViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
@@ -124,6 +121,9 @@
 		3E75DC361BFCA5D500FB5E40 /* Size Classes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Size Classes.png"; path = "../../../../../../Desktop/Size Classes.png"; sourceTree = "<group>"; };
 		3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Helper.swift"; sourceTree = "<group>"; };
 		3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Seam.xcodeproj; path = ../Seam.xcodeproj; sourceTree = "<group>"; };
+		3EC65C781C0F3BBF00109FBA /* Folder+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Folder+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3EC65C791C0F3BBF00109FBA /* Note+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Note+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3EC65C7A1C0F3BBF00109FBA /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FoldersViewController.swift; sourceTree = "<group>"; };
 		3EDA41131BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FoldersViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
 		3EDA41151BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FoldersViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
@@ -160,9 +160,9 @@
 				3EDA41271BFDE57E00A3EF78 /* Folder.swift */,
 				3EDA41291BFDE57E00A3EF78 /* Photo.swift */,
 				3EDA412B1BFDE57E00A3EF78 /* Note.swift */,
-				3E3775B21BFF62860092770D /* Photo+CoreDataProperties.swift */,
-				3E3775B31BFF62860092770D /* Folder+CoreDataProperties.swift */,
-				3E3775B41BFF62860092770D /* Note+CoreDataProperties.swift */,
+				3EC65C781C0F3BBF00109FBA /* Folder+CoreDataProperties.swift */,
+				3EC65C791C0F3BBF00109FBA /* Note+CoreDataProperties.swift */,
+				3EC65C7A1C0F3BBF00109FBA /* Photo+CoreDataProperties.swift */,
 			);
 			name = "CoreData Models";
 			sourceTree = "<group>";
@@ -464,19 +464,19 @@
 				3EDA412D1BFDE57E00A3EF78 /* Folder.swift in Sources */,
 				3EDA41191BFDE4E100A3EF78 /* FolderTableViewCell.swift in Sources */,
 				3EDA41161BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift in Sources */,
-				3E3775B51BFF62860092770D /* Photo+CoreDataProperties.swift in Sources */,
 				3E191E361B7B6CD300BB9E71 /* NotesViewController.swift in Sources */,
 				3E75DC221BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift in Sources */,
-				3E3775B71BFF62860092770D /* Note+CoreDataProperties.swift in Sources */,
 				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
 				3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */,
 				3EDA412F1BFDE57E00A3EF78 /* Photo.swift in Sources */,
+				3EC65C7C1C0F3BBF00109FBA /* Note+CoreDataProperties.swift in Sources */,
 				3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */,
+				3EC65C7B1C0F3BBF00109FBA /* Folder+CoreDataProperties.swift in Sources */,
 				3EDA41311BFDE57E00A3EF78 /* Note.swift in Sources */,
 				3EDA41111BFDE44C00A3EF78 /* FoldersViewController.swift in Sources */,
-				3E3775B61BFF62860092770D /* Folder+CoreDataProperties.swift in Sources */,
 				3E75DC241BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift in Sources */,
+				3EC65C7D1C0F3BBF00109FBA /* Photo+CoreDataProperties.swift in Sources */,
 				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

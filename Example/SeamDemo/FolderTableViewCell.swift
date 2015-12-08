@@ -18,5 +18,4 @@ class FolderTableViewCell: UITableViewCell {
   override func prepareForReuse() {
     self.nameLabel.text = ""
   }
-  
 }

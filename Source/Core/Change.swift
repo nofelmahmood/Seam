@@ -24,12 +24,14 @@
 
 import Foundation
 import CoreData
+import CloudKit
 
 class Change: NSManagedObject {
   @NSManaged var entityName: String?
   @NSManaged var type: NSNumber?
   @NSManaged var properties: String?
   @NSManaged var queued: NSNumber?
+  @NSManaged var creationDate: NSDate
   
   var separatedProperties: [String]? {
     return properties?.componentsSeparatedByString(Change.propertySeparator)
@@ -45,42 +47,6 @@ class Change: NSManagedObject {
   }
   var isQueued: Bool {
     return queued!.boolValue
-  }
-  var changedObject: NSManagedObject? {
-    let context = managedObjectContext!
-    let fetchRequest = NSFetchRequest(entityName: entityName!)
-    fetchRequest.predicate = NSPredicate(equalsToUniqueID: uniqueID)
-    let object = try? context.executeFetchRequest(fetchRequest).first
-    guard let managedObject = object as? NSManagedObject else {
-      return nil
-    }
-    return managedObject
-  }
-  var changedPropertyValuesDictionary: [String: AnyObject]? {
-    if let changedObject = changedObject {
-      if let changedProperties = separatedProperties where isUpdatedType {
-        return changedObject.dictionaryWithValuesForKeys(changedProperties)
-      } else  {
-        let keys = changedObject.entity.attributeNames + changedObject.entity.toOneRelationshipNames + changedObject.entity.assetAttributeNames
-        var dictionary = changedObject.dictionaryWithValuesForKeys(keys)
-        dictionary[EncodedValues.name] = nil
-        dictionary[UniqueID.name] = nil
-        return dictionary
-      }
-    }
-    return nil
-  }
-  
-  class func modifiedModel(fromModel model: NSManagedObjectModel) -> NSManagedObjectModel? {
-    guard let model = model.copy() as? NSManagedObjectModel else {
-      return nil
-    }
-    model.entities.forEach { entity in
-      entity.properties.append(UniqueID.attributeDescription)
-      entity.properties.append(EncodedValues.attributeDescription)
-    }
-    model.entities.append(Entity.entityDescription)
-    return model
   }
   
   func addProperties(props: [String]) {
@@ -111,10 +77,14 @@ class Change: NSManagedObject {
       entityDescription.properties.append(Properties.EntityName.attributeDescription)
       entityDescription.properties.append(Properties.ChangedProperties.attributeDescription)
       entityDescription.properties.append(Properties.ChangeQueued.attributeDescription)
+      entityDescription.properties.append(Properties.CreationDate.attributeDescription)
       entityDescription.managedObjectClassName = "Seam.Change"
       return entityDescription
     }
   }
+  
+  // MARK: Properties
+
   struct Properties {
     struct ChangeType {
       static let name = "type"
@@ -127,7 +97,7 @@ class Change: NSManagedObject {
         return attributeDescription
       }
     }
-    struct  EntityName {
+    struct EntityName {
       static let name = "entityName"
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
@@ -138,7 +108,7 @@ class Change: NSManagedObject {
         return attributeDescription
       }
     }
-    struct  ChangedProperties {
+    struct ChangedProperties {
       static let name = "properties"
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
@@ -159,87 +129,124 @@ class Change: NSManagedObject {
         return attributeDescription
       }
     }
+    struct CreationDate {
+      static let name = "creationDate"
+      static var attributeDescription: NSAttributeDescription {
+        let attributeDescription = NSAttributeDescription()
+        attributeDescription.name = name
+        attributeDescription.attributeType = .DateAttributeType
+        attributeDescription.optional = false
+        return attributeDescription
+      }
+    }
   }
   
   // MARK: - Manager
   
   class Manager {
-    private var context: NSManagedObjectContext!
+    private var changeContext: NSManagedObjectContext!
+    private var mainContext: NSManagedObjectContext?
     
-    init(managedObjectContext: NSManagedObjectContext) {
-      context = managedObjectContext
+    init(changeContext: NSManagedObjectContext) {
+      self.changeContext = changeContext
+    }
+    
+    init(changeContext: NSManagedObjectContext, mainContext: NSManagedObjectContext) {
+      self.changeContext = changeContext
+      self.mainContext = mainContext
     }
     
     func hasChanges() -> Bool {
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
       var error: NSError?
-      return context.countForFetchRequest(fetchRequest, error: &error) > 0 ? true: false
+      return changeContext.countForFetchRequest(fetchRequest, error: &error) > 0 ? true: false
     }
     
     func new(uniqueID: String,type: NSNumber, entityName: String) -> Change {
-      let change = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as! Change
+      let change = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: changeContext) as! Change
       change.uniqueID = uniqueID
       change.type = type
       change.entityName = entityName
+      change.creationDate = NSDate()
       return change
     }
     
-    func new(uniqueID: String,changedObject: NSManagedObject) throws -> Change? {
-      if changedObject.deleted {
-        if let change = try changeFor(changedObject.uniqueID) {
-          guard change.isInsertedType == false else {
-            context.deleteObject(change)
-            return nil
-          }
-        }
-        new(uniqueID,type: ChangeType.Deleted,
-          entityName: changedObject.entity.name!)
-      } else if changedObject.inserted {
-        new(uniqueID,type: ChangeType.Inserted,
-          entityName: changedObject.entity.name!)
-      } else if changedObject.updated {
-        if let change =  try changeFor(uniqueID)  {
-          guard change.isUpdatedType else {
-            return nil
-          }
-          change.addProperties(changedObject.changedValueKeys)
-          return change
-        }  else {
-          let change = new(uniqueID, type: Change.ChangeType.Updated, entityName: changedObject.entity.name!)
-          change.addProperties(changedObject.changedValueKeys)
-          return change
-        }
-      }
-      return nil
-    }
-    
-    func changeFor(uniqueID: String) throws -> Change? {
+//    func new(uniqueID: String,changedObject: NSManagedObject) throws -> Change? {
+//      if changedObject.deleted {
+//        if let change = try changeFor(uniqueID) {
+//          guard change.isInsertedType == false else {
+//            changeContext.deleteObject(change)
+//            return nil
+//          }
+//        }
+//        new(uniqueID,type: ChangeType.Deleted,
+//          entityName: changedObject.entity.name!)
+//      } else if changedObject.inserted {
+//        new(uniqueID,type: ChangeType.Inserted,
+//          entityName: changedObject.entity.name!)
+//      } else if changedObject.updated {
+//        if let change =  try changeFor(uniqueID)  {
+//          guard change.isUpdatedType else {
+//            return nil
+//          }
+//          change.addProperties(changedObject.changedValueKeys)
+//          return change
+//        }  else {
+//          let change = new(uniqueID, type: Change.ChangeType.Updated, entityName: changedObject.entity.name!)
+//          change.addProperties(changedObject.changedValueKeys)
+//          return change
+//        }
+//      }
+//      return nil
+//    }
+//    
+    private func changeFor(uniqueID: String) throws -> Change? {
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate(changeIsNotQueuedAndEqualsToID: uniqueID)
-      return try context.executeFetchRequest(fetchRequest).first as? Change
+      return try changeContext.executeFetchRequest(fetchRequest).first as? Change
     }
     
     func dequeueAll() throws -> [Change]? {
       let batchUpdateRequest = NSBatchUpdateRequest(entityName: Entity.name)
       batchUpdateRequest.propertiesToUpdate = [Properties.ChangeQueued.name: NSNumber(bool: true)]
-      try context.executeRequest(batchUpdateRequest)
+      try changeContext.executeRequest(batchUpdateRequest)
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate(changeIsQueued: true)
-      return try context.executeFetchRequest(fetchRequest) as? [Change]
+      let dateSortDescriptor = NSSortDescriptor(key: Properties.CreationDate.name, ascending: true)
+      fetchRequest.sortDescriptors = [dateSortDescriptor]
+      return try changeContext.executeFetchRequest(fetchRequest) as? [Change]
     }
     
     func removeAllQueued() throws {
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate(changeIsQueued: true)
       let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-      try context.executeRequest(batchDeleteRequest)
+      try changeContext.executeRequest(batchDeleteRequest)
     }
     
     func enqueueBackAllDequeuedChanges() throws {
       let batchUpdateRequest = NSBatchUpdateRequest(entityName: Entity.name)
       batchUpdateRequest.predicate = NSPredicate(changeIsQueued: true)
       batchUpdateRequest.propertiesToUpdate = [Properties.ChangeQueued.name: NSNumber(bool: false)]
-      try context.executeRequest(batchUpdateRequest)
+      try changeContext.executeRequest(batchUpdateRequest)
+    }
+    
+    func objectForChange(change: Change) throws -> NSManagedObject? {
+      let fetchRequest = NSFetchRequest(entityName: change.entityName!)
+      fetchRequest.predicate = NSPredicate(equalsToUniqueID: change.uniqueID)
+      return try mainContext?.executeFetchRequest(fetchRequest).first as? NSManagedObject
+    }
+    
+    func changedPropertyValuesDictionaryForChange(change: Change) throws -> [String: AnyObject]? {
+      guard let changedObject = try objectForChange(change) else {
+        return nil
+      }
+      if let changedProperties = change.separatedProperties where change.isUpdatedType {
+        return changedObject.dictionaryWithValuesForKeys(changedProperties)
+      } else  {
+        let keys = changedObject.entity.attributeNames + changedObject.entity.toOneRelationshipNames + changedObject.entity.assetAttributeNames + changedObject.entity.locationAttributeNames
+        return changedObject.dictionaryWithValuesForKeys(keys)
+      }
     }
   }
 }

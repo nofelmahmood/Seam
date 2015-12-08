@@ -26,29 +26,41 @@ import Foundation
 import CoreData
 import CloudKit
 
+let ContextDoesNotAllowChangeRecording = "ContextDoesNotAllowChangeRecording"
+let UniqueIDsForInsertedObjectsKey = "UniqueIDsForInsertedObjectsKey"
+
 extension NSManagedObjectContext {
-  public func performSyncAndMerge(completionBlock: (()->())?) {
-    var store: Store?
-    persistentStoreCoordinator?.persistentStores.forEach { persistentStore in
-      if let persistentStore = persistentStore as? Store {
-        store = persistentStore
+  var doesNotAllowChangeRecording: Bool {
+    get {
+      guard let optionValue = userInfo[ContextDoesNotAllowChangeRecording]?.boolValue else {
+        return false
       }
+      return optionValue
+    } set {
+      userInfo[ContextDoesNotAllowChangeRecording] = newValue
     }
-    if let store = store {
-      store.performContextBasedSync { (insertedOrUpdatedObjectIDs, deletedObjectIDs) in
-        self.performBlockAndWait {
-          insertedOrUpdatedObjectIDs?.forEach { objectID in
-            let object = self.objectWithID(objectID)
-            self.refreshObject(object, mergeChanges: true)
-          }
-          deletedObjectIDs?.forEach { objectID in
-            let object = self.objectWithID(objectID)
-            self.deleteObject(object)
-          }
-        }
-        completionBlock?()
-      }
+  }
+  
+  func saveIfHasChanges() throws {
+    if hasChanges {
+      try save()
     }
+  }
+  
+  func setUniqueIDForInsertedObject(uniqueID: String, object: NSManagedObject) {
+    if var insertedObjectsWithUniqueIDs = userInfo[UniqueIDsForInsertedObjectsKey] as? [NSManagedObject: String] {
+      insertedObjectsWithUniqueIDs[object] = uniqueID
+      userInfo[UniqueIDsForInsertedObjectsKey] = insertedObjectsWithUniqueIDs
+    } else {
+      userInfo[UniqueIDsForInsertedObjectsKey] = [object: uniqueID]
+    }
+  }
+  
+  func uniqueIDForInsertedObject(object: NSManagedObject) -> String? {
+    if let insertedObjectsWithUniqueIDs = userInfo[UniqueIDsForInsertedObjectsKey] as? [NSManagedObject: String] {
+      return insertedObjectsWithUniqueIDs[object]
+    }
+    return nil
   }
   
   func performBlockAndWait(block: () throws -> ()) throws {
@@ -71,65 +83,87 @@ extension NSManagedObjectContext {
     return try executeFetchRequest(fetchRequest).first as? NSManagedObject
   }
   
+  func objectIDWithUniqueID(id: String, inEntity entityName: String) throws -> NSManagedObjectID? {
+    let fetchRequest = NSFetchRequest(entityName: entityName)
+    fetchRequest.predicate = NSPredicate(equalsToUniqueID: id)
+    fetchRequest.resultType = .ManagedObjectIDResultType
+    return try executeFetchRequest(fetchRequest).first as? NSManagedObjectID
+  }
+  
+  func objectWithBackingObjectID(backingObjectID: NSManagedObjectID) throws -> NSManagedObject? {
+    let fetchRequest = NSFetchRequest(entityName: backingObjectID.entity.name!)
+    fetchRequest.predicate = NSPredicate(backingObjectID: backingObjectID)
+    return try executeFetchRequest(fetchRequest).first as? NSManagedObject
+  }
+  
   func newObject(uniqueID: String, encodedValues: NSData?, inEntity entityName: String) -> NSManagedObject {
     let managedObject = NSEntityDescription.insertNewObjectForEntityForName(entityName, inManagedObjectContext: self)
-    managedObject.setValue(uniqueID, forKey: UniqueID.name)
-    managedObject.setValue(encodedValues, forKey: EncodedValues.name)
     return managedObject
   }
   
-  func createOrUpdateObject(fromRecord record: CKRecord, inEntity entity: NSEntityDescription) throws -> NSManagedObject  {
+  func objectIDForBackingObjectForEntity(entityName: String, uniqueID: String) throws -> NSManagedObjectID? {
+    let fetchRequest = NSFetchRequest(entityName: entityName)
+    fetchRequest.predicate = NSPredicate(equalsToUniqueID: uniqueID)
+    fetchRequest.resultType = .ManagedObjectIDResultType
+    return try executeFetchRequest(fetchRequest).first as? NSManagedObjectID
+  }
+  
+  func insertObject(fromRecord record: CKRecord, backingContext context: NSManagedObjectContext) throws {
+    let entityName = record.recordType
     let uniqueID = record.recordID.recordName
-    var managedObject: NSManagedObject! = try objectWithUniqueID(uniqueID, inEntity: record.recordType)
-    if managedObject == nil {
-      managedObject = newObject(uniqueID, encodedValues: record.encodedSystemFields, inEntity: record.recordType)
-    }
-    managedObject.setValue(record.encodedSystemFields, forKey: EncodedValues.name)
+    let entity = persistentStoreCoordinator!.managedObjectModel.entitiesByName[entityName]!
+    let managedObject = NSEntityDescription.insertNewObjectForEntityForName(entityName, inManagedObjectContext: self)
+    context.setUniqueIDForInsertedObject(uniqueID, object: managedObject)
     let attributeValues = record.dictionaryWithValuesForKeys(entity.attributeNames)
-    var assetValues = record.dictionaryWithValuesForKeys(entity.assetAttributeNames)
-    assetValues.forEach { (key, value) in
-      guard value as! NSObject != NSNull() else {
-        assetValues[key] = nil
-        return
-      }
-      let asset = value as! CKAsset
-      assetValues[key] = asset.fileURL
-    }
+    let assetValues = record.dictionaryWithValuesForKeys(entity.assetAttributeNames)
+    let locationValues = record.dictionaryWithValuesForKeys(entity.locationAttributeNames)
     managedObject.setValuesForKeysWithDictionary(attributeValues)
     managedObject.setValuesForKeysWithDictionary(assetValues)
+    managedObject.setValuesForKeysWithDictionary(locationValues)
     let relationshipReferences = record.dictionaryWithValuesForKeys(entity.toOneRelationshipNames)
     try relationshipReferences.forEach { (name,reference) in
       guard reference as! NSObject != NSNull() else {
         return
       }
       if let referenceDestinationEntityName = entity.relationshipsByName[name]!.destinationEntity?.name {
-        let fetchRequest = NSFetchRequest(entityName: referenceDestinationEntityName)
-        fetchRequest.predicate = NSPredicate(equalsToUniqueID: reference.recordID.recordName)
-        if let relationshipManagedObject = try executeFetchRequest(fetchRequest).first as? NSManagedObject {
-          managedObject.setValue(relationshipManagedObject, forKey: name)
+        let uniqueID = reference.recordID.recordName
+        if let relationshipBackingObjectID = try context.objectIDForBackingObjectForEntity(referenceDestinationEntityName, uniqueID: uniqueID) {
+          if let relationshipManagedObject = try objectWithBackingObjectID(relationshipBackingObjectID) {
+            managedObject.setValue(relationshipManagedObject, forKey: name)
+          }
         }
       }
     }
-    return managedObject
   }
   
-  func createOrUpdateObjects(fromRecords records: [CKRecord], inEntities entitiesByName: [String: NSEntityDescription]) throws -> (insertedObjectIDs: [NSManagedObjectID], updatedObjectIDs: [NSManagedObjectID]) {
-    var insertedObjectIDs = [NSManagedObjectID]()
-    var updatedObjectIDs = [NSManagedObjectID]()
-    try records.forEach { record in
-      let entity = entitiesByName[record.recordType]!
-      let managedObject = try createOrUpdateObject(fromRecord: record, inEntity: entity)
-      if managedObject.inserted {
-        insertedObjectIDs.append(managedObject.objectID)
-      } else if managedObject.updated {
-        updatedObjectIDs.append(managedObject.objectID)
+  func updateObject(fromRecord record: CKRecord, objectID: NSManagedObjectID, backingContext context: NSManagedObjectContext) throws {
+    guard let managedObject = try objectWithBackingObjectID(objectID) else {
+      return
+    }
+    let entity = managedObject.entity
+    let attributeValues = record.dictionaryWithValuesForKeys(entity.attributeNames)
+    let assetValues = record.dictionaryWithValuesForKeys(entity.assetAttributeNames)
+    let locationValues = record.dictionaryWithValuesForKeys(entity.locationAttributeNames)
+    managedObject.setValuesForKeysWithDictionary(attributeValues)
+    managedObject.setValuesForKeysWithDictionary(assetValues)
+    managedObject.setValuesForKeysWithDictionary(locationValues)
+    let relationshipReferences = record.dictionaryWithValuesForKeys(entity.toOneRelationshipNames)
+    try relationshipReferences.forEach { (name, reference) in
+      guard reference as! NSObject != NSNull() else {
+        return
+      }
+      if let referenceDestinationEntityName = entity.relationshipsByName[name]!.destinationEntity?.name {
+        let uniqueID = reference.recordID.recordName
+        if let relationshipBackingObjectID = try context.objectIDForBackingObjectForEntity(referenceDestinationEntityName, uniqueID: uniqueID) {
+          if let relationshipManagedObject = try objectWithBackingObjectID(relationshipBackingObjectID) {
+            managedObject.setValue(relationshipManagedObject, forKey: name)
+          }
+        }
       }
     }
-    return (insertedObjectIDs, updatedObjectIDs)
   }
   
-  func deleteObjectsWithUniqueIDs(var ids: [String], inEntities entityNames: [String]) throws -> [(uniqueID: String, entityName: String)] {
-    var deletedObjectsInfo = [(uniqueID: String, entityName: String)]()
+  func deleteObjectsWithUniqueIDs(ids: [String], inEntities entityNames: [String]) throws {
     try entityNames.forEach { entityName in
      try ids.forEach { uniqueID in
         let fetchRequest = NSFetchRequest(entityName: entityName)
@@ -137,13 +171,8 @@ extension NSManagedObjectContext {
         fetchRequest.includesPropertyValues = false
         if let managedObject = try executeFetchRequest(fetchRequest).first as? NSManagedObject {
           deleteObject(managedObject)
-          let info = (uniqueID, entityName)
-          deletedObjectsInfo.append(info)
-          let index = ids.indexOf(uniqueID)!
-          ids.removeAtIndex(index)
         }
       }
     }
-    return deletedObjectsInfo
   }
 }

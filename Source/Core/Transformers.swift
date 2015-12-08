@@ -23,10 +23,35 @@
 //    SOFTWARE.
 
 import Foundation
+import CloudKit
 
-final class AssetURLTransformer: NSValueTransformer {
+final class AssetTransformer: NSValueTransformer {
   override class func transformedValueClass() -> AnyClass {
-    return NSURL.self
+    return CKAsset.self
+  }
+  
+  override class func allowsReverseTransformation() -> Bool {
+    return true
+  }
+  
+  override func transformedValue(value: AnyObject?) -> AnyObject? {
+    guard let value = value else {
+      return nil
+    }
+    return NSKeyedArchiver.archivedDataWithRootObject(value)
+  }
+  
+  override func reverseTransformedValue(value: AnyObject?) -> AnyObject? {
+    guard let value = value as? NSData else {
+      return nil
+    }
+    return NSKeyedUnarchiver.unarchiveObjectWithData(value)
+  }
+}
+
+final class LocationTransformer: NSValueTransformer {
+  override class func transformedValueClass() -> AnyClass {
+    return CLLocation.self
   }
   
   override class func allowsReverseTransformation() -> Bool {

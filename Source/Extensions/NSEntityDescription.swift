@@ -27,25 +27,40 @@ import CoreData
 
 extension NSAttributeDescription {
   var isAsset: Bool {
-    return userInfo?[SpecialAttribute.Asset.key] != nil
+    guard let isAsset = userInfo?[SpecialAttribute.Asset.key]?.boolValue else {
+      return false
+    }
+    return isAsset
+  }
+  var isLocation: Bool {
+    guard let isLocation = userInfo?[SpecialAttribute.Location.key]?.boolValue else {
+      return false
+    }
+    return isLocation
   }
 }
 
 extension NSEntityDescription {
   var propertyNamesToFetch: [String] {
-    return attributeNames + toOneRelationshipNames + assetAttributeNames
+    return attributeNames + toOneRelationshipNames + assetAttributeNames + locationAttributeNames
   }
   
-  var attributes: [NSAttributeDescription] {
-    return Array(attributesByName.values)
+  var allAttributesByName: [String: NSAttributeDescription] {
+    var allAttributesByName = [String: NSAttributeDescription]()
+    attributeNames.forEach { name in
+      if let attribute = propertiesByName[name] as? NSAttributeDescription where attribute.isAsset == false {
+        allAttributesByName[name] = attribute
+      }
+    }
+    return allAttributesByName
   }
   
   var attributeNames: [String] {
-   return attributesByName.filter { $0.1.isAsset == false }.map { $0.0 }
+   return attributesByName.filter { $0.1.isAsset == false && $0.1.isLocation == false }.map { $0.0 }
   }
   
   var assetAttributes: [NSAttributeDescription] {
-    return attributes.filter { $0.userInfo?[SpecialAttribute.Asset.key] != nil }
+    return Array(attributesByName.values).filter { $0.isAsset }
   }
   
   var assetAttributeNames: [String] {
@@ -58,6 +73,22 @@ extension NSEntityDescription {
       assetAttributesByName[attribute.name] = attribute
     }
     return assetAttributesByName
+  }
+  
+  var locationAttributes: [NSAttributeDescription] {
+    return Array(attributesByName.values).filter { $0.isLocation }
+  }
+  
+  var locationAttributeNames: [String] {
+    return locationAttributes.map { $0.name }
+  }
+  
+  var locationAttributesByName: [String: NSAttributeDescription] {
+    var locationAttributesByName = [String: NSAttributeDescription]()
+    locationAttributes.forEach { attribute in
+      locationAttributesByName[attribute.name] = attribute
+    }
+    return locationAttributesByName
   }
   
   var relationships: [NSRelationshipDescription] {

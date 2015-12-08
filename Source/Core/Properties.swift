@@ -25,38 +25,36 @@
 import Foundation
 import CoreData
 
-public  let SeamStoreType = Store.type
+public let SeamStoreType = Store.type
 
-struct Option {
-  static let ConflictResolutionPolicy = "SMConflictResolutionPolicy"
-}
+public let SMStoreDidStartSyncingNotification = "Seam.SMStoreDidStartSyncingNotification"
+public let SMStoreDidFinishSyncingNotification = "Seam.SMStoreDidFinishSyncingNotification"
+
+public let SMConfictResolutionPolicyOption = "Seam.SMConfictResolutionPolicyOption"
+
+public let SMServerObjectWinsConflictResolutionPolicy = "Seam.SMServerObjectWinsConflictResolutionPolicy"
+public let SMClientObjectWinsConflictResolutionPolicy = "Seam.SMClientObjectWinsConflictResolutionPolicy"
+public let SMKeepBothObjectsConflictResolutionPolicy = "Seam.SMKeepBothObjectsConflictResolutionPolicy"
 
 struct SpecialAttribute {
   struct Asset {
     static let key = "Asset"
-    static let valueTransformerName = "AssetURLTransformer"
+    static let valueTransformerName = "AssetTransformer"
+  }
+  struct Location {
+    static let key = "Location"
+    static let valueTransformerName = "LocationTransformer"
   }
 }
 
 struct UniqueID {
-  static let name = "sm_recordID_Attribute"
+  static let name = "sm_entityAttribute_uniqueID"
   static var attributeDescription: NSAttributeDescription {
     let attributeDescription = NSAttributeDescription()
     attributeDescription.name = name
     attributeDescription.attributeType = .StringAttributeType
     attributeDescription.optional = false
     attributeDescription.indexed = true
-    return attributeDescription
-  }
-}
-
-struct EncodedValues {
-  static let name = "sm_encodedValues_Attribute"
-  static var attributeDescription: NSAttributeDescription {
-    let attributeDescription = NSAttributeDescription()
-    attributeDescription.name = name
-    attributeDescription.attributeType = .BinaryDataAttributeType
-    attributeDescription.optional = true
     return attributeDescription
   }
 }

@@ -1,4 +1,4 @@
-//    Conflict.swift
+//    NSPersistentStoreCoordinator.swift
 //
 //    The MIT License (MIT)
 //
@@ -23,19 +23,16 @@
 //    SOFTWARE.
 
 import Foundation
-import CloudKit
 import CoreData
 
-class Conflict {
-  var entity: NSEntityDescription!
-  var serverRecordID: CKRecordID!
-  var clientVersion: [String: AnyObject]!
-  var serverVersion: [String: AnyObject]!
-  
-  init(serverRecordID: CKRecordID,entity: NSEntityDescription,clientVersion: [String: AnyObject], serverVersion: [String: AnyObject]) {
-    self.serverRecordID = serverRecordID
-    self.entity = entity
-    self.clientVersion = clientVersion
-    self.serverVersion = serverVersion
+extension NSPersistentStoreCoordinator {
+  var seamStore: Store? {
+    var seamStore: Store?
+    persistentStores.forEach {
+      if let store = $0 as? Store {
+        seamStore = store
+      }
+    }
+    return seamStore
   }
 }

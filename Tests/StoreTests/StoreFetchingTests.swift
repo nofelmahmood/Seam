@@ -33,6 +33,7 @@ class StoreFetching: XCTestCase {
   
   func testFetchingTasks() {
     let taskToTest = Task.all(inContext: nil, satisfyingPredicate: NSPredicate(format: "name = %@",task!.name!))?.first as? Task
+    print(taskToTest?.name,taskToTest)
     XCTAssertNotNil(taskToTest)
     XCTAssertNotNil(taskToTest!.name)
   }

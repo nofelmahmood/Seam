@@ -8,22 +8,85 @@
 
 import UIKit
 import CoreData
+import Seam
+
+// MARK: NSFetchedResultsControllerDelegate
+
+extension FoldersViewController: NSFetchedResultsControllerDelegate {
+  func controllerWillChangeContent(controller: NSFetchedResultsController) {
+    tableView.beginUpdates()
+  }
+  func controllerDidChangeContent(controller: NSFetchedResultsController) {
+    tableView.endUpdates()
+  }
+  func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    switch(type) {
+    case .Insert:
+      if let indexPath = newIndexPath {
+        tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+      }
+    case .Update:
+      if let indexPath = indexPath {
+        if let cell = tableView.cellForRowAtIndexPath(indexPath) as? FolderTableViewCell {
+          let folder = controller.objectAtIndexPath(indexPath) as! Folder
+          cell.configureWithFolder(folder)
+        }
+      }
+    case .Delete:
+      if let indexPath = indexPath {
+        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+      }
+    case .Move:
+      if let indexPath = indexPath, let newIndexPath = newIndexPath {
+        let object = controller.objectAtIndexPath(newIndexPath) as! Folder
+        if let cell = tableView.cellForRowAtIndexPath(indexPath) as? FolderTableViewCell {
+          cell.configureWithFolder(object)
+        }
+        tableView.moveRowAtIndexPath(indexPath, toIndexPath: newIndexPath)
+      }
+    }
+  }
+}
 
 class FoldersViewController: UIViewController {
   @IBOutlet var tableView: UITableView!
   
-  var folders: [Folder]!
   var context = CoreDataStack.defaultStack.managedObjectContext
+  var fetchedResultsController: NSFetchedResultsController!
   
   override func viewDidLoad() {
     super.viewDidLoad()
     // Do any additional setup after loading the view.
-    prepareDataSource()
-    tableView.reloadData()
+    let fetchRequest = NSFetchRequest(entityName: "Folder")
+    let sortDescriptor = NSSortDescriptor(key: "name", ascending: false)
+    fetchRequest.sortDescriptors = [sortDescriptor]
+    fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+    fetchedResultsController.delegate = self
+    do {
+      try prepareDataSource()
+      tableView.reloadData()
+    } catch {
+      print(error)
+    }
   }
   
-  func prepareDataSource() {
-    folders = Folder.all(inContext: context) as! [Folder]
+  override func viewDidAppear(animated: Bool) {
+    super.viewDidAppear(animated)
+    if let store = CoreDataStack.defaultStack.store {
+      NSNotificationCenter.defaultCenter().addObserver(self, selector: "didSync:", name: SMStoreDidFinishSyncingNotification, object: nil)
+      store.performSync(nil)
+    }
+  }
+  
+  func didSync(notification: NSNotification) {
+    let context = CoreDataStack.defaultStack.managedObjectContext
+    context.performBlockAndWait {
+      context.mergeChangesFromContextDidSaveNotification(notification)
+    }
+  }
+  
+  func prepareDataSource() throws {
+    try fetchedResultsController.performFetch()
   }
   
   override func didReceiveMemoryWarning() {
@@ -36,8 +99,6 @@ class FoldersViewController: UIViewController {
     let yesAction = UIAlertAction(title: "Yes", style: .Destructive, handler: { alertAction in
       self.context.deleteObject(folder)
       try! self.context.save()
-      self.prepareDataSource()
-      self.tableView.reloadData()
     })
     let noAction = UIAlertAction(title: "No", style: .Cancel, handler: { alertAction in
       self.dismissViewControllerAnimated(true, completion: nil)
@@ -50,8 +111,6 @@ class FoldersViewController: UIViewController {
   func addFolder(name: String) {
     Folder.folderWithName(name, inContext: context)
     try! context.save()
-    prepareDataSource()
-    tableView.reloadData()
   }
   
   // MARK: IBActions
@@ -88,10 +147,8 @@ class FoldersViewController: UIViewController {
   // Pass the selected object to the new view controller.
     let destinationViewController = segue.destinationViewController as! NotesViewController
     if let selectedIndexPath = tableView.indexPathForSelectedRow {
-      let folder = folders[selectedIndexPath.row]
+      let folder = fetchedResultsController.objectAtIndexPath(selectedIndexPath) as! Folder
       destinationViewController.folderObjectID = folder.objectID
     }
   }
-  
-  
 }

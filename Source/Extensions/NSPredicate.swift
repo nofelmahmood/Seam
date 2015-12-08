@@ -23,10 +23,15 @@
 //    SOFTWARE.
 
 import Foundation
+import CoreData
 
 extension NSPredicate {
   convenience init(equalsToUniqueID id: String) {
     self.init(format: "%K == %@", UniqueID.name,id)
+  }
+  
+  convenience init(backingObjectID objectID: NSManagedObjectID) {
+    self.init(format: "self == %@", objectID)
   }
   
   convenience init(changeIsNotQueuedAndEqualsToID id: String) {

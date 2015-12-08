@@ -11,7 +11,7 @@ import UIKit
 extension FoldersViewController: UITableViewDelegate {
   func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
     if editingStyle == .Delete {
-      let folder = self.folders[indexPath.row]
+      let folder = fetchedResultsController.objectAtIndexPath(indexPath) as! Folder
       self.confirmDeletion(folder)
     }
   }

@@ -34,15 +34,24 @@ extension NSManagedObject {
       setValue(newValue, forKey: UniqueID.name)
     }
   }
-  var encodedFields: NSData? {
-    get {
-      return valueForKey(EncodedValues.name) as? NSData
-    } set {
-      setValue(newValue, forKey: EncodedValues.name)
-    }
-  }
+  
   var changedValueKeys: [String] {
     let propertiesToTrack = self.entity.attributeNames + self.entity.assetAttributeNames + self.entity.toOneRelationshipNames
     return changedValues().keys.filter { propertiesToTrack.contains($0) }
+  }
+  public var uniqueObjectID: NSManagedObjectID? {
+    var seamStore: Store?
+    managedObjectContext?.persistentStoreCoordinator?.persistentStores.forEach {
+      if let store = $0 as? Store {
+        seamStore = store
+      }
+    }
+    let referenceObject = seamStore?.referenceObjectForObjectID(objectID) as! String
+    do {
+      let backingObjectID = try seamStore?.objectIDForBackingObjectForEntity(entity.name!, withReferenceObject: referenceObject)
+      return backingObjectID
+    } catch {
+      return nil
+    }
   }
 }

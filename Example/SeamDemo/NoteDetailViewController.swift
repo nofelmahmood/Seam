@@ -52,7 +52,7 @@ class NoteDetailViewController: UIViewController {
     let intersect = CGRectIntersection(keyboardFrame, textView.bounds)
     if !CGRectIsNull(intersect) {
       let duration = userInfo["UIKeyboardAnimationDurationUserInfoKey"]!.doubleValue
-      UIView.animateWithDuration(duration, animations: { () -> Void in
+      UIView.animateWithDuration(duration, animations: {
         self.textView.contentInset = UIEdgeInsetsMake(0, 0, intersect.size.height, 0)
         self.textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, intersect.size.height, 0)
       })
@@ -64,7 +64,7 @@ class NoteDetailViewController: UIViewController {
       return
     }
     let duration = userInfo["UIKeyboardAnimationDurationUserInfoKey"]!.doubleValue
-    UIView.animateWithDuration(duration) { () -> Void in
+    UIView.animateWithDuration(duration) { 
       self.textView.contentInset = UIEdgeInsetsZero
       self.textView.scrollIndicatorInsets = UIEdgeInsetsZero
     }

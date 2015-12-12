@@ -111,8 +111,8 @@ extension NSManagedObjectContext {
   func insertObject(fromRecord record: CKRecord, backingContext context: NSManagedObjectContext) throws {
     let entityName = record.recordType
     let uniqueID = record.recordID.recordName
-    let entity = persistentStoreCoordinator!.managedObjectModel.entitiesByName[entityName]!
     let managedObject = NSEntityDescription.insertNewObjectForEntityForName(entityName, inManagedObjectContext: self)
+    let entity = managedObject.entity
     context.setUniqueIDForInsertedObject(uniqueID, object: managedObject)
     let attributeValues = record.dictionaryWithValuesForKeys(entity.attributeNames)
     let assetValues = record.dictionaryWithValuesForKeys(entity.assetAttributeNames)
@@ -165,13 +165,14 @@ extension NSManagedObjectContext {
   
   func deleteObjectsWithUniqueIDs(ids: [String], inEntities entityNames: [String]) throws {
     try entityNames.forEach { entityName in
-     try ids.forEach { uniqueID in
+      try ids.forEach { uniqueID in
         let fetchRequest = NSFetchRequest(entityName: entityName)
         fetchRequest.predicate = NSPredicate(equalsToUniqueID: uniqueID)
         fetchRequest.includesPropertyValues = false
-        if let managedObject = try executeFetchRequest(fetchRequest).first as? NSManagedObject {
-          deleteObject(managedObject)
+        guard let managedObject = try executeFetchRequest(fetchRequest).first as? NSManagedObject else {
+          return
         }
+        deleteObject(managedObject)
       }
     }
   }

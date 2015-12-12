@@ -39,6 +39,7 @@ extension NSManagedObject {
     let propertiesToTrack = self.entity.attributeNames + self.entity.assetAttributeNames + self.entity.toOneRelationshipNames
     return changedValues().keys.filter { propertiesToTrack.contains($0) }
   }
+  
   public var uniqueObjectID: NSManagedObjectID? {
     var seamStore: Store?
     managedObjectContext?.persistentStoreCoordinator?.persistentStores.forEach {

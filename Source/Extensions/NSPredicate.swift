@@ -30,19 +30,17 @@ extension NSPredicate {
     self.init(format: "%K == %@", UniqueID.name,id)
   }
   
-  convenience init(backingObjectID objectID: NSManagedObjectID) {
-    self.init(format: "self == %@", objectID)
+  convenience init(equalsToUniqueID id: String, andChangeType type: NSNumber) {
+    let typePropertyName = Change.Properties.ChangeType.name
+    self.init(format: "%K == %@ && %K == %@", UniqueID.name,id,typePropertyName,type)
   }
   
-  convenience init(changeIsNotQueuedAndEqualsToID id: String) {
-    self.init(format: "%K == %@ AND %K == %@", Change.Properties.ChangeQueued.name, NSNumber(bool: false), UniqueID.name, id)
+  convenience init(backingObjectID objectID: NSManagedObjectID) {
+    self.init(format: "self == %@", objectID)
   }
   
   convenience init(inUniqueIDs ids: [String]) {
     self.init(format: "%K IN %@",UniqueID.name,ids)
   }
-  
-  convenience init(changeIsQueued queued: Bool) {
-    self.init(format: "%K == %@", Change.Properties.ChangeQueued.name,queued)
-  }
+
 }

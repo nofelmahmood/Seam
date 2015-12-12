@@ -107,13 +107,18 @@ public class Store: NSIncrementalStore {
     }
     let sync = Sync(store: self)
     sync.onCompletion = { (saveNotification, error) in
-      if let saveNotification = saveNotification where error == nil {
-        self.backingMOC.performBlock {
-          NSNotificationCenter.defaultCenter().postNotificationName(SMStoreDidFinishSyncingNotification, object: nil, userInfo: saveNotification.userInfo)
-        }
+      guard let notification = saveNotification where error == nil else {
+        return
+      }
+      self.backingMOC.performBlock {
+        NSNotificationCenter.defaultCenter().postNotificationName(SMStoreDidFinishSyncingNotification, object: nil, userInfo: notification.userInfo)
       }
     }
     operationQueue.addOperation(sync)
+  }
+  
+  func setUniqueIDForInsertedObject(uniqueID: String, insertedObject: NSManagedObject) {
+    backingMOC.setUniqueIDForInsertedObject(uniqueID, object: insertedObject)
   }
   
   // MARK: - Translation
@@ -239,39 +244,36 @@ public class Store: NSIncrementalStore {
   // MARK: - Requests
   
   override public func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
+    var result: AnyObject = []
     try backingMOC.performBlockAndWait {
       if let context = context {
         if let fetchRequest = request as? NSFetchRequest {
-          try self.executeFetchRequest(fetchRequest, context: context)
+          result = try self.executeFetchRequest(fetchRequest, context: context)
         } else if let saveChangesRequest = request as? NSSaveChangesRequest {
-          try self.executeSaveChangesRequest(saveChangesRequest, context: context)
+          result = try self.executeSaveChangesRequest(saveChangesRequest, context: context)
         } else if let batchUpdateRequest = request as? NSBatchUpdateRequest {
-          try self.executeBatchUpdateRequest(batchUpdateRequest, context: context)
+          result = try self.executeBatchUpdateRequest(batchUpdateRequest, context: context)
         } else if let batchDeleteRequest = request as? NSBatchDeleteRequest {
-          try self.executeBatchDeleteRequest(batchDeleteRequest, context: context)
+          result = try self.executeBatchDeleteRequest(batchDeleteRequest, context: context)
         } else {
           throw Error.InvalidRequest
         }
       }
     }
-    return []
+    return result
   }
   
   // MARK: FetchRequest
   
   func executeFetchRequest(fetchRequest: NSFetchRequest, context: NSManagedObjectContext) throws -> [NSManagedObject] {
-    if let result = try? backingMOC.executeFetchRequest(fetchRequest) {
-      if let fetchedObjects = result as? [NSManagedObject] {
-        return fetchedObjects.map { object in
-          let recordID = object.uniqueID
-          let entity = persistentStoreCoordinator!.managedObjectModel.entitiesByName[fetchRequest.entityName!]
-          let objectID = newObjectIDForEntity(entity!, referenceObject: recordID)
-          let object = context.objectWithID(objectID)
-          return object
-        }
-      }
+    let result = try backingMOC.executeFetchRequest(fetchRequest) as! [NSManagedObject]
+    return result.map { object in
+      let recordID = object.uniqueID
+      let entity = persistentStoreCoordinator!.managedObjectModel.entitiesByName[fetchRequest.entityName!]
+      let objectID = newObjectIDForEntity(entity!, referenceObject: recordID)
+      let object = context.objectWithID(objectID)
+      return object
     }
-    return []
   }
   
   // MARK: SaveChangesRequest
@@ -305,7 +307,7 @@ public class Store: NSIncrementalStore {
         self.setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
         try self.setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
         if context.doesNotAllowChangeRecording == false {
-          try self.changeManager.new(backingObject.uniqueID, changedObject: sourceObject)
+          self.changeManager.new(backingObject.uniqueID, changedObject: sourceObject)
         }
       }
     }
@@ -315,18 +317,19 @@ public class Store: NSIncrementalStore {
     try backingMOC.performBlockAndWait {
       try objects.forEach { sourceObject in
         let referenceObject = self.uniqueIDForObjectID(sourceObject.objectID)
-        if let backingObjectID = try self.objectIDForBackingObjectForEntity(sourceObject.entity.name!, withReferenceObject: referenceObject) {
-          if let backingObject = try? self.backingMOC.existingObjectWithID(backingObjectID) {
-            self.setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
-            try self.setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
-            let changedValueKeys = sourceObject.changedValueKeys
-            if context.doesNotAllowChangeRecording == false {
-              if changedValueKeys.count > 0 {
-                try self.changeManager.new(referenceObject, changedObject: sourceObject)
-              }
-            }
-          }
+        guard let backingObjectID = try self.objectIDForBackingObjectForEntity(sourceObject.entity.name!, withReferenceObject: referenceObject) else {
+          return
         }
+        guard let backingObject = try? self.backingMOC.existingObjectWithID(backingObjectID) else {
+          return
+        }
+        self.setAttributeValuesForBackingObject(backingObject, sourceObject: sourceObject)
+        try self.setRelationshipValuesForBackingObject(backingObject, fromSourceObject: sourceObject)
+        let changedValueKeys = sourceObject.changedValueKeys
+        guard context.doesNotAllowChangeRecording == false && changedValueKeys.count > 0 else {
+          return
+        }
+        self.changeManager.new(referenceObject, changedObject: sourceObject)
       }
     }
   }
@@ -339,12 +342,14 @@ public class Store: NSIncrementalStore {
         fetchRequest.predicate = NSPredicate(equalsToUniqueID: referenceObject)
         fetchRequest.includesPropertyValues = false
         let results = try self.backingMOC.executeFetchRequest(fetchRequest)
-        if let backingObject = results.last as? NSManagedObject {
-          self.backingMOC.deleteObject(backingObject)
-          if context.doesNotAllowChangeRecording == false {
-            try self.changeManager.new(referenceObject, changedObject: sourceObject)
-          }
+        guard let backingObject = results.last as? NSManagedObject else {
+          return
         }
+        self.backingMOC.deleteObject(backingObject)
+        guard context.doesNotAllowChangeRecording == false else {
+          return
+        }
+        self.changeManager.new(referenceObject, changedObject: sourceObject)
       }
     }
   }

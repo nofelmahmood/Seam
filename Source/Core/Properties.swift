@@ -34,7 +34,6 @@ public let SMConfictResolutionPolicyOption = "Seam.SMConfictResolutionPolicyOpti
 
 public let SMServerObjectWinsConflictResolutionPolicy = "Seam.SMServerObjectWinsConflictResolutionPolicy"
 public let SMClientObjectWinsConflictResolutionPolicy = "Seam.SMClientObjectWinsConflictResolutionPolicy"
-public let SMKeepBothObjectsConflictResolutionPolicy = "Seam.SMKeepBothObjectsConflictResolutionPolicy"
 
 struct SpecialAttribute {
   struct Asset {

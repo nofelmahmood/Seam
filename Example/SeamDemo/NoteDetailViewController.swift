@@ -11,8 +11,9 @@ import CoreData
 
 class NoteDetailViewController: UIViewController {
   @IBOutlet var textView: UITextView!
-  var context = CoreDataStack.defaultStack.managedObjectContext
+  var tempContext: NSManagedObjectContext!
   var note: Note!
+  var noteObjectID: NSManagedObjectID?
   var folderObjectID: NSManagedObjectID!
   
   override func viewDidAppear(animated: Bool) {
@@ -20,14 +21,19 @@ class NoteDetailViewController: UIViewController {
     textView.becomeFirstResponder()
   }
   
-  override func viewWillAppear(animated: Bool) {
-    super.viewWillAppear(animated)
-    if note == nil {
-      note = Note.new(inContext: context) as! Note
-      let folder = context.objectWithID(folderObjectID) as! Folder
-      note.folder = folder
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    if let noteObjectID = noteObjectID {
+      note = tempContext.objectWithID(noteObjectID) as! Note
+    } else {
+      note = Note.new(inContext: tempContext) as! Note
+      note.folder = tempContext.objectWithID(folderObjectID) as? Folder
     }
     textView.text = note.text
+  }
+  
+  override func viewWillAppear(animated: Bool) {
+    super.viewWillAppear(animated)
     NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
     NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
   }
@@ -36,9 +42,6 @@ class NoteDetailViewController: UIViewController {
     super.viewWillDisappear(animated)
     NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
     NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
-    if let noteText = note.text where noteText.isEmpty == false {
-      try! context.save()
-    }
   }
   
   // MARK: Keyboard
@@ -73,7 +76,17 @@ class NoteDetailViewController: UIViewController {
   // MARK: IBAction
   
   @IBAction func doneButtonDidPress(sender: AnyObject) {
-    try! context.save()
+    textView.resignFirstResponder()
+    if let noteText = textView.text where noteText.isEmpty == false {
+      note.text = noteText
+      tempContext.performBlockAndWait {
+        do {
+         try self.tempContext.save()
+        } catch {
+          print("Error saving ", error)
+        }
+      }
+    }
   }
 
 }

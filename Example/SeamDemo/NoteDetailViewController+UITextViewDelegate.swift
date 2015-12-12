@@ -11,11 +11,15 @@ import CoreData
 import UIKit
 
 extension NoteDetailViewController: UITextViewDelegate {
-  func textViewDidChange(textView: UITextView) {
-    note.text = textView.text
-  }
+//  func textViewDidChange(textView: UITextView) {
+//    note.text = textView.text
+//  }
   
   func textViewDidEndEditing(textView: UITextView) {
-    try! context.save()
+    print("Printing from END EDITING ",note)
+    note.text = textView.text
   }
+//  func textViewDidEndEditing(textView: UITextView) {
+//    try! context.save()
+//  }
 }

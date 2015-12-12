@@ -10,6 +10,7 @@ import UIKit
 
 extension NotesViewController: UITableViewDelegate {
   func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    segueForNewNote = false
     self.performSegueWithIdentifier("Detail", sender: self)
   }
 }

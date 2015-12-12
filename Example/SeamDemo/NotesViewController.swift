@@ -49,6 +49,7 @@ class NotesViewController: UIViewController {
   let context = CoreDataStack.defaultStack.managedObjectContext
   var folderObjectID: NSManagedObjectID!
   var fetchedResultsController: NSFetchedResultsController!
+  var segueForNewNote = true
   @IBOutlet var tableView: UITableView!
   
   override func viewDidLoad() {
@@ -58,7 +59,7 @@ class NotesViewController: UIViewController {
     fetchRequest.predicate = NSPredicate(format: "folder == %@", folder.uniqueObjectID!)
     let sortDescriptor = NSSortDescriptor(key: "text", ascending: false)
     fetchRequest.sortDescriptors = [sortDescriptor]
-    fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
+    fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: "DAGHA")
     fetchedResultsController.delegate = self
     tableView.delegate = self
     tableView.dataSource = self
@@ -74,6 +75,12 @@ class NotesViewController: UIViewController {
     try fetchedResultsController.performFetch()
   }
   
+  func tempContextDidSave(notification: NSNotification) {
+    print("GOT FROM TEMPCONTEXT ",notification)
+    let context = CoreDataStack.defaultStack.managedObjectContext
+    context.mergeChangesFromContextDidSaveNotification(notification)
+  }
+  
   override func viewWillAppear(animated: Bool) {
     super.viewWillAppear(animated)
   }
@@ -85,7 +92,17 @@ class NotesViewController: UIViewController {
   
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     let destinationViewController = segue.destinationViewController as! NoteDetailViewController
-    destinationViewController.folderObjectID = folderObjectID
+    let tempContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+    tempContext.persistentStoreCoordinator = CoreDataStack.defaultStack.persistentStoreCoordinator
+    NSNotificationCenter.defaultCenter().addObserver(self, selector: "tempContextDidSave:", name: NSManagedObjectContextDidSaveNotification, object: tempContext)
+    destinationViewController.tempContext = tempContext
+    if segueForNewNote {
+      destinationViewController.folderObjectID = folderObjectID
+    } else if let selectedItemIndexPath = tableView.indexPathForSelectedRow {
+      let note = fetchedResultsController.objectAtIndexPath(selectedItemIndexPath) as! Note
+      destinationViewController.folderObjectID = folderObjectID
+      destinationViewController.noteObjectID = note.objectID
+    }
   }
 }
 

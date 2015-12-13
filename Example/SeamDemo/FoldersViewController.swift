@@ -74,7 +74,7 @@ class FoldersViewController: UIViewController {
     super.viewDidAppear(animated)
     if let store = CoreDataStack.defaultStack.store {
       NSNotificationCenter.defaultCenter().addObserver(self, selector: "didSync:", name: SMStoreDidFinishSyncingNotification, object: nil)
-      store.performSync(nil)
+      store.sync(nil)
     }
   }
   

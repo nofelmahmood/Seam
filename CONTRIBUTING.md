@@ -7,7 +7,7 @@ This document contains information and guidelines about contributing to this pro
 - [Questions](#Questions)
 - [Reporting Issues](#Reporting Issues)
 
-## Questions <a name="Questions"></a>
+## Questions <a name = "Questions"></a>
 
 Github is used for improving [Seam](https://github.com/nofelmahmood/seam) and adding new features. In case of any usage questions that are not specific to the project itself, please ask on [Stack Overflow](http://stackoverflow.com). Doing this allows you to get answered quickly and also allows us to help others who might be in search of the same question.
 

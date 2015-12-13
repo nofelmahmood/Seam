@@ -100,7 +100,7 @@ public class Store: NSIncrementalStore {
     return model
   }
   
-  public func performSync(completionBlock: (() -> ())?) {
+  public func sync(completionBlock: (() -> ())?) {
     guard operationQueue.operationCount == 0 else {
       completionBlock?()
       return
@@ -251,10 +251,6 @@ public class Store: NSIncrementalStore {
           result = try self.executeFetchRequest(fetchRequest, context: context)
         } else if let saveChangesRequest = request as? NSSaveChangesRequest {
           result = try self.executeSaveChangesRequest(saveChangesRequest, context: context)
-        } else if let batchUpdateRequest = request as? NSBatchUpdateRequest {
-          result = try self.executeBatchUpdateRequest(batchUpdateRequest, context: context)
-        } else if let batchDeleteRequest = request as? NSBatchDeleteRequest {
-          result = try self.executeBatchDeleteRequest(batchDeleteRequest, context: context)
         } else {
           throw Error.InvalidRequest
         }
@@ -352,26 +348,5 @@ public class Store: NSIncrementalStore {
         self.changeManager.new(referenceObject, changedObject: sourceObject)
       }
     }
-  }
-  
-  // MARK: BatchUpdateRequest
-  
-  func executeBatchUpdateRequest(batchUpdateRequest: NSBatchUpdateRequest, context: NSManagedObjectContext) throws -> AnyObject {
-    try backingMOC.performBlockAndWait {
-      let request = NSBatchUpdateRequest(entityName: batchUpdateRequest.entityName)
-      request.predicate = batchUpdateRequest.predicate
-      request.propertiesToUpdate = batchUpdateRequest.propertiesToUpdate
-      try self.backingMOC.executeRequest(request)
-    }
-    return []
-  }
-  
-  // MARK: BatchDeleteRequest
-  
-  func executeBatchDeleteRequest(batchDeleteRequest: NSBatchDeleteRequest, context: NSManagedObjectContext) throws -> AnyObject {
-    try backingMOC.performBlockAndWait {
-      try self.backingMOC.executeRequest(batchDeleteRequest)
-    }
-    return []
   }
 }

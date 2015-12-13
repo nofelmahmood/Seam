@@ -98,8 +98,10 @@ class Metadata: NSManagedObject {
     func deleteMetadataForUniqueIDs(ids: [String]) throws {
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate(inUniqueIDs: ids)
-      let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
-      try context.executeRequest(batchDeleteRequest)
+      (try context.executeFetchRequest(fetchRequest)).forEach { object in
+        let managedObject = object as! NSManagedObject
+        context.deleteObject(managedObject)
+      }
     }
   }
 }

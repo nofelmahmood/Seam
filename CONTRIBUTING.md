@@ -4,14 +4,14 @@ This document contains information and guidelines about contributing to this pro
 
 <strong>Topics</strong> 
 
-- [Questions](#Questions)
-- [Reporting Issues](#Reporting Issues)
+- [Asking Questions](#asking-questions)
+- [Reporting Issues](#reporting-issues)
 
-## Questions <a name = "Questions"></a>
+## Asking Questions
 
 Github is used for improving [Seam](https://github.com/nofelmahmood/seam) and adding new features. In case of any usage questions that are not specific to the project itself, please ask on [Stack Overflow](http://stackoverflow.com). Doing this allows you to get answered quickly and also allows us to help others who might be in search of the same question.
 
-## Reporting Issues <a name = "Reporting Issues"></a>
+## Reporting Issues
 
 An awesome way to contribute to the project is to send a detailed issue when you encounter a problem. We always appreciate a well-written, thorough bug report.
 

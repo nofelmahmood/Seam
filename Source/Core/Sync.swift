@@ -201,11 +201,7 @@ class Sync: NSOperation {
     operationQueue.addOperation(modifyRecordsOperation)
     operationQueue.waitUntilAllOperationsAreFinished()
     try changes.insertedOrUpdatedRecordsAndChanges.forEach {
-      let record = $0.record
-      let uniqueID = record.recordID.recordName
-      let entityName = record.recordType
-      let encodedSystemFields = record.encodedSystemFields
-      try metadataManager.setMetadataForUniqueID(uniqueID, entityName: entityName, data: encodedSystemFields)
+      try metadataManager.setMetadata(forRecord: $0.record)
     }
     guard conflictedRecords.count == 0 else {
       var conflictedRecordsWithChanges = [(record: CKRecord, change: Change)]()
@@ -243,15 +239,19 @@ class Sync: NSOperation {
       throw Error.ConflictedRecordsFetchFailed
     }
     try recordsByRecordIDs.forEach { (recordID, record) in
-      if let conflictResolutionPolicy = conflictResolutionPolicy {
-        let uniqueID = recordID.recordName
-        let entityName = record.recordType
-        let encodedData = record.encodedSystemFields
+      try metadataManager.setMetadata(forRecord: record)
+      let serverWins = {
+        try self.insertOrUpdateObject(fromRecord: record)
         let conflictedRecordAndChange = conflictedRecordsByRecordIDsAndChanges[recordID]!
-        try metadataManager.setMetadataForUniqueID(uniqueID, entityName: entityName, data: encodedData)
-        try insertOrUpdateObject(fromRecord: record)
         let change = conflictedRecordAndChange.change
-        changeManager.remove([change])
+        self.changeManager.remove([change])
+      }
+      if let conflictResolutionPolicy = conflictResolutionPolicy {
+        if conflictResolutionPolicy == SMServerObjectWinsConflictResolutionPolicy {
+          try serverWins()
+        }
+      } else {
+        try serverWins()
       }
     }
   }
@@ -344,10 +344,7 @@ class Sync: NSOperation {
     }
     try metadataManager.deleteMetadataForUniqueIDs(deletedObjectUniqueIDs)
     try changes.insertedOrUpdatedCKRecords.forEach {
-      let uniqueID = $0.recordID.recordName
-      let entityName = $0.recordType
-      let encodedSystemFields = $0.encodedSystemFields
-      try metadataManager.setMetadataForUniqueID(uniqueID, entityName: entityName, data: encodedSystemFields)
+      try metadataManager.setMetadata(forRecord: $0)
     }
   }
 }

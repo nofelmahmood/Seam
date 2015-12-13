@@ -24,6 +24,7 @@
 
 import Foundation
 import CoreData
+import CloudKit
 
 class Metadata: NSManagedObject {
   @NSManaged var entityName: String?
@@ -80,15 +81,18 @@ class Metadata: NSManagedObject {
       return try context.executeFetchRequest(fetchRequest).first as? Metadata
     }
     
-    func setMetadataForUniqueID(id: String, entityName: String, data: NSData) throws {
-      if let metadata = try metadataWithUniqueID(id) {
-        metadata.data = data
+    func setMetadata(forRecord record: CKRecord) throws {
+      let uniqueID = record.recordID.recordName
+      let entityName = record.recordType
+      let encodedData = record.encodedSystemFields
+      if let metadata = try metadataWithUniqueID(uniqueID) {
+        metadata.data = encodedData
       } else if let metadata = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as? Metadata {
-        metadata.uniqueID = id
-        metadata.data = data
+        metadata.uniqueID = uniqueID
         metadata.entityName = entityName
+        metadata.data = encodedData
       }
-      try context.save()
+      try context.saveIfHasChanges()
     }
     
     func deleteMetadataForUniqueIDs(ids: [String]) throws {

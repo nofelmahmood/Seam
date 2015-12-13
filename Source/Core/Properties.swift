@@ -35,11 +35,11 @@ public let SMConfictResolutionPolicyOption = "Seam.SMConfictResolutionPolicyOpti
 public let SMServerObjectWinsConflictResolutionPolicy = "Seam.SMServerObjectWinsConflictResolutionPolicy"
 public let SMClientObjectWinsConflictResolutionPolicy = "Seam.SMClientObjectWinsConflictResolutionPolicy"
 
-struct SpecialAttribute {
-  struct Asset {
+struct TransformableAttribute {
+  struct CKAsset {
     static let valueTransformerName = "CKAssetTransformer"
   }
-  struct Location {
+  struct CLLocation {
     static let valueTransformerName = "CLLocationTransformer"
   }
 }

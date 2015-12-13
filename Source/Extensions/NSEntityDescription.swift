@@ -26,11 +26,11 @@ import Foundation
 import CoreData
 
 extension NSAttributeDescription {
-  var isAsset: Bool {
-    return valueTransformerName == SpecialAttribute.Asset.valueTransformerName
+  var isCKAsset: Bool {
+    return valueTransformerName == TransformableAttribute.CKAsset.valueTransformerName
   }
-  var isLocation: Bool {
-    return valueTransformerName == SpecialAttribute.Location.valueTransformerName
+  var isCLLocation: Bool {
+    return valueTransformerName == TransformableAttribute.CLLocation.valueTransformerName
   }
 }
 
@@ -42,7 +42,7 @@ extension NSEntityDescription {
   var allAttributesByName: [String: NSAttributeDescription] {
     var allAttributesByName = [String: NSAttributeDescription]()
     attributeNames.forEach { name in
-      if let attribute = propertiesByName[name] as? NSAttributeDescription where attribute.isAsset == false {
+      if let attribute = propertiesByName[name] as? NSAttributeDescription where attribute.isCKAsset == false {
         allAttributesByName[name] = attribute
       }
     }
@@ -50,11 +50,11 @@ extension NSEntityDescription {
   }
   
   var attributeNames: [String] {
-   return attributesByName.filter { $0.1.isAsset == false && $0.1.isLocation == false }.map { $0.0 }
+   return attributesByName.filter { $0.1.isCKAsset == false && $0.1.isCLLocation == false }.map { $0.0 }
   }
   
   var assetAttributes: [NSAttributeDescription] {
-    return Array(attributesByName.values).filter { $0.isAsset }
+    return Array(attributesByName.values).filter { $0.isCKAsset }
   }
   
   var assetAttributeNames: [String] {
@@ -70,7 +70,7 @@ extension NSEntityDescription {
   }
   
   var locationAttributes: [NSAttributeDescription] {
-    return Array(attributesByName.values).filter { $0.isLocation }
+    return Array(attributesByName.values).filter { $0.isCLLocation }
   }
   
   var locationAttributeNames: [String] {

@@ -64,10 +64,10 @@ public class Store: NSIncrementalStore {
   }
   
   class func registerTransformers() {
-    let assetTransformer = AssetTransformer()
-    let locationTransformer = LocationTransformer()
-    NSValueTransformer.setValueTransformer(locationTransformer, forName: SpecialAttribute.Location.valueTransformerName)
-    NSValueTransformer.setValueTransformer(assetTransformer, forName: SpecialAttribute.Asset.valueTransformerName)
+    let assetTransformer = CKAssetTransformer()
+    let locationTransformer = CLLocationTransformer()
+    NSValueTransformer.setValueTransformer(locationTransformer, forName: TransformableAttribute.CLLocation.valueTransformerName)
+    NSValueTransformer.setValueTransformer(assetTransformer, forName: TransformableAttribute.CKAsset.valueTransformerName)
   }
   
   override public func loadMetadata() throws {

@@ -25,7 +25,7 @@
 import Foundation
 import CloudKit
 
-final class AssetTransformer: NSValueTransformer {
+final class CKAssetTransformer: NSValueTransformer {
   override class func transformedValueClass() -> AnyClass {
     return CKAsset.self
   }
@@ -49,7 +49,7 @@ final class AssetTransformer: NSValueTransformer {
   }
 }
 
-final class LocationTransformer: NSValueTransformer {
+final class CLLocationTransformer: NSValueTransformer {
   override class func transformedValueClass() -> AnyClass {
     return CLLocation.self
   }

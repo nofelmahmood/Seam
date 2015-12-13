@@ -27,16 +27,10 @@ import CoreData
 
 extension NSAttributeDescription {
   var isAsset: Bool {
-    guard let isAsset = userInfo?[SpecialAttribute.Asset.key]?.boolValue else {
-      return false
-    }
-    return isAsset
+    return valueTransformerName == SpecialAttribute.Asset.valueTransformerName
   }
   var isLocation: Bool {
-    guard let isLocation = userInfo?[SpecialAttribute.Location.key]?.boolValue else {
-      return false
-    }
-    return isLocation
+    return valueTransformerName == SpecialAttribute.Location.valueTransformerName
   }
 }
 

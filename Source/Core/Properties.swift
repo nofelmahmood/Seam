@@ -37,12 +37,10 @@ public let SMClientObjectWinsConflictResolutionPolicy = "Seam.SMClientObjectWins
 
 struct SpecialAttribute {
   struct Asset {
-    static let key = "Asset"
-    static let valueTransformerName = "AssetTransformer"
+    static let valueTransformerName = "CKAssetTransformer"
   }
   struct Location {
-    static let key = "Location"
-    static let valueTransformerName = "LocationTransformer"
+    static let valueTransformerName = "CLLocationTransformer"
   }
 }
 

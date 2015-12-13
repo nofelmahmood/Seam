@@ -2,7 +2,7 @@
 
 This document contains information and guidelines about contributing to this project. Please read it before you start participating.
 
-<strong>Topics</strong> 
+**Topics**
 
 - [Asking Questions](#asking-questions)
 - [Reporting Issues](#reporting-issues)

@@ -9,6 +9,12 @@
 
 Seam allows you to sync your CoreData Stores with CloudKit.
 
+## Features
+- Mapping of CoreData Model to CloudKit Private Databases
+- Background Sync 
+- Conflict Resolution Policies
+- Tutorials
+
 ## Requirements
 
 - iOS 8.3+ / Mac OS X 10.10+
@@ -16,9 +22,9 @@ Seam allows you to sync your CoreData Stores with CloudKit.
 
 ## Installation
 
-# Cocoapods
+### Cocoapods
 
-# Carthage
+### Carthage
 
 ## Usage
 
@@ -61,25 +67,6 @@ CKAsset and CLLocation can be used in your CoreData model as Transformable attri
 Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
 - SMStoreDidStartSyncOperationNotification
 - SMStoreDidFinishSyncOperationNotification
-
-#### Conflict Resolution Policies
-In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
-
-- ClientTellsWhichWins
-
-This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the record as arguments. You do whatever changes you want on the second argument and return it.
-
-- ServerRecordWins
-
-This is the default. It considers the server record as the true record.
-
-- ClientRecordWins
-
-This considers the client record as the true record.
-
-- KeepBoth
-
-This saves both versions of the record.
 
 ### What it does support
 

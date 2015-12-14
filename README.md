@@ -10,7 +10,7 @@
 Seam allows you to sync your CoreData Stores with CloudKit.
 
 ## Features
-- Mapping of CoreData Model to CloudKit Private Databases
+- Automatic mapping of CoreData Model to CloudKit Private Databases
 - Background Sync 
 - Conflict Resolution Policies
 - Tutorials

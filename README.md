@@ -25,7 +25,7 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 
 #### Transformable Attributes
 
-CKAsset and CLLocation can be used in your CoreData model as transformable attributes. Follow the two steps below.
+CKAsset and CLLocation can be used in your CoreData model as Transformable attributes.
 
 1. To use **CKAsset** set **Transformable** as AttributeType and **CKAssetTransformer** as value transformer name for the attribute.
 

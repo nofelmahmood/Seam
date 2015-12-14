@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name = 'Seam'
   s.version = '0.6'
   s.license = 'MIT'
-  s.summary = 'CloudKit Sync done right !'
+  s.summary = 'Seamless CloudKit Sync with CoreData'
   s.homepage = 'https://github.com/nofelmahmood/Seam'
   s.social_media_url = 'http://twitter.com/NofelMahmood'
   s.authors = { 'Nofel Mahmood' => 'nofelmehmood@gmail.com' }

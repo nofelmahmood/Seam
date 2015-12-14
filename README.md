@@ -1,4 +1,5 @@
-![](http://s14.postimg.org/ll5smugr5/Logo.png)
+![seamlogo](https://cloud.githubusercontent.com/assets/3306263/11775866/4b925354-a264-11e5-9bf6-bfdcf2cf9675.png)
+
 
 [![Pod Version](https://img.shields.io/badge/pod-v0.6-blue.svg)](https://img.shields.io/cocoapods/v/Alamofire.svg)
 [![Cocoapods Compatible](https://img.shields.io/badge/Cocoapods-Compatible-brightgreen.svg)](https://img.shields.io/badge/Cocoapods-Compatible-green.svg)

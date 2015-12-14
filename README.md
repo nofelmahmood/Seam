@@ -19,9 +19,15 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 - iOS 8.3+ / Mac OS X 10.10+
 - Xcode 7.1+
 
-## CloudKit to CoreData
+## Installation
 
-### Attributes
+# Cocoapods
+
+# Carthage
+
+## Usage
+
+## Attributes
 
 | CloudKit  | CoreData |
 | ------------- | ------------- |
@@ -33,7 +39,7 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 | CKAsset | Transformable |
 | CLLocation | Transformable |
 
-#### Transformable Attributes
+### Transformable Attributes
 
 CKAsset and CLLocation can be used in your CoreData model as Transformable attributes.
 
@@ -46,7 +52,7 @@ CKAsset and CLLocation can be used in your CoreData model as Transformable attri
 ![](https://cloud.githubusercontent.com/assets/3306263/11773252/f3459564-a248-11e5-89eb-197c32ef245a.png)
 
 
-### Relationships
+## Relationships
 
 | CoreData Relationship  | Translation on CloudKit |
 | ------------- | ------------- |
@@ -79,38 +85,6 @@ This considers the client record as the true record.
 - KeepBoth
 
 This saves both versions of the record.
-
-## How to use
-
-- Declare a SMStore type property in the class where your CoreData stack resides.
-```swift
-var smStore: SMStore?
-```
-- Add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
-```swift
-do 
-{
-   self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
-}
-```
-- Enable Push Notifications for your app.
-![](http://s29.postimg.org/rb9vj0egn/Screen_Shot_2015_08_23_at_5_44_59_pm.png)
-- Implement didReceiveRemoteNotification Method in your AppDelegate and call `handlePush` on the instance of SMStore created earlier.
-```swift
- func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) 
- {
-    self.smStore?.handlePush(userInfo: userInfo)
- }
-```
-- Enjoy
-
-## Options 
-
-- SMStoreSyncConflictResolutionPolicyOption
-
-Use SMSyncConflictResolutionPolicy enum to use as a value for this option to specify the desired conflict resolution policy when adding SeamStoreType to your app's NSPersistentStoreCoordinator.
-
-## Support
 
 ### What it does support
 

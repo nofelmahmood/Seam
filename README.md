@@ -9,24 +9,32 @@
 
 Seam is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. All you have to do is use it as a store type for your CoreData store. Local caching and sync is taken care of. It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
 
-## CoreData to CloudKit
+## CloudKit to CoreData
 
 ### Attributes
 
-| CoreData  | CloudKit |
+| CloudKit  | CoreData |
 | ------------- | ------------- |
-| NSDate    | Date/Time
-| NSData | Bytes
-| NSString  | String   |
-| Integer16 | Int(64) |
-| Integer32 | Int(64) |
-| Integer64 | Int(64) |
-| Decimal | Double | 
-| Float | Double |
-| Boolean | Int(64) |
-| NSManagedObject | Reference |
+| NSDate    | NSDate
+| NSData | NSData
+| NSString  | NSString   |
+| NSNumber | NSNumber |
+| CKReference | NSManagedObject |
+| CKAsset | Transformable |
+| CLLocation | Transformable |
 
-**In the table above :** `Integer16`, `Integer32`, `Integer64`, `Decimal`, `Float` and `Boolean` are referring to the instance of `NSNumber` used to represent them in CoreData Models. `NSManagedObject` refers to a `to-one relationship` in a CoreData Model.
+#### Transformable Attributes
+
+CKAsset and CLLocation can be used in your CoreData model as Transformable attributes.
+
+1. To use **CKAsset** set **Transformable** as AttributeType and **CKAssetTransformer** as value transformer name for the attribute.
+
+![](https://cloud.githubusercontent.com/assets/3306263/11773251/f342fd36-a248-11e5-8b55-519400fdb600.png)
+
+2. To use **CLLocation** set **Transformable** as AttributeType and **CLLocationTransformer** as value transformer name for the attribute.
+
+![](https://cloud.githubusercontent.com/assets/3306263/11773252/f3459564-a248-11e5-89eb-197c32ef245a.png)
+
 
 ### Relationships
 

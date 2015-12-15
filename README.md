@@ -10,7 +10,7 @@
 Seam allows you to sync your CoreData Stores with CloudKit.
 
 ## Features
-- Automatic mapping of CoreData Model to CloudKit Private Databases
+- Automatic mapping of CoreData Models to CloudKit Private Databases
 - Background Sync 
 - Conflict Resolution Policies
 - Tutorials
@@ -24,7 +24,48 @@ Seam allows you to sync your CoreData Stores with CloudKit.
 
 ### Cocoapods
 
+[CocoaPods](http://cocoapods.org) is a dependency manager for Cocoa projects. You can install it with the following command:
+
+```bash
+$ gem install cocoapods
+```
+
+To integrate Seam into your Xcode project using CocoaPods, specify it in your `Podfile`:
+
+```ruby
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '8.3'
+use_frameworks!
+
+pod 'Seam', '~> 0.6'
+```
+
+Then, run the following command:
+
+```bash
+$ pod install
+```
+
+
+
 ### Carthage
+
+[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
+
+You can install Carthage with [Homebrew](http://brew.sh/) using the following command:
+
+```bash
+$ brew update
+$ brew install carthage
+```
+
+To integrate Seam into your Xcode project using Carthage, specify it in your `Cartfile`:
+
+```ogdl
+github "Seam/Seam" ~> 0.6
+```
+
+Run `carthage update` to build the framework and drag the built `Seam.framework` into your Xcode project.
 
 ## Usage
 

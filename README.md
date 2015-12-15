@@ -164,24 +164,6 @@ CKAsset and CLLocation can be used in your CoreData model as Transformable attri
 
 <strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and curroption of data can possibly occur.
 
-## Sync
-
-Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
-- SMStoreDidStartSyncOperationNotification
-- SMStoreDidFinishSyncOperationNotification
-
-### What it does support
-
-Seam supports only user's CloudKit `Private Database` at this time. It creates and uses a custom zone to store data and fetch changes from the server.
-
-### What it does not support
-
-CloudKit `Public Database` and here are the two reasons why, straight from the docs.
-
-1. [The disadvantage of using the default zone for storing records is that it does not have any special capabilities. You cannot save a group of records to iCloud atomically in the default zone. Similarly, you cannot use a CKFetchRecordChangesOperation object on records in the default zone.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/occ/clm/CKRecordZone/defaultRecordZone)
-
-2. [ You cannot create custom zones in a public database.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/c/tdef/CKRecordZoneCapabilities)
-
 ## Getting Started 
 
 Download the demo project. Run it and see the magic as it happens.

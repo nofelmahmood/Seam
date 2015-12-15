@@ -9,16 +9,41 @@
 
 Seam allows you to sync your CoreData Stores with CloudKit.
 
+-------
+
+<p align="center">
+    <a href="#features">Features</a> -
+    <a href="#requirements">Requirements</a> -
+    <a href="#communication">Communication</a> -
+    <a href="#installation">Installation</a> - 
+    <a href="#usage">Usage</a> - 
+    <a href="#getting-started">Getting Started </a> -
+    <a href="#author">Author</a> -
+    <a href="#license">License</a>
+</p>
+
+-------
+ 
 ## Features
 - Automatic mapping of CoreData Models to CloudKit Private Databases
+- Supports Assets
 - Background Sync 
-- Conflict Resolution Policies
+- Conflict Resolution
 - Tutorials
 
 ## Requirements
 
 - iOS 8.0+ / Mac OS X 10.10+
 - Xcode 7.1+
+
+## Communication
+
+- If you want to contribute submit a [pull request](https://github.com/nofelmahmood/Seam/pulls)
+- If you found a bug [open an issue](https://github.com/nofelmahmood/Seam/issues).
+- If you have a feature request [open an issue](https://github.com/nofelmahmood/Seam/issues).
+- If you have a question, ask it on [Stack Overflow](http://stackoverflow.com).
+
+Please read the [Contributing Guidelines](CONTRIBUTING.md) before doing any of above.
 
 ## Installation
 
@@ -158,18 +183,15 @@ CloudKit `Public Database` and here are the two reasons why, straight from the d
 2. [ You cannot create custom zones in a public database.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/c/tdef/CKRecordZoneCapabilities)
 
 ## Getting Started 
+
 Download the demo project. Run it and see the magic as it happens.
 
-## Installation
-CocoaPods is the recommended way of adding Seam to your project.
+## Author
 
-Add this `'Seam', '~> 0.6'` to your pod file.
+Seam is owned and maintained by [Nofel Mahmood](http://twitter.com/NofelMahmood).
 
-## Credits
-Seam was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)
-
-## Contact 
-Follow Nofel Mahmood on [Twitter](http://twitter.com/NofelMahmood) and [GitHub](http://github.com/nofelmahmood) or email him at nofelmehmood@gmail.com
+You can follow him on [Twitter](http://twitter.com/NofelMahmood) and [Medium](http://medium.com/@nofelmahmood)
 
 ## License
-Seam is available under the MIT license. See the LICENSE file for more info.
+
+Seam is available under the MIT license. See the [LICENSE file](LICENSE.md) for more info.

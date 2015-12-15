@@ -17,7 +17,7 @@ Seam allows you to sync your CoreData Stores with CloudKit.
 
 ## Requirements
 
-- iOS 8.3+ / Mac OS X 10.10+
+- iOS 8.0+ / Mac OS X 10.10+
 - Xcode 7.1+
 
 ## Installation
@@ -46,8 +46,6 @@ Then, run the following command:
 $ pod install
 ```
 
-
-
 ### Carthage
 
 [Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
@@ -69,7 +67,39 @@ Run `carthage update` to build the framework and drag the built `Seam.framework`
 
 ## Usage
 
+Add a Store type of ```SeamStoreType``` to a NSPersistentStoreCoordinator in your CoreData stack:
+
+``` swift
+let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: yourModel)
+let seamStore = try persistentStoreCoordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? Store
+```
+Observe the following two Notifications to know when the Sync Operation starts and finishes:
+
+``` swift
+
+NSNotificationCenter.defaultCenter().addObserver(self, selector: "didStartSyncing:", name: SMStoreDidStartSyncingNotification, object: seamStore)
+NSNotificationCenter.defaultCenter().addObserver(self, selector: "didFinishSyncing:", name: SMStoreDidFinishSyncingNotification, object: seamStore)
+
+func didStartSyncing(notification: NSNotification) {
+  // Prepare for new data before syncing completes
+}
+  
+func didFinishSyncing(notification: NSNotification) {
+  // Merge Changes into your context after syncing completes
+  mainContext.mergeChangesFromContextDidSaveNotification(notification)
+}
+  
+```
+
+Finally call sync whenever and wherever you want:
+
+```swift
+seamStore.sync()
+```
+
 ## Attributes
+
+All CloudKit Attribute
 
 | CloudKit  | CoreData |
 | ------------- | ------------- |

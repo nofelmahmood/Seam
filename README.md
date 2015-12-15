@@ -107,6 +107,7 @@ Observe the following two Notifications to know when the Sync Operation starts a
 NSNotificationCenter.defaultCenter().addObserver(self, selector: "didStartSyncing:",
                                                 name: SMStoreDidStartSyncingNotification,
                                                 object: seamStore)
+
 NSNotificationCenter.defaultCenter().addObserver(self, selector: "didFinishSyncing:",
                                                 name: SMStoreDidFinishSyncingNotification,
                                                 object: seamStore)                                               

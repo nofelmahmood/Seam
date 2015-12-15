@@ -130,7 +130,9 @@ seamStore.sync()
 
 ## Attributes
 
-All CloudKit Attribute
+All CloudKit Attributes are mapped automatically to your CoreData attributes with the exception of [CKAsset](https://developer.apple.com/library/ios/documentation/CloudKit/Reference/CKAsset_class/) and [CLLocation](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocation_Class/).
+
+CKAsset and CLLocation can be used by setting the corresponding attribute as Transformable in your CoreData Model.
 
 | CloudKit  | CoreData |
 | ------------- | ------------- |

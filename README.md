@@ -71,14 +71,20 @@ Add a Store type of ```SeamStoreType``` to a NSPersistentStoreCoordinator in you
 
 ``` swift
 let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: yourModel)
-let seamStore = try persistentStoreCoordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? Store
+let seamStore = try persistentStoreCoordinator.addPersistentStoreWithType(SeamStoreType, 
+                                                                          configuration: nil, 
+                                                                          URL: url, options: nil) as? Store
 ```
 Observe the following two Notifications to know when the Sync Operation starts and finishes:
 
 ``` swift
 
-NSNotificationCenter.defaultCenter().addObserver(self, selector: "didStartSyncing:", name: SMStoreDidStartSyncingNotification, object: seamStore)
-NSNotificationCenter.defaultCenter().addObserver(self, selector: "didFinishSyncing:", name: SMStoreDidFinishSyncingNotification, object: seamStore)
+NSNotificationCenter.defaultCenter().addObserver(self, selector: "didStartSyncing:",
+                                                name: SMStoreDidStartSyncingNotification,
+                                                object: seamStore)
+NSNotificationCenter.defaultCenter().addObserver(self, selector: "didFinishSyncing:",
+                                                name: SMStoreDidFinishSyncingNotification,
+                                                object: seamStore)                                               
 
 func didStartSyncing(notification: NSNotification) {
   // Prepare for new data before syncing completes

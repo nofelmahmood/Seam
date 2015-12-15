@@ -86,7 +86,7 @@ func didStartSyncing(notification: NSNotification) {
   
 func didFinishSyncing(notification: NSNotification) {
   // Merge Changes into your context after syncing completes
-  mainContext.mergeChangesFromContextDidSaveNotification(notification)
+  mainContext.mergeChangesFromStoreDidFinishSyncingNotification(notification)
 }
   
 ```

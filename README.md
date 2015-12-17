@@ -129,10 +129,10 @@ Finally call sync whenever and wherever you want:
 seamStore.sync(nil)
 ```
 
-To trigger sync whenever a change happens on the CloudKit Servers. Subscribe store to receive Push Notifications from CloudKit Server.
+To trigger sync whenever a change happens on the CloudKit Servers. Subscribe the store to receive Push Notifications from the CloudKit Servers.
 
 ```swift
-seamStore.subscribe({ successful in
+seamStore.subscribeToPushNotifications({ successful in
     guard successful else { return }
     // Ensured that subscription was created successfully
 })

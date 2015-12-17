@@ -42,8 +42,8 @@ class Metadata: NSManagedObject {
     }
   }
   
-  // MARK: Properties
-
+  // MARK: Properties 
+  
   struct Properties {
     struct Data {
       static let name = "data"

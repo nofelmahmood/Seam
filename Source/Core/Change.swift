@@ -174,7 +174,7 @@ class Change: NSManagedObject {
     
     func all() throws -> [Change]? {
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
-      fetchRequest.fetchBatchSize = 50
+      fetchRequest.fetchLimit = 50
       return try changeContext.executeFetchRequest(fetchRequest) as? [Change]
     }
     

@@ -26,16 +26,47 @@ import CoreData
 import CloudKit
 import ObjectiveC
 
+public typealias ConflictResolutionInfo = (serverValues: [String: AnyObject], localValues: [String: AnyObject], pendingLocallyChangedProperties: [String])
+public typealias ConflictResolutionReturnedInfo = (newValues: [String: AnyObject], pendingLocallyChangedProperties: [String])
+public typealias ConflictResolutionBlock = ((conflictResolutionInfo: ConflictResolutionInfo) -> ConflictResolutionReturnedInfo)
+
 public class Store: NSIncrementalStore {
-  static let errorDomain = "com.seam.error.store.errorDomain"
-  enum Error: ErrorType {
-    case CreationFailed
-    case ModelCreationFailed
-    case PersistentStoreInitializationFailed
-    case InvalidRequest
-    case BackingObjectFetchFailed
-  }
-  var backingPSC: NSPersistentStoreCoordinator?
+  
+  var zone: Zone!
+//    if let zoneName = self.zoneName {
+//      return Zone(zoneName: zoneName)
+//    } else if let zoneName = try? self.preferenceManager.zoneName() where zoneName != nil {
+//      return Zone(zoneName: zoneName!)
+//    }
+//    return Zone()
+//  }()
+  
+  lazy var changeManager: Change.Manager = {
+    return Change.Manager(changeContext: self.backingMOC)
+  }()
+  
+  lazy var preferenceManager: Preference.Manager = {
+    let managedObjectContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+    managedObjectContext.persistentStoreCoordinator = self.backingPSC
+    return Preference.Manager(context: managedObjectContext)
+  }()
+
+  lazy var backingPSC: NSPersistentStoreCoordinator = {
+    let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: self.backingStoreModel)
+    return persistentStoreCoordinator
+  }()
+  
+  lazy var backingStoreModel: NSManagedObjectModel = {
+    let model = self.persistentStoreCoordinator!.managedObjectModel.copy() as! NSManagedObjectModel
+    model.entities.forEach { entity in
+      entity.properties.append(UniqueID.attributeDescription)
+    }
+    model.entities.append(Change.Entity.entityDescription)
+    model.entities.append(Metadata.Entity.entityDescription)
+    model.entities.append(Preference.Entity.entityDescription)
+    return model
+  }()
+  
   private lazy var backingMOC: NSManagedObjectContext = {
     var backingMOC = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
     backingMOC.persistentStoreCoordinator = self.backingPSC
@@ -43,31 +74,39 @@ public class Store: NSIncrementalStore {
     backingMOC.mergePolicy = NSMergeByPropertyStoreTrumpMergePolicy
     return backingMOC
   }()
+  
   private lazy var operationQueue: NSOperationQueue = {
     let operationQueue = NSOperationQueue()
     operationQueue.maxConcurrentOperationCount = 1
     return operationQueue
   }()
-  var conflictResolutionBlock: ((locallyChangedProperties: [String], localManagedObject: NSManagedObject, serverValues: [String: AnyObject]) -> ())?
-  var conflictResolutionPolicy: String? {
-    return options?[SMConfictResolutionPolicyOption] as? String
+  
+  var syncConflictResolutionBlock: ConflictResolutionBlock?
+  
+  // MARK: Computed Properties for Options
+  lazy var optionValues: (conflictResolutionPolicy: String?, zoneName: String?) = {
+    let optionValues: (conflictResolutionPolicy: String?, zoneName: String?)
+    optionValues.conflictResolutionPolicy = self.options?[SMSyncConflictResolutionPolicyOption] as? String
+    optionValues.zoneName = self.options?[SMCloudKitZoneNameOption] as? String
+    return optionValues
+  }()
+  
+  // MARK: Error
+
+  static let errorDomain = "com.seam.error.store.errorDomain"
+  enum Error: ErrorType {
+    case CreationFailed
+    case InvalidRequest
+    case BackingObjectFetchFailed
   }
-  var changeManager: Change.Manager!
   
   override public class func initialize() {
     NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: type)
-    registerTransformers()
+    Transformers.registerAll()
   }
   
   class internal var type: String {
     return NSStringFromClass(self)
-  }
-  
-  class func registerTransformers() {
-    let assetTransformer = CKAssetTransformer()
-    let locationTransformer = CLLocationTransformer()
-    NSValueTransformer.setValueTransformer(locationTransformer, forName: TransformableAttribute.CLLocation.valueTransformerName)
-    NSValueTransformer.setValueTransformer(assetTransformer, forName: TransformableAttribute.CKAsset.valueTransformerName)
   }
   
   override public func loadMetadata() throws {
@@ -75,36 +114,32 @@ public class Store: NSIncrementalStore {
       NSStoreUUIDKey: NSProcessInfo().globallyUniqueString,
       NSStoreTypeKey: self.dynamicType.type
     ]
-    guard let backingMOM = modifiedModel(fromModel: persistentStoreCoordinator!.managedObjectModel) else {
-      throw Error.ModelCreationFailed
-    }
-    backingPSC = NSPersistentStoreCoordinator(managedObjectModel: backingMOM)
-    guard let backingPSC = backingPSC else {
-      throw Error.PersistentStoreInitializationFailed
-    }
+    let isNewStore = URL != nil && NSFileManager.defaultManager().fileExistsAtPath(URL!.path!) == false
     guard let _ = try? backingPSC.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: URL, options: nil) else {
       throw Error.CreationFailed
     }
     changeManager = Change.Manager(changeContext: backingMOC)
-  }
-  
-  func modifiedModel(fromModel model: NSManagedObjectModel) -> NSManagedObjectModel? {
-    guard let model = model.copy() as? NSManagedObjectModel else {
-      return nil
-    }
-    model.entities.forEach { entity in
-      entity.properties.append(UniqueID.attributeDescription)
-    }
-    model.entities.append(Change.Entity.entityDescription)
-    model.entities.append(Metadata.Entity.entityDescription)
-    return model
-  }
-  
-  public func sync(completionBlock: (() -> ())?) {
-    guard operationQueue.operationCount == 0 else {
-      completionBlock?()
+    
+    guard isNewStore else {
+      if let zoneName = try preferenceManager.zoneName() {
+        zone = Zone(zoneName: zoneName)
+      }
       return
     }
+    if let zoneName = optionValues.zoneName {
+      preferenceManager.saveZoneName(zoneName)
+      zone = Zone(zoneName: zoneName)
+    } else {
+      zone = Zone()
+      preferenceManager.saveZoneName(zone.zone.zoneID.zoneName)
+    }
+  }
+
+  public func sync(conflictResolutionBlock: ConflictResolutionBlock?) {
+    guard operationQueue.operationCount == 0 else {
+      return
+    }
+    self.syncConflictResolutionBlock = conflictResolutionBlock
     let sync = Sync(store: self)
     sync.onCompletion = { (saveNotification, error) in
       guard let notification = saveNotification where error == nil else {
@@ -115,6 +150,16 @@ public class Store: NSIncrementalStore {
       }
     }
     operationQueue.addOperation(sync)
+  }
+  
+  public func subscribeToPushNotifications(completionBlock: ((successful: Bool) -> ())?) {
+    zone.createSubscription({
+      guard $0 == nil else {
+        completionBlock?(successful: false)
+        return
+      }
+      completionBlock?(successful: true)
+    })
   }
   
   func setUniqueIDForInsertedObject(uniqueID: String, insertedObject: NSManagedObject) {
@@ -242,7 +287,7 @@ public class Store: NSIncrementalStore {
   }
   
   // MARK: - Requests
-  
+
   override public func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
     var result: AnyObject = []
     try backingMOC.performBlockAndWait {

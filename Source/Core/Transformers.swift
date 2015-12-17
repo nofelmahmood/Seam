@@ -25,7 +25,18 @@
 import Foundation
 import CloudKit
 
-final class CKAssetTransformer: NSValueTransformer {
+struct Transformers {
+  static func registerAll() {
+    let assetTransformer = CKAssetTransformer()
+    let locationTransformer = CLLocationTransformer()
+    NSValueTransformer.setValueTransformer(assetTransformer, forName: CKAssetTransformer.name)
+    NSValueTransformer.setValueTransformer(locationTransformer, forName: CLLocationTransformer.name)
+  }
+}
+
+class CKAssetTransformer: NSValueTransformer {
+  static let name = "CKAssetTransformer"
+  
   override class func transformedValueClass() -> AnyClass {
     return CKAsset.self
   }
@@ -49,7 +60,9 @@ final class CKAssetTransformer: NSValueTransformer {
   }
 }
 
-final class CLLocationTransformer: NSValueTransformer {
+class CLLocationTransformer: NSValueTransformer {
+  static let name = "CLLocationTransformer"
+  
   override class func transformedValueClass() -> AnyClass {
     return CLLocation.self
   }

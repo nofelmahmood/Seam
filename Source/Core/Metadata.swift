@@ -36,7 +36,6 @@ class Metadata: NSManagedObject {
       let entityDescription = NSEntityDescription()
       entityDescription.name = name
       entityDescription.properties.append(UniqueID.attributeDescription)
-      entityDescription.properties.append(Properties.EntityName.attributeDescription)
       entityDescription.properties.append(Properties.Data.attributeDescription)
       entityDescription.managedObjectClassName = "Seam.Metadata"
       return entityDescription
@@ -46,16 +45,6 @@ class Metadata: NSManagedObject {
   // MARK: Properties
 
   struct Properties {
-    struct EntityName {
-      static let name = "entityName"
-      static var attributeDescription: NSAttributeDescription {
-        let attributeDescription = NSAttributeDescription()
-        attributeDescription.name = name
-        attributeDescription.attributeType = .StringAttributeType
-        attributeDescription.optional = false
-        return attributeDescription
-      }
-    }
     struct Data {
       static let name = "data"
       static var attributeDescription: NSAttributeDescription {
@@ -83,13 +72,11 @@ class Metadata: NSManagedObject {
     
     func setMetadata(forRecord record: CKRecord) throws {
       let uniqueID = record.recordID.recordName
-      let entityName = record.recordType
       let encodedData = record.encodedSystemFields
       if let metadata = try metadataWithUniqueID(uniqueID) {
         metadata.data = encodedData
       } else if let metadata = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as? Metadata {
         metadata.uniqueID = uniqueID
-        metadata.entityName = entityName
         metadata.data = encodedData
       }
       try context.saveIfHasChanges()

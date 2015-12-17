@@ -59,7 +59,7 @@ class NotesViewController: UIViewController {
     fetchRequest.predicate = NSPredicate(format: "folder == %@", folder.uniqueObjectID!)
     let sortDescriptor = NSSortDescriptor(key: "text", ascending: false)
     fetchRequest.sortDescriptors = [sortDescriptor]
-    fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: "DAGHA")
+    fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: nil, cacheName: nil)
     fetchedResultsController.delegate = self
     tableView.delegate = self
     tableView.dataSource = self

@@ -56,6 +56,8 @@
 		3EBF6C241BF3894F00A8B7C3 /* NSEntityDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8252001BF35340008B3E86 /* NSEntityDescription.swift */; };
 		3EBF6C251BF3894F00A8B7C3 /* NSManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8252011BF35340008B3E86 /* NSManagedObject.swift */; };
 		3EBF6C261BF3894F00A8B7C3 /* NSPredicate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E8252021BF35340008B3E86 /* NSPredicate.swift */; };
+		3EFE20AC1C2199A3003EEA91 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EFE20AB1C2199A3003EEA91 /* Preferences.swift */; };
+		3EFE20AD1C2199A3003EEA91 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EFE20AB1C2199A3003EEA91 /* Preferences.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -113,6 +115,7 @@
 		3EBF6BC11BF37CB900A8B7C3 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		3EBF6BE61BF3838700A8B7C3 /* Seam.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Seam.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3EBF6BEF1BF3838700A8B7C3 /* Seam OSX Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Seam OSX Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3EFE20AB1C2199A3003EEA91 /* Preferences.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Preferences.swift; path = Source/Core/Preferences.swift; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,11 +157,12 @@
 		3E191DF31B7B52A400BB9E71 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				3EFE20AB1C2199A3003EEA91 /* Preferences.swift */,
 				3E4EB1C71C0A333500CB07C6 /* Metadata.swift */,
 				3E8252081BF35349008B3E86 /* Change.swift */,
 				3E82520C1BF35349008B3E86 /* Sync.swift */,
-				3E82520A1BF35349008B3E86 /* Properties.swift */,
 				3E82520B1BF35349008B3E86 /* Store.swift */,
+				3E82520A1BF35349008B3E86 /* Properties.swift */,
 				3E82520D1BF3534A008B3E86 /* Token.swift */,
 				3E82520E1BF3534A008B3E86 /* Zone.swift */,
 				3E75DC2B1BFC9CE200FB5E40 /* Transformers.swift */,
@@ -482,6 +486,7 @@
 				3E8252071BF35340008B3E86 /* NSPredicate.swift in Sources */,
 				3E8252051BF35340008B3E86 /* NSEntityDescription.swift in Sources */,
 				3E4EB1921C034F0600CB07C6 /* NSPersistentStoreCoordinator.swift in Sources */,
+				3EFE20AC1C2199A3003EEA91 /* Preferences.swift in Sources */,
 				3E8252041BF35340008B3E86 /* CKRecordID.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -504,6 +509,7 @@
 				3EBF6C251BF3894F00A8B7C3 /* NSManagedObject.swift in Sources */,
 				3EBF6C221BF3894F00A8B7C3 /* CKRecord.swift in Sources */,
 				3E4EB1931C034F0600CB07C6 /* NSPersistentStoreCoordinator.swift in Sources */,
+				3EFE20AD1C2199A3003EEA91 /* Preferences.swift in Sources */,
 				3EBF6C181BF3894700A8B7C3 /* Store.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -656,7 +662,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
@@ -682,7 +688,7 @@
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "$(SRCROOT)/Source/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_DYLIB_INSTALL_NAME = "$(DYLIB_INSTALL_NAME_BASE:standardizepath)/$(EXECUTABLE_PATH)";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.10;

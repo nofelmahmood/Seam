@@ -25,8 +25,8 @@
 import Foundation
 import CloudKit
 
-extension CKRecordID {
-  convenience init(uniqueID: String) {
-    self.init(recordName: uniqueID, zoneID: Zone.zoneID)
-  }
-}
+//extension CKRecordID {
+//  convenience init(uniqueID: String) {
+//    self.init(recordName: uniqueID, zoneID: Zone.zoneID)
+//  }
+//}

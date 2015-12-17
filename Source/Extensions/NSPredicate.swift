@@ -42,5 +42,12 @@ extension NSPredicate {
   convenience init(inUniqueIDs ids: [String]) {
     self.init(format: "%K IN %@",UniqueID.name,ids)
   }
-
+  
+  class var preferenceZoneNamePredicate: NSPredicate {
+    return NSPredicate(format: "%K == %@", Preference.Properties.Key.name, Preference.Default.zoneName)
+  }
+  
+  class var preferenceZoneSubscriptionNamePredicate: NSPredicate {
+    return NSPredicate(format: "%K == %@", Preference.Properties.Key.name, Preference.Default.zoneSubscriptionName)
+  }
 }

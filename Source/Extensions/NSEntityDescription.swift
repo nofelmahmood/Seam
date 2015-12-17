@@ -27,10 +27,10 @@ import CoreData
 
 extension NSAttributeDescription {
   var isCKAsset: Bool {
-    return valueTransformerName == TransformableAttribute.CKAsset.valueTransformerName
+    return valueTransformerName == CKAssetTransformer.name
   }
   var isCLLocation: Bool {
-    return valueTransformerName == TransformableAttribute.CLLocation.valueTransformerName
+    return valueTransformerName == CLLocationTransformer.name
   }
 }
 

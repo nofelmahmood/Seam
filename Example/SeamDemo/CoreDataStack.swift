@@ -35,13 +35,14 @@ class CoreDataStack: NSObject {
     let url = self.applicationDocumentsDirectory.URLByAppendingPathComponent("SingleViewCoreData.sqlite")
     var failureReason = "There was an error creating or loading the application's saved data."
     do {
-      self.store = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? Store
+      var options = [NSObject: AnyObject]()
+      options[SMCloudKitZoneNameOption] = "Seam_CustomZone"
+      self.store = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: options) as? Store
     } catch {
       // Report any error we got.
       var dict = [String: AnyObject]()
       dict[NSLocalizedDescriptionKey] = "Failed to initialize the application's saved data"
       dict[NSLocalizedFailureReasonErrorKey] = failureReason
-      
       dict[NSUnderlyingErrorKey] = error as NSError
       let wrappedError = NSError(domain: "YOUR_ERROR_DOMAIN", code: 9999, userInfo: dict)
       // Replace this with code to handle the error appropriately.

@@ -27,6 +27,7 @@ import CoreData
 import CloudKit
 
 extension NSManagedObject {
+
   var uniqueID: String {
     get {
       return valueForKey(UniqueID.name) as! String

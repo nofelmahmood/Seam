@@ -9,8 +9,35 @@
 import UIKit
 import CoreData
 
+// MARK: UIImagePickerControllerDelegate
+
+extension NoteDetailViewController: UIImagePickerControllerDelegate {
+  func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
+    let textAttachment = NSTextAttachment()
+    textAttachment.image = image
+    let attributedString = NSAttributedString(attachment: textAttachment)
+    let mutableAttributedTextViewString = NSMutableAttributedString(attributedString: textView.attributedText)
+    mutableAttributedTextViewString.appendAttributedString(attributedString)
+    textView.attributedText = mutableAttributedTextViewString
+    dismissViewControllerAnimated(true, completion: nil)
+  }
+  func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+    dismissViewControllerAnimated(true, completion: nil)
+  }
+}
+
+extension NoteDetailViewController: UINavigationControllerDelegate {
+  
+}
+
 class NoteDetailViewController: UIViewController {
   @IBOutlet var textView: UITextView!
+  lazy var imagePickerController: UIImagePickerController = {
+    let imagePickerController = UIImagePickerController()
+    imagePickerController.delegate = self
+    imagePickerController.sourceType = .SavedPhotosAlbum
+    return imagePickerController
+  }()
   var tempContext: NSManagedObjectContext!
   var note: Note!
   var noteObjectID: NSManagedObjectID?
@@ -75,6 +102,10 @@ class NoteDetailViewController: UIViewController {
   
   // MARK: IBAction
   
+  @IBAction func cameraButtonDidPress() {
+    presentViewController(imagePickerController, animated: true, completion: nil)
+  }
+  
   @IBAction func doneButtonDidPress(sender: AnyObject) {
     textView.resignFirstResponder()
     if let noteText = textView.text where noteText.isEmpty == false {
@@ -88,5 +119,4 @@ class NoteDetailViewController: UIViewController {
       }
     }
   }
-
 }

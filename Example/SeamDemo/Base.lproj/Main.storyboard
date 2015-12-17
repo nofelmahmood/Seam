@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9059" systemVersion="14F1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="v3V-hh-t2a">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="9531" systemVersion="14F1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="v3V-hh-t2a">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -98,13 +98,26 @@
                                     <outlet property="delegate" destination="1tJ-yV-I58" id="93x-2G-NUg"/>
                                 </connections>
                             </textView>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dDr-zz-mxS">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <items>
+                                    <barButtonItem systemItem="camera" id="ctq-24-jOy">
+                                        <connections>
+                                            <action selector="cameraButtonDidPress" destination="1tJ-yV-I58" id="thB-H2-64g"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="Dag-Vo-tFV" firstAttribute="top" secondItem="41s-LP-l6j" secondAttribute="bottom" id="0PG-Hr-eOn"/>
                             <constraint firstItem="Dag-Vo-tFV" firstAttribute="leading" secondItem="dgp-je-9CK" secondAttribute="leading" id="2cn-7n-FZA"/>
                             <constraint firstItem="Qnv-5R-a7H" firstAttribute="top" secondItem="Dag-Vo-tFV" secondAttribute="bottom" id="5md-Ou-qxR"/>
+                            <constraint firstAttribute="trailing" secondItem="dDr-zz-mxS" secondAttribute="trailing" id="7S3-1o-pz6"/>
                             <constraint firstItem="Dag-Vo-tFV" firstAttribute="top" secondItem="dgp-je-9CK" secondAttribute="top" id="9u3-9z-Nds"/>
+                            <constraint firstItem="Qnv-5R-a7H" firstAttribute="top" secondItem="dDr-zz-mxS" secondAttribute="bottom" id="JRx-dL-Kej"/>
+                            <constraint firstItem="dDr-zz-mxS" firstAttribute="leading" secondItem="dgp-je-9CK" secondAttribute="leading" id="NT2-RJ-Yxp"/>
                             <constraint firstAttribute="trailing" secondItem="Dag-Vo-tFV" secondAttribute="trailing" id="fJv-6P-9um"/>
                         </constraints>
                         <variation key="default">

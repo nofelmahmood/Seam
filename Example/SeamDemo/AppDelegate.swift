@@ -22,8 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
-    print("Receiving Notifications")
-    print(userInfo)
+    CoreDataStack.defaultStack.store?.sync(nil)
   }
   
   func applicationWillResignActive(application: UIApplication) {

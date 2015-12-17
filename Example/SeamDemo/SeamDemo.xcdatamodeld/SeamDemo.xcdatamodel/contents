@@ -10,7 +10,7 @@
         <relationship name="photos" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Photo" inverseName="note" inverseEntity="Photo" syncable="YES"/>
     </entity>
     <entity name="Photo" representedClassName=".Photo" syncable="YES">
-        <attribute name="photo" optional="YES" attributeType="Transformable" valueTransformerName="AssetTransformer" syncable="YES">
+        <attribute name="photo" optional="YES" attributeType="Transformable" valueTransformerName="CKAssetTransformer" syncable="YES">
             <userInfo>
                 <entry key="Asset" value="YES"/>
             </userInfo>

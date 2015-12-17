@@ -30,19 +30,20 @@ public let SeamStoreType = Store.type
 public let SMStoreDidStartSyncingNotification = "Seam.SMStoreDidStartSyncingNotification"
 public let SMStoreDidFinishSyncingNotification = "Seam.SMStoreDidFinishSyncingNotification"
 
-public let SMConfictResolutionPolicyOption = "Seam.SMConfictResolutionPolicyOption"
-
 public let SMServerObjectWinsConflictResolutionPolicy = "Seam.SMServerObjectWinsConflictResolutionPolicy"
 public let SMClientObjectWinsConflictResolutionPolicy = "Seam.SMClientObjectWinsConflictResolutionPolicy"
 
-struct TransformableAttribute {
-  struct CKAsset {
-    static let valueTransformerName = "CKAssetTransformer"
-  }
-  struct CLLocation {
-    static let valueTransformerName = "CLLocationTransformer"
-  }
-}
+// MARK: Options
+
+public let SMSyncConflictResolutionPolicyOption = "Seam.SMSyncConflictResolutionPolicyOption"
+public let SMCloudKitZoneNameOption = "Seam.SMCloudKitZoneNameOption"
+
+// MARK: Zone Properties
+
+let ZoneNameKey = "com.seam.zone.name"
+let ZoneSubscriptionNameKey = "com.seam.zone.name"
+
+// MARK: General
 
 struct UniqueID {
   static let name = "sm_entityAttribute_uniqueID"

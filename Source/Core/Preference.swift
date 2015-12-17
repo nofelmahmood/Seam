@@ -25,6 +25,7 @@
 import Foundation
 import CoreData
 
+/// Preference is a subclass of NSManagedObject.. This class is added to the backing store model automatically and used by backing store to save some information about the store.
 class Preference: NSManagedObject {
   
   @NSManaged var key: String?
@@ -34,8 +35,12 @@ class Preference: NSManagedObject {
     static let zoneName = "zoneName"
     static let zoneSubscriptionName = "zoneSubscriptionName"
   }
+  
   // MARK: Entity
-
+  
+  /**
+  *  Entity information for Preference.
+  */
   struct Entity {
     static let name = "Seam_Preference"
     static var entityDescription: NSEntityDescription {
@@ -50,6 +55,9 @@ class Preference: NSManagedObject {
   
   // MARK: Properties
   
+  /**
+  *  Properties information belonging to the Preference entity.
+  */
   struct Properties {
     struct Key {
       static let name = "key"
@@ -75,13 +83,25 @@ class Preference: NSManagedObject {
   
   // MARK: Manager
   
+  /// Preference.Manager is class which is used to manage preferences by the store.
   class Manager {
     let context: NSManagedObjectContext!
     
+    /**
+     Initializer to initialize the manager with an instance of NSManagedObjectContext attached to backing store's instance of NSPersistentStoreCoordinator.
+     
+     - parameter context: An instance of NSManagedObjectContext.
+     
+     */
     init(context: NSManagedObjectContext) {
       self.context = context
     }
     
+    /**
+     Helper method to persist CloudKit custom zone name used by the store.
+     
+     - parameter name: Name of the CloudKit custom zone.
+     */
     func saveZoneName(name: String) {
       let preference = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as! Preference
       preference.key = Default.zoneName
@@ -89,6 +109,11 @@ class Preference: NSManagedObject {
       try! context.save()
     }
     
+    /**
+     Helper method to persist CloudKit custom zone subscription name used by the store.
+     
+     - parameter name: Name of the CloudKit custom zone subscription.
+     */
     func saveZoneSubscriptionName(name: String) {
       let preference = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as! Preference
       preference.key = Default.zoneSubscriptionName
@@ -96,12 +121,26 @@ class Preference: NSManagedObject {
       try! context.save()
     }
     
+    /**
+     Helper method to retrieve CloudKit saved custom zone name used by the store.
+     
+     - throws: CoreData fetch request error.
+     
+     - returns: An optional that might or might not contain saved custom zone name.
+     */
     func zoneName() throws -> String? {
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate.preferenceZoneNamePredicate
       return (try context.executeFetchRequest(fetchRequest).first as? Preference)?.value
     }
     
+    /**
+     Helper method to retrieve CloudKit saved custom zone subscription name used by the store.
+     
+     - throws: CoreData fetch request error.
+     
+     - returns: An optional that might or might not contain saved custom zone subscription name.
+     */
     func zoneSubscriptionName() throws -> String? {
       let fetchRequest = NSFetchRequest(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate.preferenceZoneSubscriptionNamePredicate

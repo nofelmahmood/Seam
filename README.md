@@ -126,8 +126,24 @@ func didFinishSyncing(notification: NSNotification) {
 Finally call sync whenever and wherever you want:
 
 ```swift
-seamStore.sync()
+seamStore.sync(nil)
 ```
+
+To trigger sync whenever a change happens on the CloudKit Servers. Subscribe store to receive Push Notifications from CloudKit Server.
+
+```swift
+seamStore.subscribe({ successful in
+    guard successful else { return }
+    // Ensured that subscription was created successfully
+})
+
+// In your AppDelegate
+
+func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+    seamStore.sync(nil)
+}
+```
+
 
 ## Attributes
 

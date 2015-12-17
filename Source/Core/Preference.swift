@@ -1,4 +1,4 @@
-//    Preferences.swift
+//    Preference.swift
 //
 //    The MIT License (MIT)
 //

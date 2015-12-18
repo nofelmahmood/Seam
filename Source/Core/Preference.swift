@@ -25,7 +25,7 @@
 import Foundation
 import CoreData
 
-/// Preference is a subclass of NSManagedObject.. This class is added to the backing store model automatically and used by backing store to save some information about the store.
+/// Preference is a subclass of NSManagedObject. This class is added to the backing store model automatically and used by backing store to save some information about the store.
 class Preference: NSManagedObject {
   
   @NSManaged var key: String?
@@ -83,7 +83,7 @@ class Preference: NSManagedObject {
   
   // MARK: Manager
   
-  /// Preference.Manager is class which is used to manage preferences by the store.
+  /// Preference.Manager is a class used to manage preferences by the store.
   class Manager {
     let context: NSManagedObjectContext!
     

@@ -9,7 +9,6 @@
 
 Seam allows you to sync your CoreData Stores with CloudKit.
 
--------
 ## Topics
 
 - [Features](#features)
@@ -22,8 +21,6 @@ Seam allows you to sync your CoreData Stores with CloudKit.
 - [Author](#author)
 - [License](#license)
 
--------
- 
 ## Features
 - Automatic mapping of CoreData Models to CloudKit Private Databases
 - Supports Assets

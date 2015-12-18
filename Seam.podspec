@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.authors = { 'Nofel Mahmood' => 'nofelmehmood@gmail.com' }
   s.source = { :git => 'https://github.com/nofelmahmood/Seam.git', :branch => 'Improve-Store' }
 
-  s.ios.deployment_target = '8.3'
+  s.ios.deployment_target = '8.0'
   s.osx.deployment_target = '10.10'
 
   s.source_files = 'Source/**/*.swift'

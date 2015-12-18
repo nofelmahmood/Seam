@@ -17,6 +17,7 @@ Seam allows you to sync your CoreData Stores with CloudKit.
 - [Installation](#installation)
 - [Usage](#usage)
 - [Getting Started](#getting-started)
+- [FAQ](#faq)
 - [Apps](#apps)
 - [Author](#author)
 - [License](#license)
@@ -26,7 +27,6 @@ Seam allows you to sync your CoreData Stores with CloudKit.
 - Supports Assets
 - Background Sync 
 - Conflict Resolution
-- Tutorials
 
 ## Requirements
 
@@ -57,7 +57,7 @@ To integrate Seam into your Xcode project using CocoaPods, specify it in your `P
 
 ```ruby
 source 'https://github.com/CocoaPods/Specs.git'
-platform :ios, '8.3'
+platform :ios, '8.0'
 use_frameworks!
 
 pod 'Seam', '~> 0.6'
@@ -184,6 +184,11 @@ CKAsset and CLLocation can be used in your CoreData model as Transformable attri
 ## Getting Started 
 
 Download the demo project. Run it and see the magic as it happens.
+
+## FAQ
+
+### tvOS Support ?
+tvOS provides no persistent local storage. Seam uses SQLITE file to keep a local copy of your database which is not possible with tvOS.
 
 ## Apps
 

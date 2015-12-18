@@ -2,7 +2,6 @@
 
 
 [![Pod Version](https://img.shields.io/badge/pod-v0.6-blue.svg)](https://img.shields.io/cocoapods/v/Alamofire.svg)
-[![Cocoapods Compatible](https://img.shields.io/badge/Cocoapods-Compatible-brightgreen.svg)](https://img.shields.io/badge/Cocoapods-Compatible-green.svg)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![Platform](https://img.shields.io/badge/platform-iOS%20--%20OSX-lightgrey.svg)](https://img.shields.io/badge/platform-iOS%20--%20OSX-lightgrey.svg)
 [![License](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://img.shields.io/packagist/l/doctrine/orm.svg)

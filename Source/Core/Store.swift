@@ -153,8 +153,8 @@ public class Store: NSIncrementalStore {
   }
   
   public func subscribeToPushNotifications(completionBlock: ((successful: Bool) -> ())?) {
-    zone.createSubscription({
-      guard $0 == nil else {
+    zone.createSubscription({ successful in
+      guard successful else {
         completionBlock?(successful: false)
         return
       }

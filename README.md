@@ -1,4 +1,4 @@
-![seamlogo](https://cloud.githubusercontent.com/assets/3306263/11775866/4b925354-a264-11e5-9bf6-bfdcf2cf9675.png)
+![seamlogo](https://cloud.githubusercontent.com/assets/3306263/11891970/83208bf0-a585-11e5-98b5-3ac6bff009d9.png)
 
 
 [![Pod Version](https://img.shields.io/badge/pod-v0.6-blue.svg)](https://img.shields.io/cocoapods/v/Alamofire.svg)

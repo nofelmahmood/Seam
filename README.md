@@ -10,17 +10,17 @@
 Seam allows you to sync your CoreData Stores with CloudKit.
 
 -------
+## Topics
 
-<p align="center">
-    <a href="#features">Features</a> -
-    <a href="#requirements">Requirements</a> -
-    <a href="#communication">Communication</a> -
-    <a href="#installation">Installation</a> - 
-    <a href="#usage">Usage</a> - 
-    <a href="#getting-started">Getting Started </a> -
-    <a href="#author">Author</a> -
-    <a href="#license">License</a>
-</p>
+- [Features](#features)
+- [Requirements](#requirements)
+- [Communication](#communication)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Getting Started](#getting-started)
+- [Apps](#apps)
+- [Author](#author)
+- [License](#license)
 
 -------
  
@@ -187,6 +187,10 @@ CKAsset and CLLocation can be used in your CoreData model as Transformable attri
 ## Getting Started 
 
 Download the demo project. Run it and see the magic as it happens.
+
+## Apps
+
+A [list of Apps](APPS.md) which are using **Seam**.
 
 ## Author
 

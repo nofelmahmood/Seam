@@ -26,13 +26,13 @@ import Foundation
 import CoreData
 
 extension NSPersistentStoreCoordinator {
-  var seamStore: Store? {
-    var seamStore: Store?
-    persistentStores.forEach {
-      if let store = $0 as? Store {
-        seamStore = store
-      }
+    var seamStore: Store? {
+        var seamStore: Store?
+        persistentStores.forEach {
+            if let store = $0 as? Store {
+                seamStore = store
+            }
+        }
+        return seamStore
     }
-    return seamStore
-  }
 }

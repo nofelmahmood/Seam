@@ -27,43 +27,43 @@ import CoreData
 import CloudKit
 
 extension CKRecord {
-  var encodedSystemFields: NSData {
-    let data = NSMutableData()
-    let coder = NSKeyedArchiver(forWritingWithMutableData: data)
-    encodeSystemFieldsWithCoder(coder)
-    coder.finishEncoding()
-    return data
-  }
-  
-  class func recordWithEncodedData(data: NSData) -> CKRecord {
-    let coder = NSKeyedUnarchiver(forReadingWithData: data)
-    let record = CKRecord(coder: coder)!
-    coder.finishDecoding()
-    return record
-  }
-  
-//  class func record(uniqueID: String, entity: NSEntityDescription, propertyValuesDictionary: [String: AnyObject], encodedMetadata: NSData?) -> CKRecord {
-//    var record: CKRecord?
-//    if let metadata = encodedMetadata {
-//      record = CKRecord.recordWithEncodedData(metadata)
-//    } else {
-//      let recordID = CKRecordID(uniqueID: uniqueID)
-//      record = CKRecord(recordType: entity.name!, recordID: recordID)
-//    }
-//    propertyValuesDictionary.forEach { (key, value) in
-//      guard value as! NSObject != NSNull() else {
-//        record?.setObject(nil, forKey: key)
-//        return
-//      }
-//      if let referenceManagedObject = value as? NSManagedObject {
-//        let referenceUniqueID = referenceManagedObject.uniqueID
-//        let referenceRecordID = CKRecordID(recordName: referenceUniqueID, zoneID: Zone.zoneID)
-//        let reference = CKReference(recordID: referenceRecordID, action: CKReferenceAction.DeleteSelf)
-//        record?.setObject(reference, forKey: key)
-//      } else {
-//        record?.setValue(value, forKey: key)
-//      }
-//    }
-//    return record!
-//  }
+    var encodedSystemFields: NSData {
+        let data = NSMutableData()
+        let coder = NSKeyedArchiver(forWritingWithMutableData: data)
+        encodeSystemFieldsWithCoder(coder)
+        coder.finishEncoding()
+        return data
+    }
+    
+    class func recordWithEncodedData(data: NSData) -> CKRecord {
+        let coder = NSKeyedUnarchiver(forReadingWithData: data)
+        let record = CKRecord(coder: coder)!
+        coder.finishDecoding()
+        return record
+    }
+    
+    //  class func record(uniqueID: String, entity: NSEntityDescription, propertyValuesDictionary: [String: AnyObject], encodedMetadata: NSData?) -> CKRecord {
+    //    var record: CKRecord?
+    //    if let metadata = encodedMetadata {
+    //      record = CKRecord.recordWithEncodedData(metadata)
+    //    } else {
+    //      let recordID = CKRecordID(uniqueID: uniqueID)
+    //      record = CKRecord(recordType: entity.name!, recordID: recordID)
+    //    }
+    //    propertyValuesDictionary.forEach { (key, value) in
+    //      guard value as! NSObject != NSNull() else {
+    //        record?.setObject(nil, forKey: key)
+    //        return
+    //      }
+    //      if let referenceManagedObject = value as? NSManagedObject {
+    //        let referenceUniqueID = referenceManagedObject.uniqueID
+    //        let referenceRecordID = CKRecordID(recordName: referenceUniqueID, zoneID: Zone.zoneID)
+    //        let reference = CKReference(recordID: referenceRecordID, action: CKReferenceAction.DeleteSelf)
+    //        record?.setObject(reference, forKey: key)
+    //      } else {
+    //        record?.setValue(value, forKey: key)
+    //      }
+    //    }
+    //    return record!
+    //  }
 }

@@ -26,39 +26,39 @@ import Foundation
 import CloudKit
 
 class Token {
-  static let Key = "com.seam.syncToken.key"
-  private var newToken: CKServerChangeToken?
-  static let sharedToken = Token()
-  
-  func rawToken() -> CKServerChangeToken? {
-    guard let rawToken = NSUserDefaults.standardUserDefaults().objectForKey(Token.Key) as? NSData else {
-      return nil
+    static let Key = "com.seam.syncToken.key"
+    private var newToken: CKServerChangeToken?
+    static let sharedToken = Token()
+    
+    func rawToken() -> CKServerChangeToken? {
+        guard let rawToken = NSUserDefaults.standardUserDefaults().objectForKey(Token.Key) as? NSData else {
+            return nil
+        }
+        return NSKeyedUnarchiver.unarchiveObjectWithData(rawToken) as? CKServerChangeToken
     }
-    return NSKeyedUnarchiver.unarchiveObjectWithData(rawToken) as? CKServerChangeToken
-  }
-  
-  func save(token: CKServerChangeToken) {
-    newToken = token
-  }
-  
-  func discard() {
-    newToken = nil
-  }
-  
-  func unCommittedToken() -> CKServerChangeToken? {
-    return newToken
-  }
-  
-  func commit() {
-    guard let newToken = newToken else {
-      return
+    
+    func save(token: CKServerChangeToken) {
+        newToken = token
     }
-    let archivedToken = NSKeyedArchiver.archivedDataWithRootObject(newToken)
-    NSUserDefaults.standardUserDefaults().setObject(archivedToken, forKey: Token.Key)
-  }
-  
-  func reset() {
-    discard()
-    NSUserDefaults.standardUserDefaults().setObject(nil, forKey: Token.Key)
-  }
+    
+    func discard() {
+        newToken = nil
+    }
+    
+    func unCommittedToken() -> CKServerChangeToken? {
+        return newToken
+    }
+    
+    func commit() {
+        guard let newToken = newToken else {
+            return
+        }
+        let archivedToken = NSKeyedArchiver.archivedDataWithRootObject(newToken)
+        NSUserDefaults.standardUserDefaults().setObject(archivedToken, forKey: Token.Key)
+    }
+    
+    func reset() {
+        discard()
+        NSUserDefaults.standardUserDefaults().setObject(nil, forKey: Token.Key)
+    }
 }

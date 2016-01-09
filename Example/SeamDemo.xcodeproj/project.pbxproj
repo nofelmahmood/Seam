@@ -25,7 +25,6 @@
 		3E75DC241BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */; };
 		3E75DC261BFC84F800FB5E40 /* NoteDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC251BFC84F800FB5E40 /* NoteDetailViewController.swift */; };
 		3E75DC2A1BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC291BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift */; };
-		3E75DC371BFCA5D500FB5E40 /* Size Classes.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E75DC361BFCA5D500FB5E40 /* Size Classes.png */; };
 		3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */; };
 		3EBF6C4E1BF3989B00A8B7C3 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; };
 		3EBF6C4F1BF3989B00A8B7C3 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -36,6 +35,13 @@
 		3EDA412D1BFDE57E00A3EF78 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41271BFDE57E00A3EF78 /* Folder.swift */; };
 		3EDA412F1BFDE57E00A3EF78 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41291BFDE57E00A3EF78 /* Photo.swift */; };
 		3EDA41311BFDE57E00A3EF78 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA412B1BFDE57E00A3EF78 /* Note.swift */; };
+		6EE61F631C414EF70014F8E1 /* Setting+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE61F611C414EF70014F8E1 /* Setting+CoreDataProperties.swift */; };
+		6EE61F641C414EF70014F8E1 /* Setting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE61F621C414EF70014F8E1 /* Setting.swift */; };
+		6EE61F681C414F520014F8E1 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE61F671C414F520014F8E1 /* SettingsViewController.swift */; };
+		6EE61F6B1C4158CF0014F8E1 /* SettingsViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE61F6A1C4158CF0014F8E1 /* SettingsViewController+UITableViewDataSource.swift */; };
+		6EE61F6D1C41595B0014F8E1 /* SettingsViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE61F6C1C41595B0014F8E1 /* SettingsViewController+UITableViewDelegate.swift */; };
+		6EE61F6F1C415D280014F8E1 /* SettingEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE61F6E1C415D280014F8E1 /* SettingEditor.swift */; };
+		6EE61F711C4161BC0014F8E1 /* CoreDataStack+Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EE61F701C4161BC0014F8E1 /* CoreDataStack+Settings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -121,7 +127,6 @@
 		3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NotesViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
 		3E75DC251BFC84F800FB5E40 /* NoteDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteDetailViewController.swift; sourceTree = "<group>"; };
 		3E75DC291BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NoteDetailViewController+UITextViewDelegate.swift"; sourceTree = "<group>"; };
-		3E75DC361BFCA5D500FB5E40 /* Size Classes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Size Classes.png"; path = "../../../../../../Desktop/Size Classes.png"; sourceTree = "<group>"; };
 		3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Helper.swift"; sourceTree = "<group>"; };
 		3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Seam.xcodeproj; path = ../Seam.xcodeproj; sourceTree = "<group>"; };
 		3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FoldersViewController.swift; sourceTree = "<group>"; };
@@ -131,6 +136,13 @@
 		3EDA41271BFDE57E00A3EF78 /* Folder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
 		3EDA41291BFDE57E00A3EF78 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		3EDA412B1BFDE57E00A3EF78 /* Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		6EE61F611C414EF70014F8E1 /* Setting+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Setting+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		6EE61F621C414EF70014F8E1 /* Setting.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Setting.swift; sourceTree = "<group>"; };
+		6EE61F671C414F520014F8E1 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		6EE61F6A1C4158CF0014F8E1 /* SettingsViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SettingsViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
+		6EE61F6C1C41595B0014F8E1 /* SettingsViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SettingsViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
+		6EE61F6E1C415D280014F8E1 /* SettingEditor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingEditor.swift; sourceTree = "<group>"; };
+		6EE61F701C4161BC0014F8E1 /* CoreDataStack+Settings.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CoreDataStack+Settings.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,9 +172,11 @@
 				3EDA41271BFDE57E00A3EF78 /* Folder.swift */,
 				3EDA41291BFDE57E00A3EF78 /* Photo.swift */,
 				3EDA412B1BFDE57E00A3EF78 /* Note.swift */,
+				6EE61F621C414EF70014F8E1 /* Setting.swift */,
 				3E127D561C1ED37100036F51 /* Folder+CoreDataProperties.swift */,
 				3E127D571C1ED37100036F51 /* Note+CoreDataProperties.swift */,
 				3E127D581C1ED37100036F51 /* Photo+CoreDataProperties.swift */,
+				6EE61F611C414EF70014F8E1 /* Setting+CoreDataProperties.swift */,
 			);
 			name = "CoreData Models";
 			sourceTree = "<group>";
@@ -170,7 +184,6 @@
 		3E191E271B7B6CD300BB9E71 = {
 			isa = PBXGroup;
 			children = (
-				3E75DC361BFCA5D500FB5E40 /* Size Classes.png */,
 				3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */,
 				3E191E321B7B6CD300BB9E71 /* SeamDemo */,
 				3EBF6C331BF3940400A8B7C3 /* Frameworks */,
@@ -198,7 +211,9 @@
 				3EDA410C1BFDE43600A3EF78 /* FolderViewController */,
 				3E75DC1F1BFC80E400FB5E40 /* NotesViewController */,
 				3E75DC271BFC850100FB5E40 /* NoteDetailViewController */,
+				6EE61F661C414F230014F8E1 /* SettingsViewController */,
 				3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */,
+				6EE61F701C4161BC0014F8E1 /* CoreDataStack+Settings.swift */,
 				3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */,
 				3E191E371B7B6CD300BB9E71 /* Main.storyboard */,
 				3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */,
@@ -309,6 +324,25 @@
 			name = CustomCell;
 			sourceTree = "<group>";
 		};
+		6EE61F661C414F230014F8E1 /* SettingsViewController */ = {
+			isa = PBXGroup;
+			children = (
+				6EE61F671C414F520014F8E1 /* SettingsViewController.swift */,
+				6EE61F6E1C415D280014F8E1 /* SettingEditor.swift */,
+				6EE61F691C4158AB0014F8E1 /* Extensions */,
+			);
+			name = SettingsViewController;
+			sourceTree = "<group>";
+		};
+		6EE61F691C4158AB0014F8E1 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				6EE61F6A1C4158CF0014F8E1 /* SettingsViewController+UITableViewDataSource.swift */,
+				6EE61F6C1C41595B0014F8E1 /* SettingsViewController+UITableViewDelegate.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -360,7 +394,7 @@
 				TargetAttributes = {
 					3E191E2F1B7B6CD300BB9E71 = {
 						CreatedOnToolsVersion = 7.0;
-						DevelopmentTeam = UBAKNBA97C;
+						DevelopmentTeam = LBFBZP3Z4J;
 						SystemCapabilities = {
 							com.apple.Push = {
 								enabled = 1;
@@ -437,7 +471,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E75DC371BFCA5D500FB5E40 /* Size Classes.png in Resources */,
 				3E191E411B7B6CD300BB9E71 /* LaunchScreen.storyboard in Resources */,
 				3E191E3E1B7B6CD300BB9E71 /* Assets.xcassets in Resources */,
 				3E191E391B7B6CD300BB9E71 /* Main.storyboard in Resources */,
@@ -458,25 +491,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6EE61F711C4161BC0014F8E1 /* CoreDataStack+Settings.swift in Sources */,
 				3EDA41141BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift in Sources */,
 				3E75DC261BFC84F800FB5E40 /* NoteDetailViewController.swift in Sources */,
 				3E75DC2A1BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift in Sources */,
 				3EDA412D1BFDE57E00A3EF78 /* Folder.swift in Sources */,
 				3EDA41191BFDE4E100A3EF78 /* FolderTableViewCell.swift in Sources */,
 				3EDA41161BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift in Sources */,
+				6EE61F641C414EF70014F8E1 /* Setting.swift in Sources */,
 				3E191E361B7B6CD300BB9E71 /* NotesViewController.swift in Sources */,
+				6EE61F6D1C41595B0014F8E1 /* SettingsViewController+UITableViewDelegate.swift in Sources */,
 				3E75DC221BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift in Sources */,
 				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
 				3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */,
+				6EE61F6B1C4158CF0014F8E1 /* SettingsViewController+UITableViewDataSource.swift in Sources */,
 				3EDA412F1BFDE57E00A3EF78 /* Photo.swift in Sources */,
 				3E127D5A1C1ED37100036F51 /* Note+CoreDataProperties.swift in Sources */,
 				3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */,
+				6EE61F681C414F520014F8E1 /* SettingsViewController.swift in Sources */,
 				3E127D591C1ED37100036F51 /* Folder+CoreDataProperties.swift in Sources */,
 				3EDA41311BFDE57E00A3EF78 /* Note.swift in Sources */,
 				3EDA41111BFDE44C00A3EF78 /* FoldersViewController.swift in Sources */,
 				3E75DC241BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift in Sources */,
 				3E127D5B1C1ED37100036F51 /* Photo+CoreDataProperties.swift in Sources */,
+				6EE61F6F1C415D280014F8E1 /* SettingEditor.swift in Sources */,
+				6EE61F631C414EF70014F8E1 /* Setting+CoreDataProperties.swift in Sources */,
 				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -616,9 +656,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = SeamDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = oskari.rauta.SeamDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -633,9 +673,9 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				INFOPLIST_FILE = SeamDemo/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = oskari.rauta.SeamDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};

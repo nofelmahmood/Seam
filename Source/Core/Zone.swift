@@ -26,100 +26,100 @@ import Foundation
 import CloudKit
 
 class Zone {
-  var zone: CKRecordZone!
-  var subscription: CKSubscription!
-  
-  init() {
-    let uniqueID = NSUUID().UUIDString
-    let zoneName = "Seam_Zone_" + uniqueID
-    zone = CKRecordZone(zoneName: zoneName)
-    let subscriptionName = zone.zoneID.zoneName + "Subscription"
-    subscription = CKSubscription(zoneID: zone.zoneID, subscriptionID: subscriptionName, options: CKSubscriptionOptions(rawValue: 0))
-    let subscriptionNotificationInfo = CKNotificationInfo()
-    subscriptionNotificationInfo.alertBody = ""
-    subscriptionNotificationInfo.shouldSendContentAvailable = true
-    subscription.notificationInfo = subscriptionNotificationInfo
-    subscriptionNotificationInfo.shouldBadge = false
-  }
-  
-  init(zoneName: String) {
-    zone = CKRecordZone(zoneName: zoneName)
-    let subscriptionName = zone.zoneID.zoneName + "Subscription"
-    subscription = CKSubscription(zoneID: zone.zoneID, subscriptionID: subscriptionName, options: CKSubscriptionOptions(rawValue: 0))
-    let subscriptionNotificationInfo = CKNotificationInfo()
-    subscriptionNotificationInfo.alertBody = ""
-    subscriptionNotificationInfo.shouldSendContentAvailable = true
-    subscription.notificationInfo = subscriptionNotificationInfo
-    subscriptionNotificationInfo.shouldBadge = false
-  }
-  
-  // MARK: Error
-
-  static let errorDomain = "com.seam.error.zone.errorDomain"
-  enum Error: ErrorType {
-    case ZoneCreationFailed
-    case ZoneSubscriptionCreationFailed
-  }
-  
-  // MARK: Methods
-
-  func zoneExistsOnServer(resultBlock: (result: Bool) -> ()) {
-    let fetchRecordZonesOperation = CKFetchRecordZonesOperation(recordZoneIDs: [zone.zoneID])
-    fetchRecordZonesOperation.fetchRecordZonesCompletionBlock = { (recordZonesByID, error) in
-      let successful = error == nil && recordZonesByID != nil && recordZonesByID![self.zone.zoneID] != nil
-      resultBlock(result: successful)
+    var zone: CKRecordZone!
+    var subscription: CKSubscription!
+    
+    init() {
+        let uniqueID = NSUUID().UUIDString
+        let zoneName = "Seam_Zone_" + uniqueID
+        zone = CKRecordZone(zoneName: zoneName)
+        let subscriptionName = zone.zoneID.zoneName + "Subscription"
+        subscription = CKSubscription(zoneID: zone.zoneID, subscriptionID: subscriptionName, options: CKSubscriptionOptions(rawValue: 0))
+        let subscriptionNotificationInfo = CKNotificationInfo()
+        subscriptionNotificationInfo.alertBody = ""
+        subscriptionNotificationInfo.shouldSendContentAvailable = true
+        subscription.notificationInfo = subscriptionNotificationInfo
+        subscriptionNotificationInfo.shouldBadge = false
     }
-    NSOperationQueue().addOperation(fetchRecordZonesOperation)
-  }
-  
-  func subscriptionExistsOnServer(resultBlock: (result: Bool) -> ()) {
-    let fetchZoneSubscriptionsOperation = CKFetchSubscriptionsOperation(subscriptionIDs: [subscription.subscriptionID])
-    fetchZoneSubscriptionsOperation.fetchSubscriptionCompletionBlock = { (subscriptionsByID, error) in
-      let successful = error == nil && subscriptionsByID != nil && subscriptionsByID![self.subscription.subscriptionID] != nil
-      resultBlock(result: successful)
+    
+    init(zoneName: String) {
+        zone = CKRecordZone(zoneName: zoneName)
+        let subscriptionName = zone.zoneID.zoneName + "Subscription"
+        subscription = CKSubscription(zoneID: zone.zoneID, subscriptionID: subscriptionName, options: CKSubscriptionOptions(rawValue: 0))
+        let subscriptionNotificationInfo = CKNotificationInfo()
+        subscriptionNotificationInfo.alertBody = ""
+        subscriptionNotificationInfo.shouldSendContentAvailable = true
+        subscription.notificationInfo = subscriptionNotificationInfo
+        subscriptionNotificationInfo.shouldBadge = false
     }
-  }
-  
-  func createZone() throws {
-    var error: NSError?
-    let operationQueue = NSOperationQueue()
-    let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
-    modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = { (_,_,operationError) in
-      error = operationError
+    
+    // MARK: Error
+    
+    static let errorDomain = "com.seam.error.zone.errorDomain"
+    enum Error: ErrorType {
+        case ZoneCreationFailed
+        case ZoneSubscriptionCreationFailed
     }
-    operationQueue.addOperation(modifyRecordZonesOperation)
-    operationQueue.waitUntilAllOperationsAreFinished()
-    guard error == nil else {
-      throw Error.ZoneCreationFailed
+    
+    // MARK: Methods
+    
+    func zoneExistsOnServer(resultBlock: (result: Bool) -> ()) {
+        let fetchRecordZonesOperation = CKFetchRecordZonesOperation(recordZoneIDs: [zone.zoneID])
+        fetchRecordZonesOperation.fetchRecordZonesCompletionBlock = { (recordZonesByID, error) in
+            let successful = error == nil && recordZonesByID != nil && recordZonesByID![self.zone.zoneID] != nil
+            resultBlock(result: successful)
+        }
+        NSOperationQueue().addOperation(fetchRecordZonesOperation)
     }
-  }
-  
-  func createSubscription() throws {
-    var error: NSError?
-    let operationQueue = NSOperationQueue()
-    let modifyZoneSubscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
-    modifyZoneSubscriptionsOperation.modifySubscriptionsCompletionBlock = { (_,_,operationError) in
-      error = operationError
+    
+    func subscriptionExistsOnServer(resultBlock: (result: Bool) -> ()) {
+        let fetchZoneSubscriptionsOperation = CKFetchSubscriptionsOperation(subscriptionIDs: [subscription.subscriptionID])
+        fetchZoneSubscriptionsOperation.fetchSubscriptionCompletionBlock = { (subscriptionsByID, error) in
+            let successful = error == nil && subscriptionsByID != nil && subscriptionsByID![self.subscription.subscriptionID] != nil
+            resultBlock(result: successful)
+        }
     }
-    operationQueue.addOperation(modifyZoneSubscriptionsOperation)
-    operationQueue.waitUntilAllOperationsAreFinished()
-    guard error == nil else {
-      throw Error.ZoneSubscriptionCreationFailed
+    
+    func createZone() throws {
+        var error: NSError?
+        let operationQueue = NSOperationQueue()
+        let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
+        modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = { (_,_,operationError) in
+            error = operationError
+        }
+        operationQueue.addOperation(modifyRecordZonesOperation)
+        operationQueue.waitUntilAllOperationsAreFinished()
+        guard error == nil else {
+            throw Error.ZoneCreationFailed
+        }
     }
-  }
-  
-  func createSubscription(completionBlock: ((successful: Bool) -> ())?) {
-    let fetchZoneSubscriptions = CKFetchSubscriptionsOperation(subscriptionIDs: [subscription.subscriptionID])
-    fetchZoneSubscriptions.fetchSubscriptionCompletionBlock = { (subscriptionsByID, error) in
-      guard let allSubscriptionsByID = subscriptionsByID where error == nil else {
-        completionBlock?(successful: false)
-        return
-      }
+    
+    func createSubscription() throws {
+        var error: NSError?
+        let operationQueue = NSOperationQueue()
+        let modifyZoneSubscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
+        modifyZoneSubscriptionsOperation.modifySubscriptionsCompletionBlock = { (_,_,operationError) in
+            error = operationError
+        }
+        operationQueue.addOperation(modifyZoneSubscriptionsOperation)
+        operationQueue.waitUntilAllOperationsAreFinished()
+        guard error == nil else {
+            throw Error.ZoneSubscriptionCreationFailed
+        }
     }
-    let modifyZoneSubscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
-    modifyZoneSubscriptionsOperation.modifySubscriptionsCompletionBlock = { (_,_,operationError) in
-      completionBlock?(error: operationError)
+    
+    func createSubscription(completionBlock: ((successful: Bool) -> ())?) {
+        let fetchZoneSubscriptions = CKFetchSubscriptionsOperation(subscriptionIDs: [subscription.subscriptionID])
+        fetchZoneSubscriptions.fetchSubscriptionCompletionBlock = { (subscriptionsByID, error) in
+            guard let _ = subscriptionsByID where error == nil else {
+                completionBlock?(successful: false)
+                return
+            }
+        }
+        let modifyZoneSubscriptionsOperation = CKModifySubscriptionsOperation(subscriptionsToSave: [subscription], subscriptionIDsToDelete: nil)
+        modifyZoneSubscriptionsOperation.modifySubscriptionsCompletionBlock = { (_,_,operationError) in
+            completionBlock?(successful: operationError == nil ? true : false)
+        }
+        NSOperationQueue().addOperation(modifyZoneSubscriptionsOperation)
     }
-    NSOperationQueue().addOperation(modifyZoneSubscriptionsOperation)
-  }
 }

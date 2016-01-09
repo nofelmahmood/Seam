@@ -26,28 +26,28 @@ import Foundation
 import CoreData
 
 extension NSPredicate {
-  convenience init(equalsToUniqueID id: String) {
-    self.init(format: "%K == %@", UniqueID.name,id)
-  }
-  
-  convenience init(equalsToUniqueID id: String, andChangeType type: NSNumber) {
-    let typePropertyName = Change.Properties.ChangeType.name
-    self.init(format: "%K == %@ && %K == %@", UniqueID.name,id,typePropertyName,type)
-  }
-  
-  convenience init(backingObjectID objectID: NSManagedObjectID) {
-    self.init(format: "self == %@", objectID)
-  }
-  
-  convenience init(inUniqueIDs ids: [String]) {
-    self.init(format: "%K IN %@",UniqueID.name,ids)
-  }
-  
-  class var preferenceZoneNamePredicate: NSPredicate {
-    return NSPredicate(format: "%K == %@", Preference.Properties.Key.name, Preference.Default.zoneName)
-  }
-  
-  class var preferenceZoneSubscriptionNamePredicate: NSPredicate {
-    return NSPredicate(format: "%K == %@", Preference.Properties.Key.name, Preference.Default.zoneSubscriptionName)
-  }
+    convenience init(equalsToUniqueID id: String) {
+        self.init(format: "%K == %@", UniqueID.name,id)
+    }
+    
+    convenience init(equalsToUniqueID id: String, andChangeType type: NSNumber) {
+        let typePropertyName = Change.Properties.ChangeType.name
+        self.init(format: "%K == %@ && %K == %@", UniqueID.name,id,typePropertyName,type)
+    }
+    
+    convenience init(backingObjectID objectID: NSManagedObjectID) {
+        self.init(format: "self == %@", objectID)
+    }
+    
+    convenience init(inUniqueIDs ids: [String]) {
+        self.init(format: "%K IN %@",UniqueID.name,ids)
+    }
+    
+    class var preferenceZoneNamePredicate: NSPredicate {
+        return NSPredicate(format: "%K == %@", Preference.Properties.Key.name, Preference.Default.zoneName)
+    }
+    
+    class var preferenceZoneSubscriptionNamePredicate: NSPredicate {
+        return NSPredicate(format: "%K == %@", Preference.Properties.Key.name, Preference.Default.zoneSubscriptionName)
+    }
 }

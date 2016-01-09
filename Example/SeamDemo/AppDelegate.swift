@@ -37,9 +37,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncBegins:",name: SMStoreDidStartSyncingNotification, object: nil)
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: "syncEnds:", name: SMStoreDidFinishSyncingNotification, object: nil)
-        
         return true
     }
     

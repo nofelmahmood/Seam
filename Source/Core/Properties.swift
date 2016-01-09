@@ -46,13 +46,13 @@ let ZoneSubscriptionNameKey = "com.seam.zone.name"
 // MARK: General
 
 struct UniqueID {
-  static let name = "sm_entityAttribute_uniqueID"
-  static var attributeDescription: NSAttributeDescription {
-    let attributeDescription = NSAttributeDescription()
-    attributeDescription.name = name
-    attributeDescription.attributeType = .StringAttributeType
-    attributeDescription.optional = false
-    attributeDescription.indexed = true
-    return attributeDescription
-  }
+    static let name = "sm_entityAttribute_uniqueID"
+    static var attributeDescription: NSAttributeDescription {
+        let attributeDescription = NSAttributeDescription()
+        attributeDescription.name = name
+        attributeDescription.attributeType = .StringAttributeType
+        attributeDescription.optional = false
+        attributeDescription.indexed = true
+        return attributeDescription
+    }
 }

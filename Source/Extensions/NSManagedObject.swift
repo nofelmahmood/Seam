@@ -27,33 +27,33 @@ import CoreData
 import CloudKit
 
 extension NSManagedObject {
-
-  var uniqueID: String {
-    get {
-      return valueForKey(UniqueID.name) as! String
-    } set {
-      setValue(newValue, forKey: UniqueID.name)
+    
+    var uniqueID: String {
+        get {
+            return valueForKey(UniqueID.name) as! String
+        } set {
+            setValue(newValue, forKey: UniqueID.name)
+        }
     }
-  }
-  
-  var changedValueKeys: [String] {
-    let propertiesToTrack = self.entity.attributeNames + self.entity.assetAttributeNames + self.entity.toOneRelationshipNames
-    return changedValues().keys.filter { propertiesToTrack.contains($0) }
-  }
-  
-  public var uniqueObjectID: NSManagedObjectID? {
-    var seamStore: Store?
-    managedObjectContext?.persistentStoreCoordinator?.persistentStores.forEach {
-      if let store = $0 as? Store {
-        seamStore = store
-      }
+    
+    var changedValueKeys: [String] {
+        let propertiesToTrack = self.entity.attributeNames + self.entity.assetAttributeNames + self.entity.toOneRelationshipNames
+        return changedValues().keys.filter { propertiesToTrack.contains($0) }
     }
-    let referenceObject = seamStore?.referenceObjectForObjectID(objectID) as! String
-    do {
-      let backingObjectID = try seamStore?.objectIDForBackingObjectForEntity(entity.name!, withReferenceObject: referenceObject)
-      return backingObjectID
-    } catch {
-      return nil
+    
+    public var uniqueObjectID: NSManagedObjectID? {
+        var seamStore: Store?
+        managedObjectContext?.persistentStoreCoordinator?.persistentStores.forEach {
+            if let store = $0 as? Store {
+                seamStore = store
+            }
+        }
+        let referenceObject = seamStore?.referenceObjectForObjectID(objectID) as! String
+        do {
+            let backingObjectID = try seamStore?.objectIDForBackingObjectForEntity(entity.name!, withReferenceObject: referenceObject)
+            return backingObjectID
+        } catch {
+            return nil
+        }
     }
-  }
 }

@@ -26,88 +26,88 @@ import Foundation
 import CoreData
 
 extension NSAttributeDescription {
-  var isCKAsset: Bool {
-    return valueTransformerName == CKAssetTransformer.name
-  }
-  var isCLLocation: Bool {
-    return valueTransformerName == CLLocationTransformer.name
-  }
+    var isCKAsset: Bool {
+        return valueTransformerName == CKAssetTransformer.name
+    }
+    var isCLLocation: Bool {
+        return valueTransformerName == CLLocationTransformer.name
+    }
 }
 
 extension NSEntityDescription {
-  var propertyNamesToFetch: [String] {
-    return attributeNames + toOneRelationshipNames + assetAttributeNames + locationAttributeNames
-  }
-  
-  var allAttributesByName: [String: NSAttributeDescription] {
-    var allAttributesByName = [String: NSAttributeDescription]()
-    attributeNames.forEach { name in
-      if let attribute = propertiesByName[name] as? NSAttributeDescription where attribute.isCKAsset == false {
-        allAttributesByName[name] = attribute
-      }
+    var propertyNamesToFetch: [String] {
+        return attributeNames + toOneRelationshipNames + assetAttributeNames + locationAttributeNames
     }
-    return allAttributesByName
-  }
-  
-  var attributeNames: [String] {
-   return attributesByName.filter { $0.1.isCKAsset == false && $0.1.isCLLocation == false }.map { $0.0 }
-  }
-  
-  var assetAttributes: [NSAttributeDescription] {
-    return Array(attributesByName.values).filter { $0.isCKAsset }
-  }
-  
-  var assetAttributeNames: [String] {
-    return assetAttributes.map { $0.name }
-  }
-  
-  var assetAttributesByName: [String: NSAttributeDescription] {
-    var assetAttributesByName = [String: NSAttributeDescription]()
-    assetAttributes.forEach { attribute in
-      assetAttributesByName[attribute.name] = attribute
+    
+    var allAttributesByName: [String: NSAttributeDescription] {
+        var allAttributesByName = [String: NSAttributeDescription]()
+        attributeNames.forEach { name in
+            if let attribute = propertiesByName[name] as? NSAttributeDescription where attribute.isCKAsset == false {
+                allAttributesByName[name] = attribute
+            }
+        }
+        return allAttributesByName
     }
-    return assetAttributesByName
-  }
-  
-  var locationAttributes: [NSAttributeDescription] {
-    return Array(attributesByName.values).filter { $0.isCLLocation }
-  }
-  
-  var locationAttributeNames: [String] {
-    return locationAttributes.map { $0.name }
-  }
-  
-  var locationAttributesByName: [String: NSAttributeDescription] {
-    var locationAttributesByName = [String: NSAttributeDescription]()
-    locationAttributes.forEach { attribute in
-      locationAttributesByName[attribute.name] = attribute
+    
+    var attributeNames: [String] {
+        return attributesByName.filter { $0.1.isCKAsset == false && $0.1.isCLLocation == false }.map { $0.0 }
     }
-    return locationAttributesByName
-  }
-  
-  var relationships: [NSRelationshipDescription] {
-    return Array(relationshipsByName.values)
-  }
-  
-  var relationshipNames: [String] {
-    return Array(relationshipsByName.keys)
-  }
-  
-  var toOneRelationships: [NSRelationshipDescription] {
-    return Array(relationshipsByName.values).filter({ $0.toMany == false })
-  }
-  
-  var toOneRelationshipNames: [String] {
-    return Array(toOneRelationshipsByName.keys)
-  }
-  
-  var toOneRelationshipsByName: [String:NSRelationshipDescription] {
-    var dictionary = [String: NSRelationshipDescription]()
-    relationshipsByName.forEach({ (key,value) in
-      if value.toMany == false {
-        dictionary[key] = value
-      }
-    })
-    return dictionary
-  }
+    
+    var assetAttributes: [NSAttributeDescription] {
+        return Array(attributesByName.values).filter { $0.isCKAsset }
+    }
+    
+    var assetAttributeNames: [String] {
+        return assetAttributes.map { $0.name }
+    }
+    
+    var assetAttributesByName: [String: NSAttributeDescription] {
+        var assetAttributesByName = [String: NSAttributeDescription]()
+        assetAttributes.forEach { attribute in
+            assetAttributesByName[attribute.name] = attribute
+        }
+        return assetAttributesByName
+    }
+    
+    var locationAttributes: [NSAttributeDescription] {
+        return Array(attributesByName.values).filter { $0.isCLLocation }
+    }
+    
+    var locationAttributeNames: [String] {
+        return locationAttributes.map { $0.name }
+    }
+    
+    var locationAttributesByName: [String: NSAttributeDescription] {
+        var locationAttributesByName = [String: NSAttributeDescription]()
+        locationAttributes.forEach { attribute in
+            locationAttributesByName[attribute.name] = attribute
+        }
+        return locationAttributesByName
+    }
+    
+    var relationships: [NSRelationshipDescription] {
+        return Array(relationshipsByName.values)
+    }
+    
+    var relationshipNames: [String] {
+        return Array(relationshipsByName.keys)
+    }
+    
+    var toOneRelationships: [NSRelationshipDescription] {
+        return Array(relationshipsByName.values).filter({ $0.toMany == false })
+    }
+    
+    var toOneRelationshipNames: [String] {
+        return Array(toOneRelationshipsByName.keys)
+    }
+    
+    var toOneRelationshipsByName: [String:NSRelationshipDescription] {
+        var dictionary = [String: NSRelationshipDescription]()
+        relationshipsByName.forEach({ (key,value) in
+            if value.toMany == false {
+                dictionary[key] = value
+            }
+        })
+        return dictionary
+    }
 }

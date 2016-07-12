@@ -179,7 +179,15 @@ public class SMStore: NSIncrementalStore {
     override public func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
         if request.requestType == NSPersistentStoreRequestType.FetchRequestType {
             let fetchRequest: NSFetchRequest = request as! NSFetchRequest
-            return try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
+            switch fetchRequest.resultType
+            {
+            case NSFetchRequestResultType.CountResultType:
+                let result = try self.executeInResponseToCountFetchRequest(fetchRequest, context: context!)
+                return result
+                
+            default:
+                return try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
+            }
         } else if request.requestType == NSPersistentStoreRequestType.SaveRequestType {
             let saveChangesRequest: NSSaveChangesRequest = request as! NSSaveChangesRequest
             return try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
@@ -266,6 +274,11 @@ public class SMStore: NSIncrementalStore {
         return []
     }
     
+    func executeInResponseToCountFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext) throws ->NSArray {
+        let resultsFromLocalStore = try self.backingMOC.executeFetchRequest(fetchRequest)
+        return resultsFromLocalStore
+    }
+
     // MARK : SaveChanges Request
     private func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext) throws -> Array<AnyObject> {
         try self.insertObjectsInBackingStore(objectsToInsert: context.insertedObjects, mainContext: context)

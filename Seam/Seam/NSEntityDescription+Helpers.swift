@@ -30,21 +30,21 @@ extension NSEntityDescription {
     
     func attributesByNameByRemovingBackingStoreAttributes() -> [String:NSAttributeDescription] {
         var attributesByName = self.attributesByName
-        attributesByName.removeValueForKey(SMLocalStoreRecordIDAttributeName)
-        attributesByName.removeValueForKey(SMLocalStoreRecordEncodedValuesAttributeName)
+        attributesByName.removeValue(forKey: SMLocalStoreRecordIDAttributeName)
+        attributesByName.removeValue(forKey: SMLocalStoreRecordEncodedValuesAttributeName)
         return attributesByName
     }
     
     func toOneRelationships() -> [NSRelationshipDescription] {
         return Array(self.relationshipsByName.values).filter({ (relationshipDescription) -> Bool in
-            return relationshipDescription.toMany == false
+            return relationshipDescription.isToMany == false
         })
     }
     
     func toOneRelationshipsByName() -> [String:NSRelationshipDescription] {
         var relationshipsByNameDictionary: Dictionary<String,NSRelationshipDescription> = Dictionary<String,NSRelationshipDescription>()
         for (key,value) in self.relationshipsByName {
-            if value.toMany == true {
+            if value.isToMany == true {
                 continue
             }
             relationshipsByNameDictionary[key] = value

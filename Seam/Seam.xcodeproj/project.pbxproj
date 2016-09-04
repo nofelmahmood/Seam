@@ -29,7 +29,7 @@
 		3E191DF11B7B3DB600BB9E71 /* NSManagedObjectContext+Helpers.swift in Headers */ = {isa = PBXBuildFile; fileRef = 3E191DD31B7B3CAF00BB9E71 /* NSManagedObjectContext+Helpers.swift */; settings = {ATTRIBUTES = (Private, ); }; };
 		3E8E26C51B7B11BD009C47EA /* Seam.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E8E26C41B7B11BD009C47EA /* Seam.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3EC07BF51BE6645600AAA747 /* SeamTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EC07BF41BE6645600AAA747 /* SeamTests.swift */; };
-		3EC07BF71BE6645600AAA747 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26C11B7B11BD009C47EA /* Seam.framework */; settings = {ASSET_TAGS = (); }; };
+		3EC07BF71BE6645600AAA747 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E8E26C11B7B11BD009C47EA /* Seam.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -210,7 +210,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = CloudKitSpace;
 				TargetAttributes = {
 					3E8E26C01B7B11BD009C47EA = {
@@ -307,8 +307,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -355,8 +357,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -377,7 +381,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -388,8 +392,8 @@
 		3E8E26D61B7B11BD009C47EA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -404,6 +408,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				VALIDATE_PRODUCT = NO;
 				VALID_ARCHS = "arm64 armv7 armv7s x86_64 i386";
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -413,8 +418,8 @@
 		3E8E26D71B7B11BD009C47EA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD)";
 				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -428,7 +433,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.Seam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 				VALID_ARCHS = "arm64 armv7 armv7s x86_64 i386";
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
@@ -484,6 +490,7 @@
 				3EC07BFB1BE6645600AAA747 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

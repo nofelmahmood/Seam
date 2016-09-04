@@ -29,10 +29,10 @@ import CloudKit
 let SMStoreCloudStoreCustomZoneName = "SMStoreCloudStore_CustomZone"
 let SMStoreCloudStoreSubscriptionName = "SM_CloudStore_Subscription"
 
-class SMServerStoreSetupOperation:NSOperation {
+class SMServerStoreSetupOperation:Operation {
     
     var database:CKDatabase?
-    var setupOperationCompletionBlock:((customZoneCreated:Bool,customZoneSubscriptionCreated:Bool)->Void)?
+    var setupOperationCompletionBlock:((_ customZoneCreated:Bool,_ customZoneSubscriptionCreated:Bool)->Void)?
     
     init(cloudDatabase:CKDatabase?) {
         self.database = cloudDatabase
@@ -40,17 +40,17 @@ class SMServerStoreSetupOperation:NSOperation {
     }
     
     override func main() {
-        let operationQueue = NSOperationQueue()
+        let operationQueue = OperationQueue()
         let zone = CKRecordZone(zoneName: SMStoreCloudStoreCustomZoneName)
-        var error: NSError?
+        var error: Error?
         let modifyRecordZonesOperation = CKModifyRecordZonesOperation(recordZonesToSave: [zone], recordZoneIDsToDelete: nil)
         modifyRecordZonesOperation.database = self.database
         modifyRecordZonesOperation.modifyRecordZonesCompletionBlock = ({(savedRecordZones, deletedRecordZonesIDs, operationError) -> Void in
             error = operationError
-            let customZoneWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName)
-            let customZoneSubscriptionWasCreated:AnyObject? = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreSubscriptionName)
+            let customZoneWasCreated: Any? = UserDefaults.standard.object(forKey: SMStoreCloudStoreCustomZoneName)
+            let customZoneSubscriptionWasCreated: Any? = UserDefaults.standard.object(forKey: SMStoreCloudStoreSubscriptionName)
             if ((operationError == nil || customZoneWasCreated != nil) && customZoneSubscriptionWasCreated == nil) {
-                NSUserDefaults.standardUserDefaults().setBool(true, forKey: SMStoreCloudStoreCustomZoneName)
+                UserDefaults.standard.set(true, forKey: SMStoreCloudStoreCustomZoneName)
                 let recordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
                 let subscription = CKSubscription(zoneID: recordZoneID, subscriptionID: SMStoreCloudStoreSubscriptionName, options: CKSubscriptionOptions(rawValue: 0))
                 let subscriptionNotificationInfo = CKNotificationInfo()
@@ -62,7 +62,7 @@ class SMServerStoreSetupOperation:NSOperation {
                 subscriptionsOperation.database = self.database
                 subscriptionsOperation.modifySubscriptionsCompletionBlock=({ (modified,created,operationError) -> Void in
                     if operationError == nil {
-                        NSUserDefaults.standardUserDefaults().setBool(true, forKey: SMStoreCloudStoreSubscriptionName)
+                        UserDefaults.standard.set(true, forKey: SMStoreCloudStoreSubscriptionName)
                     }
                     error = operationError
                 })
@@ -73,12 +73,12 @@ class SMServerStoreSetupOperation:NSOperation {
         operationQueue.waitUntilAllOperationsAreFinished()
         if self.setupOperationCompletionBlock != nil {
             if error == nil {
-                self.setupOperationCompletionBlock!(customZoneCreated: true, customZoneSubscriptionCreated: true)
+                self.setupOperationCompletionBlock!(true, true)
             } else {
-                if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName) == nil {
-                    self.setupOperationCompletionBlock!(customZoneCreated: false, customZoneSubscriptionCreated: false)
+                if UserDefaults.standard.object(forKey: SMStoreCloudStoreCustomZoneName) == nil {
+                    self.setupOperationCompletionBlock!(false, false)
                 } else {
-                    self.setupOperationCompletionBlock!(customZoneCreated: true, customZoneSubscriptionCreated: false)
+                    self.setupOperationCompletionBlock!(true, false)
                 }
             }
         }

@@ -31,17 +31,17 @@ let SMStoreSyncOperationServerTokenKey = "SMStoreSyncOperationServerTokenKey"
 class SMServerTokenHandler {
 
     static let defaultHandler = SMServerTokenHandler()
-    private var newToken: CKServerChangeToken?
+    fileprivate var newToken: CKServerChangeToken?
     
     func token() -> CKServerChangeToken? {
-        if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreSyncOperationServerTokenKey) != nil {
-            let fetchTokenKeyArchived = NSUserDefaults.standardUserDefaults().objectForKey(SMStoreSyncOperationServerTokenKey) as! NSData
-            return NSKeyedUnarchiver.unarchiveObjectWithData(fetchTokenKeyArchived) as? CKServerChangeToken
+        if UserDefaults.standard.object(forKey: SMStoreSyncOperationServerTokenKey) != nil {
+            let fetchTokenKeyArchived = UserDefaults.standard.object(forKey: SMStoreSyncOperationServerTokenKey) as! Data
+            return NSKeyedUnarchiver.unarchiveObject(with: fetchTokenKeyArchived) as? CKServerChangeToken
         }
         return nil
     }
     
-    func save(serverChangeToken serverChangeToken: CKServerChangeToken) {
+    func save(serverChangeToken: CKServerChangeToken) {
         self.newToken = serverChangeToken
     }
     
@@ -51,13 +51,13 @@ class SMServerTokenHandler {
     
     func commit() {
         if self.newToken != nil {
-            NSUserDefaults.standardUserDefaults().setObject(NSKeyedArchiver.archivedDataWithRootObject(self.newToken!), forKey: SMStoreSyncOperationServerTokenKey)
+            UserDefaults.standard.set(NSKeyedArchiver.archivedData(withRootObject: self.newToken!), forKey: SMStoreSyncOperationServerTokenKey)
         }
     }
     
     func delete() {
         if self.token() != nil {
-            NSUserDefaults.standardUserDefaults().setObject(nil, forKey: SMStoreSyncOperationServerTokenKey)
+            UserDefaults.standard.set(nil, forKey: SMStoreSyncOperationServerTokenKey)
         }
     }
 }

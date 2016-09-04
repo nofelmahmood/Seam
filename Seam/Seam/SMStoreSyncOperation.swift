@@ -33,27 +33,27 @@ let SMSyncConflictsResolvedRecordsKey = "SMSyncConflictsResolvedRecordsKey"
 let SMCloudRecordNilValue = "@!SM_CloudStore_Record_Nil_Value"
 
 enum SMSyncConflictResolutionPolicy: Int16 {
-    case ClientTellsWhichWins = 0
-    case ServerRecordWins = 1
-    case ClientRecordWins = 2
-    case KeepBoth = 4
+    case clientTellsWhichWins = 0
+    case serverRecordWins = 1
+    case clientRecordWins = 2
+    case keepBoth = 4
 }
 
-enum SMSyncOperationError: ErrorType {
-    case LocalChangesFetchError
-    case ConflictsDetected(conflictedRecords: [CKRecord])
-    case UnknownError
+enum SMSyncOperationError: Error {
+    case localChangesFetchError
+    case conflictsDetected(conflictedRecords: [CKRecord])
+    case unknownError
 }
 
-class SMStoreSyncOperation: NSOperation {
+class SMStoreSyncOperation: Operation {
     
-    private var operationQueue: NSOperationQueue?
-    private var localStoreMOC: NSManagedObjectContext?
-    private var persistentStoreCoordinator: NSPersistentStoreCoordinator?
-    private var entities: Array<NSEntityDescription>?
+    fileprivate var operationQueue: OperationQueue?
+    fileprivate var localStoreMOC: NSManagedObjectContext?
+    fileprivate var persistentStoreCoordinator: NSPersistentStoreCoordinator?
+    fileprivate var entities: Array<NSEntityDescription>?
     var syncConflictPolicy: SMSyncConflictResolutionPolicy?
-    var syncCompletionBlock: ((syncError:NSError?) -> ())?
-    var syncConflictResolutionBlock: ((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
+    var syncCompletionBlock: ((_ syncError:NSError?) -> ())?
+    var syncConflictResolutionBlock: ((_ clientRecord:CKRecord,_ serverRecord:CKRecord)->CKRecord)?
     
     init(persistentStoreCoordinator:NSPersistentStoreCoordinator?,entitiesToSync entities:[NSEntityDescription], conflictPolicy:SMSyncConflictResolutionPolicy?) {
         self.persistentStoreCoordinator = persistentStoreCoordinator
@@ -65,18 +65,18 @@ class SMStoreSyncOperation: NSOperation {
     // MARK: Sync
     override func main() {
         print("Sync Started", terminator: "\n")
-        self.operationQueue = NSOperationQueue()
+        self.operationQueue = OperationQueue()
         self.operationQueue!.maxConcurrentOperationCount = 1
-        self.localStoreMOC = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
+        self.localStoreMOC = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.privateQueueConcurrencyType)
         self.localStoreMOC!.persistentStoreCoordinator = self.persistentStoreCoordinator
         if self.syncCompletionBlock != nil {
             do {
                 try self.performSync()
                 print("Sync Performed", terminator: "\n")
-                self.syncCompletionBlock!(syncError: nil)
+                self.syncCompletionBlock!(nil)
             } catch let error as NSError? {
                 print("Sync Performed with Error", terminator: "\n")
-                self.syncCompletionBlock!(syncError: error)
+                self.syncCompletionBlock!(error)
             }
         }
     }
@@ -89,7 +89,7 @@ class SMStoreSyncOperation: NSOperation {
             SMServerTokenHandler.defaultHandler.commit()
             try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
             return
-        } catch SMSyncOperationError.ConflictsDetected(let conflictedRecords) {
+        } catch SMSyncOperationError.conflictsDetected(let conflictedRecords) {
             self.resolveConflicts(conflictedRecords: conflictedRecords)
             var insertedOrUpdatedCKRecordsWithRecordIDStrings: Dictionary<String,CKRecord> = Dictionary<String,CKRecord>()
             for record in localChangesInServerRepresentation.insertedOrUpdatedCKRecords! {
@@ -105,7 +105,7 @@ class SMStoreSyncOperation: NSOperation {
             SMServerTokenHandler.defaultHandler.commit()
             try SMStoreChangeSetHandler.defaultHandler.removeAllQueuedChangeSets(backingContext: self.localStoreMOC!)
         } catch {
-            throw SMSyncOperationError.UnknownError
+            throw SMSyncOperationError.unknownError
         }
     }
     
@@ -115,20 +115,20 @@ class SMStoreSyncOperation: NSOperation {
         var deletedCKRecordIDsFromServer = [CKRecordID]()
         while moreComing {
             let returnValue = self.fetchRecordChangesFromServer()
-            insertedOrUpdatedCKRecordsFromServer.appendContentsOf([] + returnValue.insertedOrUpdatedCKRecords)
-            deletedCKRecordIDsFromServer.appendContentsOf([] + returnValue.deletedRecordIDs)
+            insertedOrUpdatedCKRecordsFromServer.append(contentsOf: [] + returnValue.insertedOrUpdatedCKRecords)
+            deletedCKRecordIDsFromServer.append(contentsOf: [] + returnValue.deletedRecordIDs)
             moreComing = returnValue.moreComing
         }
         try self.applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecordsFromServer, deletedCKRecordIDs: deletedCKRecordIDsFromServer)
     }
     
     // MARK: Local Changes
-    func applyServerChangesToLocalDatabase(insertedOrUpdatedCKRecords: [CKRecord], deletedCKRecordIDs:[CKRecordID]) throws {
+    func applyServerChangesToLocalDatabase(_ insertedOrUpdatedCKRecords: [CKRecord], deletedCKRecordIDs:[CKRecordID]) throws {
         try self.insertOrUpdateManagedObjects(fromCKRecords: insertedOrUpdatedCKRecords)
         try self.deleteManagedObjects(fromCKRecordIDs: deletedCKRecordIDs)
     }
     
-    func applyLocalChangesToServer(insertedOrUpdatedCKRecords insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecordID>?) throws {
+    func applyLocalChangesToServer(insertedOrUpdatedCKRecords: Array<CKRecord>? , deletedCKRecordIDs: Array<CKRecordID>?) throws {
         if insertedOrUpdatedCKRecords == nil && deletedCKRecordIDs == nil {
             return
         }
@@ -140,29 +140,30 @@ class SMStoreSyncOperation: NSOperation {
         })
         ckModifyRecordsOperation.perRecordCompletionBlock = ({(ckRecord,operationError)->Void in
             
-            let error:NSError? = operationError
-            if error != nil && error!.code == CKErrorCode.ServerRecordChanged.rawValue
-            {
-                print("Conflicted Record \(error!)", terminator: "\n")
-                conflictedRecords.append(ckRecord!)
+            if let nsError = operationError as? NSError {
+                let error = CKError(_nsError: nsError)
+                if error.code == CKError.serverRecordChanged {
+                    print("Conflicted Record \(error)", terminator: "\n")
+                    conflictedRecords.append(ckRecord!)
+                }
             }
         })
         self.operationQueue!.addOperation(ckModifyRecordsOperation)
         self.operationQueue!.waitUntilAllOperationsAreFinished()
         if conflictedRecords.count > 0 {
-            throw SMSyncOperationError.ConflictsDetected(conflictedRecords: conflictedRecords)
+            throw SMSyncOperationError.conflictsDetected(conflictedRecords: conflictedRecords)
         }
         if savedRecords.count > 0 {
             let recordIDSubstitution = "recordIDSubstitution"
             let fetchPredicate: NSPredicate = NSPredicate(format: "%K == $recordIDSubstitution", SMLocalStoreRecordIDAttributeName)
             for record in savedRecords {
-                let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: record.recordType)
-                let recordIDString: String = record.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
-                fetchRequest.predicate = fetchPredicate.predicateWithSubstitutionVariables([recordIDSubstitution:recordIDString])
+                let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: record.recordType)
+                let recordIDString: String = record.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
+                fetchRequest.predicate = fetchPredicate.withSubstitutionVariables([recordIDSubstitution:recordIDString])
                 fetchRequest.fetchLimit = 1
-                let results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
+                let results = try self.localStoreMOC!.fetch(fetchRequest)
                 if results.count > 0 {
-                    let managedObject = results.last as? NSManagedObject
+                    let managedObject = results.last
                     let encodedFields = record.encodedSystemFields()
                     managedObject?.setValue(encodedFields, forKey: SMLocalStoreRecordEncodedValuesAttributeName)
                 }
@@ -171,7 +172,7 @@ class SMStoreSyncOperation: NSOperation {
         }
     }
     
-    func resolveConflicts(conflictedRecords conflictedRecords: [CKRecord])
+    func resolveConflicts(conflictedRecords: [CKRecord])
     {
         if conflictedRecords.count > 0 {
             var conflictedRecordsWithStringRecordIDs: Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)> = Dictionary<String,(clientRecord:CKRecord?,serverRecord:CKRecord?)>()
@@ -198,17 +199,17 @@ class SMStoreSyncOperation: NSOperation {
             for key in Array(conflictedRecordsWithStringRecordIDs.keys) {
                 let value = conflictedRecordsWithStringRecordIDs[key]!
                 var clientServerCKRecord = value as (clientRecord:CKRecord?,serverRecord:CKRecord?)
-                if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ClientTellsWhichWins {
+                if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.clientTellsWhichWins {
                     if self.syncConflictResolutionBlock != nil {
-                        clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientRecord: clientServerCKRecord.clientRecord!,serverRecord: clientServerCKRecord.serverRecord!)
+                        clientServerCKRecord.serverRecord = self.syncConflictResolutionBlock!(clientServerCKRecord.clientRecord!,clientServerCKRecord.serverRecord!)
                     } else {
                         print("ClientTellsWhichWins conflict resolution policy requires to set syncConflictResolutionBlock on the instance of SMStore")
                     }
-                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ClientRecordWins {
+                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.clientRecordWins {
                     
-                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.ServerRecordWins {
+                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.serverRecordWins {
                     
-                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.KeepBoth {
+                } else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.keepBoth {
                     
                 }
 //                else if self.syncConflictPolicy == SMSyncConflictResolutionPolicy.KeepBoth
@@ -278,7 +279,7 @@ class SMStoreSyncOperation: NSOperation {
                         }
                         return true
                     }
-                    desiredKeys!.appendContentsOf(properties)
+                    desiredKeys!.append(contentsOf: properties)
                 }
             }
             insertedOrUpdatedCKRecords.removeAll()
@@ -296,7 +297,7 @@ class SMStoreSyncOperation: NSOperation {
                 if entity != nil {
                     for key in Array(entity!.propertiesByName.keys) {
                         if record[key] == nil && key != SMLocalStoreRecordIDAttributeName && key != SMLocalStoreRecordEncodedValuesAttributeName {
-                            record[key] = SMCloudRecordNilValue
+                            record[key] = NSString(string: SMCloudRecordNilValue)
                         }
                     }
                 }
@@ -312,7 +313,7 @@ class SMStoreSyncOperation: NSOperation {
     
     func insertOrUpdateManagedObjects(fromCKRecords ckRecords:Array<CKRecord>) throws {
         for record in ckRecords {
-            try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
+            _ = try record.createOrUpdateManagedObjectFromRecord(usingContext: self.localStoreMOC!)
             try self.localStoreMOC!.saveIfHasChanges()
         }
     }
@@ -328,12 +329,12 @@ class SMStoreSyncOperation: NSOperation {
                 return entity.name!
             }
             for name in entityNames {
-                let fetchRequest = NSFetchRequest(entityName: name as String)
-                fetchRequest.predicate = predicate.predicateWithSubstitutionVariables(["ckRecordIDs":ckRecordIDStrings])
-                let results = try self.localStoreMOC!.executeFetchRequest(fetchRequest)
+                let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: name as String)
+                fetchRequest.predicate = predicate.withSubstitutionVariables(["ckRecordIDs":ckRecordIDStrings])
+                let results = try self.localStoreMOC!.fetch(fetchRequest)
                 if results.count > 0 {
-                    for object in results as! [NSManagedObject] {
-                        self.localStoreMOC?.deleteObject(object)
+                    for object in results {
+                        self.localStoreMOC?.delete(object)
                     }
                 }
             }

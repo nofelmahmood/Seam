@@ -41,12 +41,12 @@ class SMStoreChangeSetHandler {
     
     static let defaultHandler = SMStoreChangeSetHandler()
     
-    func changedPropertyKeys(keys: [String], entity: NSEntityDescription) -> [String] {
+    func changedPropertyKeys(_ keys: [String], entity: NSEntityDescription) -> [String] {
         return keys.filter({ (key) -> Bool in
             let property = entity.propertiesByName[key]
             if property != nil && property is NSRelationshipDescription {
                 let relationshipDescription: NSRelationshipDescription = property as! NSRelationshipDescription
-                return relationshipDescription.toMany == false
+                return relationshipDescription.isToMany == false
             }
             return true
         })
@@ -55,14 +55,14 @@ class SMStoreChangeSetHandler {
     func addExtraBackingStoreAttributes(toEntity entity: NSEntityDescription) {
         let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
         recordIDAttribute.name = SMLocalStoreRecordIDAttributeName
-        recordIDAttribute.optional = false
-        recordIDAttribute.indexed = true
-        recordIDAttribute.attributeType = NSAttributeType.StringAttributeType
+        recordIDAttribute.isOptional = false
+        recordIDAttribute.isIndexed = true
+        recordIDAttribute.attributeType = NSAttributeType.stringAttributeType
         entity.properties.append(recordIDAttribute)
         let recordEncodedValuesAttribute: NSAttributeDescription = NSAttributeDescription()
         recordEncodedValuesAttribute.name = SMLocalStoreRecordEncodedValuesAttributeName
-        recordEncodedValuesAttribute.attributeType = NSAttributeType.BinaryDataAttributeType
-        recordEncodedValuesAttribute.optional = true
+        recordEncodedValuesAttribute.attributeType = NSAttributeType.binaryDataAttributeType
+        recordEncodedValuesAttribute.isOptional = true
         entity.properties.append(recordEncodedValuesAttribute)
     }
     
@@ -71,31 +71,31 @@ class SMStoreChangeSetHandler {
         changeSetEntity.name = SMLocalStoreChangeSetEntityName
         let entityNameAttribute: NSAttributeDescription = NSAttributeDescription()
         entityNameAttribute.name = SMLocalStoreEntityNameAttributeName
-        entityNameAttribute.attributeType = NSAttributeType.StringAttributeType
-        entityNameAttribute.optional = true
+        entityNameAttribute.attributeType = NSAttributeType.stringAttributeType
+        entityNameAttribute.isOptional = true
         changeSetEntity.properties.append(entityNameAttribute)
         let recordIDAttribute: NSAttributeDescription = NSAttributeDescription()
         recordIDAttribute.name = SMLocalStoreRecordIDAttributeName
-        recordIDAttribute.attributeType = NSAttributeType.StringAttributeType
-        recordIDAttribute.optional = false
-        recordIDAttribute.indexed = true
+        recordIDAttribute.attributeType = NSAttributeType.stringAttributeType
+        recordIDAttribute.isOptional = false
+        recordIDAttribute.isIndexed = true
         changeSetEntity.properties.append(recordIDAttribute)
         let recordChangedPropertiesAttribute: NSAttributeDescription = NSAttributeDescription()
         recordChangedPropertiesAttribute.name = SMLocalStoreRecordChangedPropertiesAttributeName
-        recordChangedPropertiesAttribute.attributeType = NSAttributeType.StringAttributeType
-        recordChangedPropertiesAttribute.optional = true
+        recordChangedPropertiesAttribute.attributeType = NSAttributeType.stringAttributeType
+        recordChangedPropertiesAttribute.isOptional = true
         changeSetEntity.properties.append(recordChangedPropertiesAttribute)
         let recordChangeTypeAttribute: NSAttributeDescription = NSAttributeDescription()
         recordChangeTypeAttribute.name = SMLocalStoreChangeTypeAttributeName
-        recordChangeTypeAttribute.attributeType = NSAttributeType.Integer16AttributeType
-        recordChangeTypeAttribute.optional = false
-        recordChangeTypeAttribute.defaultValue = NSNumber(short: SMLocalStoreRecordChangeType.RecordInserted.rawValue)
+        recordChangeTypeAttribute.attributeType = NSAttributeType.integer16AttributeType
+        recordChangeTypeAttribute.isOptional = false
+        recordChangeTypeAttribute.defaultValue = NSNumber(value: SMLocalStoreRecordChangeType.recordInserted.rawValue)
         changeSetEntity.properties.append(recordChangeTypeAttribute)
         let changeTypeQueuedAttribute: NSAttributeDescription = NSAttributeDescription()
         changeTypeQueuedAttribute.name = SMLocalStoreChangeQueuedAttributeName
-        changeTypeQueuedAttribute.optional = false
-        changeTypeQueuedAttribute.attributeType = NSAttributeType.BooleanAttributeType
-        changeTypeQueuedAttribute.defaultValue = NSNumber(bool: false)
+        changeTypeQueuedAttribute.isOptional = false
+        changeTypeQueuedAttribute.attributeType = NSAttributeType.booleanAttributeType
+        changeTypeQueuedAttribute.defaultValue = NSNumber(value: false)
         changeSetEntity.properties.append(changeTypeQueuedAttribute)
         return changeSetEntity
     }
@@ -111,43 +111,43 @@ class SMStoreChangeSetHandler {
     
     // MARK: Creation
     func createChangeSet(ForInsertedObjectRecordID recordID: String, entityName: String, backingContext: NSManagedObjectContext) {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(SMLocalStoreChangeSetEntityName, inManagedObjectContext: backingContext)
+        let changeSet = NSEntityDescription.insertNewObject(forEntityName: SMLocalStoreChangeSetEntityName, into: backingContext)
         changeSet.setValue(recordID, forKey: SMLocalStoreRecordIDAttributeName)
         changeSet.setValue(entityName, forKey: SMLocalStoreEntityNameAttributeName)
-        changeSet.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordInserted.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+        changeSet.setValue(NSNumber(value: SMLocalStoreRecordChangeType.recordInserted.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
     }
     
     func createChangeSet(ForUpdatedObject object: NSManagedObject, usingContext context: NSManagedObjectContext) {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(SMLocalStoreChangeSetEntityName, inManagedObjectContext: context)
+        let changeSet = NSEntityDescription.insertNewObject(forEntityName: SMLocalStoreChangeSetEntityName, into: context)
         let changedPropertyKeys = self.changedPropertyKeys(Array(object.changedValues().keys), entity: object.entity)
-        let recordIDString: String = object.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
-        let changedPropertyKeysString = changedPropertyKeys.joinWithSeparator(",")
+        let recordIDString: String = object.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
+        let changedPropertyKeysString = changedPropertyKeys.joined(separator: ",")
         changeSet.setValue(recordIDString, forKey: SMLocalStoreRecordIDAttributeName)
         changeSet.setValue(object.entity.name!, forKey: SMLocalStoreEntityNameAttributeName)
         changeSet.setValue(changedPropertyKeysString, forKey: SMLocalStoreRecordChangedPropertiesAttributeName)
-        changeSet.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+        changeSet.setValue(NSNumber(value: SMLocalStoreRecordChangeType.recordUpdated.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
     }
     
     func createChangeSet(ForDeletedObjectRecordID recordID:String, backingContext: NSManagedObjectContext) {
-        let changeSet = NSEntityDescription.insertNewObjectForEntityForName(SMLocalStoreChangeSetEntityName, inManagedObjectContext: backingContext)
+        let changeSet = NSEntityDescription.insertNewObject(forEntityName: SMLocalStoreChangeSetEntityName, into: backingContext)
         changeSet.setValue(recordID, forKey: SMLocalStoreRecordIDAttributeName)
-        changeSet.setValue(NSNumber(short: SMLocalStoreRecordChangeType.RecordDeleted.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
+        changeSet.setValue(NSNumber(value: SMLocalStoreRecordChangeType.recordDeleted.rawValue), forKey: SMLocalStoreChangeTypeAttributeName)
     }
     
     // MARK: Fetch
-    private func changeSets(ForChangeType changeType:SMLocalStoreRecordChangeType, propertiesToFetch: Array<String>,  backingContext: NSManagedObjectContext) throws -> [AnyObject]? {
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: SMLocalStoreChangeSetEntityName)
-        let predicate: NSPredicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeTypeAttributeName, NSNumber(short: changeType.rawValue))
+    fileprivate func changeSets(ForChangeType changeType:SMLocalStoreRecordChangeType, propertiesToFetch: Array<String>,  backingContext: NSManagedObjectContext) throws -> [AnyObject]? {
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: SMLocalStoreChangeSetEntityName)
+        let predicate: NSPredicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeTypeAttributeName, NSNumber(value: changeType.rawValue))
         fetchRequest.predicate = predicate
-        fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
+        fetchRequest.resultType = NSFetchRequestResultType.dictionaryResultType
         fetchRequest.propertiesToFetch = propertiesToFetch
-        let results = try backingContext.executeFetchRequest(fetchRequest)
+        let results = try backingContext.fetch(fetchRequest)
         return results
     }
     
-    func recordIDsForDeletedObjects(backingContext: NSManagedObjectContext) throws -> [CKRecordID]? {
+    func recordIDsForDeletedObjects(_ backingContext: NSManagedObjectContext) throws -> [CKRecordID]? {
         let propertiesToFetch = [SMLocalStoreRecordIDAttributeName]
-        let deletedObjectsChangeSets = try self.changeSets(ForChangeType: SMLocalStoreRecordChangeType.RecordDeleted, propertiesToFetch: propertiesToFetch, backingContext: backingContext)
+        let deletedObjectsChangeSets = try self.changeSets(ForChangeType: SMLocalStoreRecordChangeType.recordDeleted, propertiesToFetch: propertiesToFetch, backingContext: backingContext)
         if deletedObjectsChangeSets!.count > 0 {
             return deletedObjectsChangeSets!.map({ (object) -> CKRecordID in
                 let valuesDictionary: Dictionary<String,NSObject> = object as! Dictionary<String,NSObject>
@@ -160,28 +160,28 @@ class SMStoreChangeSetHandler {
     }
     
     func recordsForUpdatedObjects(backingContext context: NSManagedObjectContext) throws -> [CKRecord]? {
-        let fetchRequest = NSFetchRequest(entityName: SMLocalStoreChangeSetEntityName)
-        fetchRequest.predicate = NSPredicate(format: "%K == %@ || %K == %@", SMLocalStoreChangeTypeAttributeName, NSNumber(short: SMLocalStoreRecordChangeType.RecordInserted.rawValue), SMLocalStoreChangeTypeAttributeName, NSNumber(short: SMLocalStoreRecordChangeType.RecordUpdated.rawValue))
-        let results = try context.executeFetchRequest(fetchRequest)
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: SMLocalStoreChangeSetEntityName)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@ || %K == %@", SMLocalStoreChangeTypeAttributeName, NSNumber(value: SMLocalStoreRecordChangeType.recordInserted.rawValue), SMLocalStoreChangeTypeAttributeName, NSNumber(value: SMLocalStoreRecordChangeType.recordUpdated.rawValue))
+        let results = try context.fetch(fetchRequest)
         var ckRecords: [CKRecord] = [CKRecord]()
         if results.count > 0 {
             let recordIDSubstitution = "recordIDString"
             let predicate = NSPredicate(format: "%K == $recordIDString", SMLocalStoreRecordIDAttributeName)
-            for result in results as! [NSManagedObject] {
-                result.setValue(NSNumber(bool: true), forKey: SMLocalStoreChangeQueuedAttributeName)
-                let entityName: String = result.valueForKey(SMLocalStoreEntityNameAttributeName) as! String
-                let recordIDString: String = result.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
-                let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entityName)
-                fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([recordIDSubstitution:recordIDString])
+            for result in results {
+                result.setValue(NSNumber(value: true), forKey: SMLocalStoreChangeQueuedAttributeName)
+                let entityName: String = result.value(forKey: SMLocalStoreEntityNameAttributeName) as! String
+                let recordIDString: String = result.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
+                let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: entityName)
+                fetchRequest.predicate = predicate.withSubstitutionVariables([recordIDSubstitution:recordIDString])
                 fetchRequest.fetchLimit = 1
-                let objects = try context.executeFetchRequest(fetchRequest)
+                let objects = try context.fetch(fetchRequest)
                 if objects.count > 0 {
-                    let object: NSManagedObject = objects.last as! NSManagedObject
-                    let changedPropertyKeys = result.valueForKey(SMLocalStoreRecordChangedPropertiesAttributeName) as? String
+                    let object = objects.last!
+                    let changedPropertyKeys = result.value(forKey: SMLocalStoreRecordChangedPropertiesAttributeName) as? String
                     var changedPropertyKeysArray: [String]?
                     if changedPropertyKeys != nil && changedPropertyKeys!.isEmpty == false {
-                        if changedPropertyKeys!.rangeOfString(",") != nil {
-                            changedPropertyKeysArray = changedPropertyKeys!.componentsSeparatedByString(",")
+                        if changedPropertyKeys!.range(of: ",") != nil {
+                            changedPropertyKeysArray = changedPropertyKeys!.components(separatedBy: ",")
                         } else {
                             changedPropertyKeysArray = [changedPropertyKeys!]
                         }
@@ -198,23 +198,23 @@ class SMStoreChangeSetHandler {
     }
 
     func removeAllQueuedChangeSetsFromQueue(backingContext context: NSManagedObjectContext) throws {
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: SMLocalStoreChangeSetEntityName)
-        fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeQueuedAttributeName, NSNumber(bool: true))
-        let results = try context.executeFetchRequest(fetchRequest)
-        for result in results as! [NSManagedObject] {
-            result.setValue(NSNumber(bool: false), forKey: SMLocalStoreChangeQueuedAttributeName)
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: SMLocalStoreChangeSetEntityName)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeQueuedAttributeName, NSNumber(value: true))
+        let results = try context.fetch(fetchRequest)
+        for result in results {
+            result.setValue(NSNumber(value: false), forKey: SMLocalStoreChangeQueuedAttributeName)
         }
         try context.saveIfHasChanges()
     }
     
     func removeAllQueuedChangeSets(backingContext context: NSManagedObjectContext) throws {
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: SMLocalStoreChangeSetEntityName)
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: SMLocalStoreChangeSetEntityName)
         fetchRequest.includesPropertyValues = false
-        fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeQueuedAttributeName, NSNumber(bool: true))
-        let results = try context.executeFetchRequest(fetchRequest)
+        fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreChangeQueuedAttributeName, NSNumber(value: true))
+        let results = try context.fetch(fetchRequest)
         if results.count > 0 {
-            for managedObject in results as! [NSManagedObject] {
-                context.deleteObject(managedObject)
+            for managedObject in results {
+                context.delete(managedObject)
             }
             try context.saveIfHasChanges()
         }

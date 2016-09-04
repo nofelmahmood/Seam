@@ -47,73 +47,73 @@ let SMStoreErrorDomain = "SMStoreErrorDomain"
 public let SeamStoreType = SMStore.type
 
 enum SMLocalStoreRecordChangeType: Int16 {
-    case RecordNoChange = 0
-    case RecordUpdated  = 1
-    case RecordDeleted  = 2
-    case RecordInserted = 3
+    case recordNoChange = 0
+    case recordUpdated  = 1
+    case recordDeleted  = 2
+    case recordInserted = 3
 }
 
-enum SMStoreError: ErrorType {
-    case BackingStoreFetchRequestError
-    case InvalidRequest
-    case BackingStoreCreationFailed
+enum SMStoreError: Error {
+    case backingStoreFetchRequestError
+    case invalidRequest
+    case backingStoreCreationFailed
 }
 
-public class SMStore: NSIncrementalStore {
-    private var syncOperation: SMStoreSyncOperation?
-    private var cloudStoreSetupOperation: SMServerStoreSetupOperation?
-    private var cksStoresSyncConflictPolicy: SMSyncConflictResolutionPolicy = SMSyncConflictResolutionPolicy.ServerRecordWins
-    private var database: CKDatabase?
-    private var operationQueue: NSOperationQueue?
-    private var backingPersistentStoreCoordinator: NSPersistentStoreCoordinator?
-    private var backingPersistentStore: NSPersistentStore?
+open class SMStore: NSIncrementalStore {
+    fileprivate var syncOperation: SMStoreSyncOperation?
+    fileprivate var cloudStoreSetupOperation: SMServerStoreSetupOperation?
+    fileprivate var cksStoresSyncConflictPolicy: SMSyncConflictResolutionPolicy = SMSyncConflictResolutionPolicy.serverRecordWins
+    fileprivate var database: CKDatabase?
+    fileprivate var operationQueue: OperationQueue?
+    fileprivate var backingPersistentStoreCoordinator: NSPersistentStoreCoordinator?
+    fileprivate var backingPersistentStore: NSPersistentStore?
     var syncAutomatically: Bool = true
-    var recordConflictResolutionBlock:((clientRecord:CKRecord,serverRecord:CKRecord)->CKRecord)?
-    private lazy var backingMOC: NSManagedObjectContext = {
-        var moc = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.PrivateQueueConcurrencyType)
+    var recordConflictResolutionBlock:((_ clientRecord:CKRecord,_ serverRecord:CKRecord)->CKRecord)?
+    fileprivate lazy var backingMOC: NSManagedObjectContext = {
+        var moc = NSManagedObjectContext(concurrencyType: NSManagedObjectContextConcurrencyType.privateQueueConcurrencyType)
         moc.persistentStoreCoordinator = self.backingPersistentStoreCoordinator
         moc.retainsRegisteredObjects = true
         return moc
         }()
     
-    override public class func initialize() {
+    override open class func initialize() {
         NSPersistentStoreCoordinator.registerStoreClass(self, forStoreType: self.type)
     }
     
-    override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator?, configurationName name: String?, URL url: NSURL, options: [NSObject : AnyObject]?) {
-        self.database = CKContainer.defaultContainer().privateCloudDatabase
+    override init(persistentStoreCoordinator root: NSPersistentStoreCoordinator?, configurationName name: String?, at url: URL, options: [AnyHashable : Any]?) {
+        self.database = CKContainer.default().privateCloudDatabase
         if options != nil {
             if options![SMStoreSyncConflictResolutionPolicyOption] != nil {
                 let syncConflictPolicy = options![SMStoreSyncConflictResolutionPolicyOption] as! NSNumber
-                self.cksStoresSyncConflictPolicy = SMSyncConflictResolutionPolicy(rawValue: syncConflictPolicy.shortValue)!
+                self.cksStoresSyncConflictPolicy = SMSyncConflictResolutionPolicy(rawValue: syncConflictPolicy.int16Value)!
             }
         }
-        super.init(persistentStoreCoordinator: root, configurationName: name, URL: url, options: options)
+        super.init(persistentStoreCoordinator: root, configurationName: name, at: url, options: options)
     }
     
-    class public var type:String {
+    class open var type:String {
         return NSStringFromClass(self)
     }
     
-    override public func loadMetadata() throws {
+    override open func loadMetadata() throws {
         self.metadata=[
-            NSStoreUUIDKey: NSProcessInfo().globallyUniqueString,
-            NSStoreTypeKey: self.dynamicType.type
+            NSStoreUUIDKey: ProcessInfo().globallyUniqueString,
+            NSStoreTypeKey: type(of: self).type
         ]
-        let storeURL=self.URL
+        let storeURL=self.url
         let backingMOM: NSManagedObjectModel? = self.backingModel()
         if backingMOM != nil {
             self.backingPersistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: backingMOM!)
             do {
-                self.backingPersistentStore = try self.backingPersistentStoreCoordinator?.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
-                self.operationQueue = NSOperationQueue()
+                self.backingPersistentStore = try self.backingPersistentStoreCoordinator?.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
+                self.operationQueue = OperationQueue()
                 self.operationQueue!.maxConcurrentOperationCount = 1
             } catch {
-                throw SMStoreError.BackingStoreCreationFailed
+                throw SMStoreError.backingStoreCreationFailed
             }
             return
         }
-        throw SMStoreError.BackingStoreCreationFailed
+        throw SMStoreError.backingStoreCreationFailed
     }
     
     func backingModel() -> NSManagedObjectModel? {
@@ -124,10 +124,10 @@ public class SMStore: NSIncrementalStore {
         return nil
     }
     
-    public func handlePush(userInfo userInfo:[NSObject : AnyObject]) {
+    open func handlePush(userInfo:[NSObject : AnyObject]) {
         let u = userInfo as! [String : NSObject]
         let ckNotification = CKNotification(fromRemoteNotificationDictionary: u)
-        if ckNotification.notificationType == CKNotificationType.RecordZone {
+        if ckNotification.notificationType == CKNotificationType.recordZone {
             let recordZoneNotification = CKRecordZoneNotification(fromRemoteNotificationDictionary: u)
             if recordZoneNotification.recordZoneID!.zoneName == SMStoreCloudStoreCustomZoneName {
                 self.triggerSync()
@@ -142,7 +142,7 @@ public class SMStore: NSIncrementalStore {
         }
     }
     
-    public func triggerSync() {
+    open func triggerSync() {
         if self.operationQueue != nil && self.operationQueue!.operationCount > 0 {
             return
         }
@@ -152,19 +152,19 @@ public class SMStore: NSIncrementalStore {
             self.syncOperation?.syncCompletionBlock =  { error in
                 if error == nil {
                     print("Sync Performed Successfully")
-                    NSOperationQueue.mainQueue().addOperationWithBlock {
-                        NSNotificationCenter.defaultCenter().postNotificationName(SMStoreDidFinishSyncOperationNotification, object: self)
+                    OperationQueue.main.addOperation {
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreDidFinishSyncOperationNotification), object: self)
                     }
                 } else {
                     print("Sync unSuccessful")
-                    NSOperationQueue.mainQueue().addOperationWithBlock {
-                        NSNotificationCenter.defaultCenter().postNotificationName(SMStoreDidFinishSyncOperationNotification, object: self, userInfo: error!.userInfo)
+                    OperationQueue.main.addOperation {
+                        NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreDidFinishSyncOperationNotification), object: self, userInfo: error!.userInfo)
                     }
                 }
             }
             self.operationQueue?.addOperation(self.syncOperation!)
         }
-        if NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreCustomZoneName) == nil || NSUserDefaults.standardUserDefaults().objectForKey(SMStoreCloudStoreSubscriptionName) == nil {
+        if UserDefaults.standard.object(forKey: SMStoreCloudStoreCustomZoneName) == nil || UserDefaults.standard.object(forKey: SMStoreCloudStoreSubscriptionName) == nil {
             self.cloudStoreSetupOperation = SMServerStoreSetupOperation(cloudDatabase: self.database)
             self.cloudStoreSetupOperation?.setupOperationCompletionBlock = { customZoneWasCreated, customZoneSubscriptionWasCreated in
                 syncOperationBlock()
@@ -173,48 +173,48 @@ public class SMStore: NSIncrementalStore {
         } else {
             syncOperationBlock()
         }
-        NSNotificationCenter.defaultCenter().postNotificationName(SMStoreDidStartSyncOperationNotification, object: self)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: SMStoreDidStartSyncOperationNotification), object: self)
     }
     
-    override public func executeRequest(request: NSPersistentStoreRequest, withContext context: NSManagedObjectContext?) throws -> AnyObject {
-        if request.requestType == NSPersistentStoreRequestType.FetchRequestType {
-            let fetchRequest: NSFetchRequest = request as! NSFetchRequest
+    override open func execute(_ request: NSPersistentStoreRequest, with context: NSManagedObjectContext?) throws -> Any {
+        if request.requestType == NSPersistentStoreRequestType.fetchRequestType {
+            let fetchRequest = request as! NSFetchRequest<NSManagedObject>
             return try self.executeInResponseToFetchRequest(fetchRequest, context: context!)
-        } else if request.requestType == NSPersistentStoreRequestType.SaveRequestType {
+        } else if request.requestType == NSPersistentStoreRequestType.saveRequestType {
             let saveChangesRequest: NSSaveChangesRequest = request as! NSSaveChangesRequest
             return try self.executeInResponseToSaveChangesRequest(saveChangesRequest, context: context!)
         } else {
-            throw NSError(domain: SMStoreErrorDomain, code: SMStoreError.InvalidRequest._code, userInfo: nil)
+            throw NSError(domain: SMStoreErrorDomain, code: SMStoreError.invalidRequest._code, userInfo: nil)
         }
     }
     
-    override public func newValuesForObjectWithID(objectID: NSManagedObjectID, withContext context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
-        let recordID:String = self.referenceObjectForObjectID(objectID) as! String
+    override open func newValuesForObject(with objectID: NSManagedObjectID, with context: NSManagedObjectContext) throws -> NSIncrementalStoreNode {
+        let recordID:String = self.referenceObject(for: objectID) as! String
         let propertiesToFetch = Array(objectID.entity.propertiesByName.values).filter { object  in
             if object is NSRelationshipDescription {
                 let relationshipDescription: NSRelationshipDescription = object as! NSRelationshipDescription
-                return relationshipDescription.toMany == false
+                return relationshipDescription.isToMany == false
             }
             return true
             }.map {
                 return $0.name
         }
-        let fetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: objectID.entity.name!)
         let predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,recordID)
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = predicate
-        fetchRequest.resultType = NSFetchRequestResultType.DictionaryResultType
+        fetchRequest.resultType = NSFetchRequestResultType.dictionaryResultType
         fetchRequest.propertiesToFetch = propertiesToFetch
-        let results = try self.backingMOC.executeFetchRequest(fetchRequest)
+        let results = try self.backingMOC.fetch(fetchRequest)
         var backingObjectValues = results.last as! Dictionary<String,NSObject>
         for (key,value) in backingObjectValues {
             if value is NSManagedObject {
                 let managedObject: NSManagedObject = value as! NSManagedObject
-                let recordID: String = managedObject.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
+                let recordID: String = managedObject.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
                 let entities = self.persistentStoreCoordinator!.managedObjectModel.entitiesByName
                 let entityName = managedObject.entity.name!
                 let entity: NSEntityDescription = entities[entityName]! as NSEntityDescription
-                let objectID = self.newObjectIDForEntity(entity, referenceObject: recordID)
+                let objectID = self.newObjectID(for: entity, referenceObject: recordID)
                 backingObjectValues[key] = objectID
             }
         }
@@ -223,51 +223,51 @@ public class SMStore: NSIncrementalStore {
         
     }
     
-    override public func newValueForRelationship(relationship: NSRelationshipDescription, forObjectWithID objectID: NSManagedObjectID, withContext context: NSManagedObjectContext?) throws -> AnyObject {
-        let recordID: String = self.referenceObjectForObjectID(objectID) as! String
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: objectID.entity.name!)
+    override open func newValue(forRelationship relationship: NSRelationshipDescription, forObjectWith objectID: NSManagedObjectID, with context: NSManagedObjectContext?) throws -> Any {
+        let recordID: String = self.referenceObject(for: objectID) as! String
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: objectID.entity.name!)
         let predicate: NSPredicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,recordID)
         fetchRequest.predicate = predicate
-        let results = try self.backingMOC.executeFetchRequest(fetchRequest)
+        let results = try self.backingMOC.fetch(fetchRequest)
         if results.count > 0 {
-            let managedObject: NSManagedObject = results.first as! NSManagedObject
-            let relationshipValues: Set<NSObject> = managedObject.valueForKey(relationship.name) as! Set<NSObject>
+            let managedObject = results.first!
+            let relationshipValues: Set<NSObject> = managedObject.value(forKey: relationship.name) as! Set<NSObject>
             return Array(relationshipValues).map({(object) -> NSManagedObjectID in
                 let value: NSManagedObject = object as! NSManagedObject
-                let recordID: String = value.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
-                let objectID: NSManagedObjectID = self.newObjectIDForEntity(value.entity, referenceObject: recordID)
+                let recordID: String = value.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
+                let objectID: NSManagedObjectID = self.newObjectID(for: value.entity, referenceObject: recordID)
                 return objectID
             })
         }
         return []
     }
     
-    override public func obtainPermanentIDsForObjects(array: [NSManagedObject]) throws -> [NSManagedObjectID] {
+    override open func obtainPermanentIDs(for array: [NSManagedObject]) throws -> [NSManagedObjectID] {
         return array.map { object in
             let insertedObject:NSManagedObject = object as NSManagedObject
-            let newRecordID: String = NSUUID().UUIDString
-            return self.newObjectIDForEntity(insertedObject.entity, referenceObject: newRecordID)
+            let newRecordID: String = UUID().uuidString
+            return self.newObjectID(for: insertedObject.entity, referenceObject: newRecordID)
         }
     }
     
     // MARK : Fetch Request
-    func executeInResponseToFetchRequest(fetchRequest:NSFetchRequest,context:NSManagedObjectContext) throws ->NSArray {
-        let resultsFromLocalStore = try self.backingMOC.executeFetchRequest(fetchRequest)
+    func executeInResponseToFetchRequest(_ fetchRequest:NSFetchRequest<NSManagedObject>,context:NSManagedObjectContext) throws ->NSArray {
+        let resultsFromLocalStore = try self.backingMOC.fetch(fetchRequest)
         if resultsFromLocalStore.count > 0 {
-            return resultsFromLocalStore.map({(result)->NSManagedObject in
-                let result = result as! NSManagedObject
-                let recordID: String = result.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
+            return NSArray(array: resultsFromLocalStore.map({(result)->NSManagedObject in
+                let result = result
+                let recordID: String = result.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
                 let entity = self.persistentStoreCoordinator?.managedObjectModel.entitiesByName[fetchRequest.entityName!]
-                let objectID = self.newObjectIDForEntity(entity!, referenceObject: recordID)
-                let object = context.objectWithID(objectID)
+                let objectID = self.newObjectID(for: entity!, referenceObject: recordID)
+                let object = context.object(with: objectID)
                 return object
-            })
+            }))
         }
         return []
     }
     
     // MARK : SaveChanges Request
-    private func executeInResponseToSaveChangesRequest(saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext) throws -> Array<AnyObject> {
+    fileprivate func executeInResponseToSaveChangesRequest(_ saveRequest:NSSaveChangesRequest,context:NSManagedObjectContext) throws -> Array<AnyObject> {
         try self.insertObjectsInBackingStore(objectsToInsert: context.insertedObjects, mainContext: context)
         try self.updateObjectsInBackingStore(objectsToUpdate: context.updatedObjects)
         try self.deleteObjectsFromBackingStore(objectsToDelete: context.deletedObjects, mainContext: context)
@@ -276,48 +276,52 @@ public class SMStore: NSIncrementalStore {
         return []
     }
     
-    func objectIDForBackingObjectForEntity(entityName: String, withReferenceObject referenceObject: String?) throws -> NSManagedObjectID? {
+    func objectIDForBackingObjectForEntity(_ entityName: String, withReferenceObject referenceObject: String?) throws -> NSManagedObjectID? {
         if referenceObject == nil {
             return nil
         }
-        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: entityName)
-        fetchRequest.resultType = NSFetchRequestResultType.ManagedObjectIDResultType
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: entityName)
+        fetchRequest.resultType = NSFetchRequestResultType.managedObjectIDResultType
         fetchRequest.fetchLimit = 1
         fetchRequest.predicate = NSPredicate(format: "%K == %@", SMLocalStoreRecordIDAttributeName,referenceObject!)
-        let results = try self.backingMOC.executeFetchRequest(fetchRequest)
-        if results.count > 0 {
-            return results.last as? NSManagedObjectID
+        do {
+            let results = try self.backingMOC.fetch(fetchRequest)
+            if results.count > 0 {
+                return results.last?.objectID
+            }
+        } catch {
+            print("")
         }
         return nil
     }
     
-    private func setRelationshipValuesForBackingObject(backingObject:NSManagedObject,sourceObject:NSManagedObject) throws {
+    fileprivate func setRelationshipValuesForBackingObject(_ backingObject:NSManagedObject,sourceObject:NSManagedObject) throws {
         for relationship in Array(sourceObject.entity.relationshipsByName.values) as [NSRelationshipDescription] {
-            if sourceObject.hasFaultForRelationshipNamed(relationship.name) || sourceObject.valueForKey(relationship.name) == nil {
+            if sourceObject.hasFault(forRelationshipNamed: relationship.name) || sourceObject.value(forKey: relationship.name) == nil {
                 continue
             }
-            if relationship.toMany == true {
-                let relationshipValue: Set<NSObject> = sourceObject.valueForKey(relationship.name) as! Set<NSObject>
+            if relationship.isToMany == true {
+                let relationshipValue: Set<NSObject> = sourceObject.value(forKey: relationship.name) as! Set<NSObject>
                 var backingRelationshipValue: Set<NSObject> = Set<NSObject>()
                 for relationshipObject in relationshipValue {
                     let relationshipManagedObject: NSManagedObject = relationshipObject as! NSManagedObject
-                    if relationshipManagedObject.objectID.temporaryID == false {
-                        let referenceObject: String = self.referenceObjectForObjectID(relationshipManagedObject.objectID) as! String
+                    if relationshipManagedObject.objectID.isTemporaryID == false {
+                        let referenceObject: String = self.referenceObject(for: relationshipManagedObject.objectID) as! String
                         let backingRelationshipObjectID = try self.objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject)
                         if backingRelationshipObjectID != nil {
-                            let backingRelationshipObject = try backingObject.managedObjectContext?.existingObjectWithID(backingRelationshipObjectID!)
+                            let backingRelationshipObject = try backingObject.managedObjectContext?.existingObject(with: backingRelationshipObjectID!)
                             backingRelationshipValue.insert(backingRelationshipObject!)
                         }
                     }
                 }
                 backingObject.setValue(backingRelationshipValue, forKey: relationship.name)
             } else {
-                let relationshipValue: NSManagedObject = sourceObject.valueForKey(relationship.name) as! NSManagedObject
-                if relationshipValue.objectID.temporaryID == false {
-                    let referenceObject: String = self.referenceObjectForObjectID(relationshipValue.objectID) as! String
+                let relationshipValue: NSManagedObject = sourceObject.value(forKey: relationship.name) as! NSManagedObject
+                if relationshipValue.objectID.isTemporaryID == false {
+                    let referenceObject: String = self.referenceObject(for: relationshipValue.objectID) as! String
                     let backingRelationshipObjectID = try self.objectIDForBackingObjectForEntity(relationship.destinationEntity!.name!, withReferenceObject: referenceObject)
                     if backingRelationshipObjectID != nil {
-                        let backingRelationshipObject = try self.backingMOC.existingObjectWithID(backingRelationshipObjectID!)
+                        let backingRelationshipObject = try self.backingMOC.existingObject(with: backingRelationshipObjectID!)
                         backingObject.setValue(backingRelationshipObject, forKey: relationship.name)
                     }
                 }
@@ -328,52 +332,52 @@ public class SMStore: NSIncrementalStore {
     func insertObjectsInBackingStore(objectsToInsert objects:Set<NSObject>, mainContext: NSManagedObjectContext) throws {
         for object in objects {
             let sourceObject: NSManagedObject = object as! NSManagedObject
-            let managedObject:NSManagedObject = NSEntityDescription.insertNewObjectForEntityForName((sourceObject.entity.name)!, inManagedObjectContext: self.backingMOC) as NSManagedObject
+            let managedObject:NSManagedObject = NSEntityDescription.insertNewObject(forEntityName: (sourceObject.entity.name)!, into: self.backingMOC) as NSManagedObject
             let keys = Array(sourceObject.entity.attributesByName.keys)
-            let dictionary = sourceObject.dictionaryWithValuesForKeys(keys)
-            managedObject.setValuesForKeysWithDictionary(dictionary)
-            let referenceObject: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
+            let dictionary = sourceObject.dictionaryWithValues(forKeys: keys)
+            managedObject.setValuesForKeys(dictionary)
+            let referenceObject: String = self.referenceObject(for: sourceObject.objectID) as! String
             managedObject.setValue(referenceObject, forKey: SMLocalStoreRecordIDAttributeName)
-            mainContext.willChangeValueForKey("objectID")
-            try mainContext.obtainPermanentIDsForObjects([sourceObject])
-            mainContext.didChangeValueForKey("objectID")
+            mainContext.willChangeValue(forKey: "objectID")
+            try mainContext.obtainPermanentIDs(for: [sourceObject])
+            mainContext.didChangeValue(forKey: "objectID")
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForInsertedObjectRecordID: referenceObject, entityName: sourceObject.entity.name!, backingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(managedObject, sourceObject: sourceObject)
             try self.backingMOC.saveIfHasChanges()
         }
     }
     
-    private func deleteObjectsFromBackingStore(objectsToDelete objects: Set<NSObject>, mainContext: NSManagedObjectContext) throws {
+    fileprivate func deleteObjectsFromBackingStore(objectsToDelete objects: Set<NSObject>, mainContext: NSManagedObjectContext) throws {
         let predicateObjectRecordIDKey = "objectRecordID"
         let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", SMLocalStoreRecordIDAttributeName)
         for object in objects {
             let sourceObject: NSManagedObject = object as! NSManagedObject
-            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: sourceObject.entity.name!)
-            let recordID: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
-            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([predicateObjectRecordIDKey: recordID])
+            let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: sourceObject.entity.name!)
+            let recordID: String = self.referenceObject(for: sourceObject.objectID) as! String
+            fetchRequest.predicate = predicate.withSubstitutionVariables([predicateObjectRecordIDKey: recordID])
             fetchRequest.fetchLimit = 1
-            let results = try self.backingMOC.executeFetchRequest(fetchRequest)
-            let backingObject: NSManagedObject = results.last as! NSManagedObject
+            let results = try self.backingMOC.fetch(fetchRequest)
+            let backingObject = results.last!
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForDeletedObjectRecordID: recordID, backingContext: self.backingMOC)
-            self.backingMOC.deleteObject(backingObject)
+            self.backingMOC.delete(backingObject)
             try self.backingMOC.saveIfHasChanges()
         }
     }
     
-    private func updateObjectsInBackingStore(objectsToUpdate objects: Set<NSObject>) throws {
+    fileprivate func updateObjectsInBackingStore(objectsToUpdate objects: Set<NSObject>) throws {
         let predicateObjectRecordIDKey = "objectRecordID"
         let predicate: NSPredicate = NSPredicate(format: "%K == $objectRecordID", SMLocalStoreRecordIDAttributeName)
         for object in objects {
             let sourceObject: NSManagedObject = object as! NSManagedObject
-            let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: sourceObject.entity.name!)
-            let recordID: String = self.referenceObjectForObjectID(sourceObject.objectID) as! String
-            fetchRequest.predicate = predicate.predicateWithSubstitutionVariables([predicateObjectRecordIDKey:recordID])
+            let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: sourceObject.entity.name!)
+            let recordID: String = self.referenceObject(for: sourceObject.objectID) as! String
+            fetchRequest.predicate = predicate.withSubstitutionVariables([predicateObjectRecordIDKey:recordID])
             fetchRequest.fetchLimit = 1
-            let results = try self.backingMOC.executeFetchRequest(fetchRequest)
-            let backingObject: NSManagedObject = results.last as! NSManagedObject
+            let results = try self.backingMOC.fetch(fetchRequest)
+            let backingObject = results.last!
             let keys = Array(self.persistentStoreCoordinator!.managedObjectModel.entitiesByName[sourceObject.entity.name!]!.attributesByName.keys)
-            let sourceObjectValues = sourceObject.dictionaryWithValuesForKeys(keys)
-            backingObject.setValuesForKeysWithDictionary(sourceObjectValues)
+            let sourceObjectValues = sourceObject.dictionaryWithValues(forKeys: keys)
+            backingObject.setValuesForKeys(sourceObjectValues)
             SMStoreChangeSetHandler.defaultHandler.createChangeSet(ForUpdatedObject: backingObject, usingContext: self.backingMOC)
             try self.setRelationshipValuesForBackingObject(backingObject, sourceObject: sourceObject)
             try self.backingMOC.saveIfHasChanges()

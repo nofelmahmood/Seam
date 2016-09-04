@@ -15,64 +15,62 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-//        do
-//        {
-//            try moc.save()
-//        }
-//        catch
-//        {
-//            print("Error thrown baby", appendNewline: true)
-//        }
-//        let fetchRequest: NSFetchRequest = NSFetchRequest(entityName: "Task")
-//        do
-//        {
-//            let results = try moc.executeFetchRequest(fetchRequest)
-//            for result in results as! [Task]
-//            {
-//                result.name = "\(result.name!) ClientChange"
-//            }
-//            try moc.save()
-//        }
-//        catch
-//        {
-//            
-//        }
+        let moc = CoreDataStack.defaultStack.managedObjectContext
         
-//        let moc = CoreDataStack.defaultStack.managedObjectContext
+        do
+        {
+            try moc.save()
+        }
+        catch
+        {
+            print("Error thrown baby\n")
+        }
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Task")
+        do
+        {
+            let results = try moc.fetch(fetchRequest)
+            for result in results as! [Task]
+            {
+                result.name = "\(result.name!) ClientChange"
+            }
+            try moc.save()
+        }
+        catch
+        {
+            
+        }
 
-//        let task: Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: moc) as! Task
-//        task.name = "HElaLuia"
-//        
-//        let cycling: Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: moc) as! Task
-//        cycling.name = "Foolish"
-//        
-//        let biking: Task = NSEntityDescription.insertNewObjectForEntityForName("Task", inManagedObjectContext: moc) as! Task
-//        biking.name = "Acting"
-//        
-//        let outdoorTasksTag = NSEntityDescription.insertNewObjectForEntityForName("Tag", inManagedObjectContext: moc) as! Tag
-//        outdoorTasksTag.name = "AnotherTag"
-//        
-//        let newTasksTag = NSEntityDescription.insertNewObjectForEntityForName("Tag", inManagedObjectContext: moc) as! Tag
-//        newTasksTag.name = "Just Another Tag"
-//        newTasksTag.task = biking
-//        
-//        outdoorTasksTag.task = cycling
+        let task: Task = NSEntityDescription.insertNewObject(forEntityName: "Task", into: moc) as! Task
+        task.name = "HElaLuia"
         
+        let cycling: Task = NSEntityDescription.insertNewObject(forEntityName: "Task", into: moc) as! Task
+        cycling.name = "Foolish"
         
-//        if moc.hasChanges
-//        {
-//            do
-//            {
-//                try moc.save()
-//            }
-//            catch let error as NSError?
-//            {
-//                print("Error Occured \(error!)", appendNewline: true)
-//            }
-//        }
-//        CoreDataStack.defaultStack.seamStore!.triggerSync()
-//        CoreDataStack.defaultStack.seamStore!.tri
+        let biking: Task = NSEntityDescription.insertNewObject(forEntityName: "Task", into: moc) as! Task
+        biking.name = "Acting"
         
+        let outdoorTasksTag = NSEntityDescription.insertNewObject(forEntityName: "Tag", into: moc) as! Tag
+        outdoorTasksTag.name = "AnotherTag"
+        
+        let newTasksTag = NSEntityDescription.insertNewObject(forEntityName: "Tag", into: moc) as! Tag
+        newTasksTag.name = "Just Another Tag"
+        newTasksTag.task = biking
+        
+        outdoorTasksTag.task = cycling
+      
+      
+        if moc.hasChanges
+        {
+            do
+            {
+                try moc.save()
+            }
+            catch let error as NSError?
+            {
+                print("Error Occured \(error!)\n")
+            }
+        }
+        CoreDataStack.defaultStack.seamStore!.triggerSync()
     }
 
     override func didReceiveMemoryWarning() {

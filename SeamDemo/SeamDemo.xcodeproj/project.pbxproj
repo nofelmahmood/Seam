@@ -14,7 +14,6 @@
 		3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */; };
 		3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E351B7B6CD300BB9E71 /* ViewController.swift */; };
 		3E191E391B7B6CD300BB9E71 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E371B7B6CD300BB9E71 /* Main.storyboard */; };
-		3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E3A1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld */; };
 		3E191E3E1B7B6CD300BB9E71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */; };
 		3E191E411B7B6CD300BB9E71 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E3F1B7B6CD300BB9E71 /* LaunchScreen.storyboard */; };
 		3E191E4C1B7B6CD300BB9E71 /* SeamDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E4B1B7B6CD300BB9E71 /* SeamDemoTests.swift */; };
@@ -32,6 +31,7 @@
 		3E96E9BE1B7CB9E000186E43 /* SMStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B11B7CB9E000186E43 /* SMStore.swift */; };
 		3E96E9BF1B7CB9E000186E43 /* SMStoreChangeSetHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B21B7CB9E000186E43 /* SMStoreChangeSetHandler.swift */; };
 		3E96E9C01B7CB9E000186E43 /* SMStoreSyncOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E96E9B31B7CB9E000186E43 /* SMStoreSyncOperation.swift */; };
+		D052F2D41D7CC302007A7497 /* SeamDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = D052F2D21D7CC302007A7497 /* SeamDemo.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,7 +66,6 @@
 		3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		3E191E351B7B6CD300BB9E71 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		3E191E381B7B6CD300BB9E71 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		3E191E3B1B7B6CD300BB9E71 /* SeamDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SeamDemo.xcdatamodel; sourceTree = "<group>"; };
 		3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3E191E401B7B6CD300BB9E71 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		3E191E421B7B6CD300BB9E71 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -88,6 +87,7 @@
 		3E96E9B11B7CB9E000186E43 /* SMStore.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStore.swift; path = ../../Seam/Seam/SMStore.swift; sourceTree = "<group>"; };
 		3E96E9B21B7CB9E000186E43 /* SMStoreChangeSetHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStoreChangeSetHandler.swift; path = ../../Seam/Seam/SMStoreChangeSetHandler.swift; sourceTree = "<group>"; };
 		3E96E9B31B7CB9E000186E43 /* SMStoreSyncOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SMStoreSyncOperation.swift; path = ../../Seam/Seam/SMStoreSyncOperation.swift; sourceTree = "<group>"; };
+		D052F2D31D7CC302007A7497 /* SeamDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SeamDemo.xcdatamodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,7 +154,7 @@
 				3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */,
 				3E191E3F1B7B6CD300BB9E71 /* LaunchScreen.storyboard */,
 				3E191E421B7B6CD300BB9E71 /* Info.plist */,
-				3E191E3A1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld */,
+				D052F2D21D7CC302007A7497 /* SeamDemo.xcdatamodeld */,
 			);
 			path = SeamDemo;
 			sourceTree = "<group>";
@@ -231,7 +231,7 @@
 		3E191E281B7B6CD300BB9E71 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = CloudKitSpace;
 				TargetAttributes = {
 					3E191E2F1B7B6CD300BB9E71 = {
@@ -248,6 +248,7 @@
 					};
 					3E191E461B7B6CD300BB9E71 = {
 						CreatedOnToolsVersion = 7.0;
+						LastSwiftMigration = 0800;
 						TestTargetID = 3E191E2F1B7B6CD300BB9E71;
 					};
 				};
@@ -299,12 +300,12 @@
 				3E0226431B7C62D20080F9AB /* Tag.swift in Sources */,
 				3E96E9BF1B7CB9E000186E43 /* SMStoreChangeSetHandler.swift in Sources */,
 				3E96E9BE1B7CB9E000186E43 /* SMStore.swift in Sources */,
+				D052F2D41D7CC302007A7497 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E361B7B6CD300BB9E71 /* ViewController.swift in Sources */,
 				3E96E9BC1B7CB9E000186E43 /* SMServerStoreSetupOperation.swift in Sources */,
 				3E96E9BA1B7CB9E000186E43 /* NSManagedObject+CKRecord.swift in Sources */,
 				3E96E9B81B7CB9E000186E43 /* CKRecordZoneID+Helpers.swift in Sources */,
 				3E96E9BD1B7CB9E000186E43 /* SMServerTokenHandler.swift in Sources */,
-				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
 				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
 				3E0226401B7C62D20080F9AB /* Task+CoreDataProperties.swift in Sources */,
 				3E96E9BB1B7CB9E000186E43 /* NSManagedObjectContext+Helpers.swift in Sources */,
@@ -369,8 +370,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -414,8 +417,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -434,6 +439,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -452,6 +458,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -468,6 +475,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -479,6 +487,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SeamDemo.app/SeamDemo";
 			};
 			name = Debug;
@@ -491,6 +500,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemoTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SeamDemo.app/SeamDemo";
 			};
 			name = Release;
@@ -528,12 +538,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		3E191E3A1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld */ = {
+		D052F2D21D7CC302007A7497 /* SeamDemo.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				3E191E3B1B7B6CD300BB9E71 /* SeamDemo.xcdatamodel */,
+				D052F2D31D7CC302007A7497 /* SeamDemo.xcdatamodel */,
 			);
-			currentVersion = 3E191E3B1B7B6CD300BB9E71 /* SeamDemo.xcdatamodel */;
+			currentVersion = D052F2D31D7CC302007A7497 /* SeamDemo.xcdatamodel */;
 			path = SeamDemo.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

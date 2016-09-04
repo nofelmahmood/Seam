@@ -28,48 +28,48 @@ import CoreData
 import CloudKit
 
 extension NSManagedObject {
-    private func setAttributesValues(ofCKRecord ckRecord:CKRecord, withValuesOfAttributeWithKeys keys: [String]?) {
+    fileprivate func setAttributesValues(ofCKRecord ckRecord:CKRecord, withValuesOfAttributeWithKeys keys: [String]?) {
         var attributes: [String] = [String]()
         if keys != nil {
             attributes = keys!
         } else {
             attributes = Array(self.entity.attributesByNameByRemovingBackingStoreAttributes().keys)
         }
-        let valuesDictionary = self.dictionaryWithValuesForKeys(attributes)
+        let valuesDictionary = self.dictionaryWithValues(forKeys: attributes)
         for (key,_) in valuesDictionary {
             let attributeDescription = self.entity.attributesByName[key]
-            if attributeDescription != nil && self.valueForKey(attributeDescription!.name) != nil {
+            if attributeDescription != nil && self.value(forKey: attributeDescription!.name) != nil {
                 switch(attributeDescription!.attributeType) {
-                case .StringAttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! String, forKey: attributeDescription!.name)
-                case .DateAttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSDate, forKey: attributeDescription!.name)
-                case .BinaryDataAttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSData, forKey: attributeDescription!.name)
-                case .BooleanAttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                case .DecimalAttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                case .DoubleAttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                case .FloatAttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                case .Integer16AttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                case .Integer32AttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
-                case .Integer64AttributeType:
-                    ckRecord.setObject(self.valueForKey(attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                case .stringAttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! String as CKRecordValue?, forKey: attributeDescription!.name)
+                case .dateAttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! Date as CKRecordValue?, forKey: attributeDescription!.name)
+                case .binaryDataAttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! Data as CKRecordValue?, forKey: attributeDescription!.name)
+                case .booleanAttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                case .decimalAttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                case .doubleAttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                case .floatAttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                case .integer16AttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                case .integer32AttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
+                case .integer64AttributeType:
+                    ckRecord.setObject(self.value(forKey: attributeDescription!.name) as! NSNumber, forKey: attributeDescription!.name)
                 default:
                     break
                 }
-            } else if attributeDescription != nil && self.valueForKey(attributeDescription!.name) == nil {
+            } else if attributeDescription != nil && self.value(forKey: attributeDescription!.name) == nil {
                 ckRecord.setObject(nil, forKey: attributeDescription!.name)
             }
         }
     }
     
-    private func setRelationshipValues(ofCKRecord ckRecord:CKRecord, withValuesOfRelationshipWithKeys keys: [String]?) {
+    fileprivate func setRelationshipValues(ofCKRecord ckRecord:CKRecord, withValuesOfRelationshipWithKeys keys: [String]?) {
         var relationships: [String] = [String]()
         if keys != nil {
             relationships = keys!
@@ -77,24 +77,24 @@ extension NSManagedObject {
             relationships = Array(self.entity.toOneRelationshipsByName().keys)
         }
         for relationship in relationships {
-            let relationshipManagedObject = self.valueForKey(relationship)
+            let relationshipManagedObject = self.value(forKey: relationship)
             if relationshipManagedObject != nil {
-                let recordIDString: String = self.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
+                let recordIDString: String = self.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
                 let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
                 let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
-                let ckReference: CKReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.DeleteSelf)
+                let ckReference: CKReference = CKReference(recordID: ckRecordID, action: CKReferenceAction.deleteSelf)
                 ckRecord.setObject(ckReference, forKey: relationship)
             }
         }
     }
     
     public func createOrUpdateCKRecord(usingValuesOfChangedKeys keys: [String]?) -> CKRecord? {
-        let encodedFields: NSData? = self.valueForKey(SMLocalStoreRecordEncodedValuesAttributeName) as? NSData
+        let encodedFields: Data? = self.value(forKey: SMLocalStoreRecordEncodedValuesAttributeName) as? Data
         var ckRecord: CKRecord?
         if encodedFields != nil {
             ckRecord = CKRecord.recordWithEncodedFields(encodedFields!)
         } else {
-            let recordIDString = self.valueForKey(SMLocalStoreRecordIDAttributeName) as! String
+            let recordIDString = self.value(forKey: SMLocalStoreRecordIDAttributeName) as! String
             let ckRecordZoneID: CKRecordZoneID = CKRecordZoneID(zoneName: SMStoreCloudStoreCustomZoneName, ownerName: CKOwnerDefaultName)
             let ckRecordID: CKRecordID = CKRecordID(recordName: recordIDString, zoneID: ckRecordZoneID)
             ckRecord = CKRecord(recordType: self.entity.name!, recordID: ckRecordID)

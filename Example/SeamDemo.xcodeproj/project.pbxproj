@@ -1,0 +1,714 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		3E127D591C1ED37100036F51 /* Folder+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E127D561C1ED37100036F51 /* Folder+CoreDataProperties.swift */; };
+		3E127D5A1C1ED37100036F51 /* Note+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E127D571C1ED37100036F51 /* Note+CoreDataProperties.swift */; };
+		3E127D5B1C1ED37100036F51 /* Photo+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E127D581C1ED37100036F51 /* Photo+CoreDataProperties.swift */; };
+		3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */; };
+		3E191E361B7B6CD300BB9E71 /* NotesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E351B7B6CD300BB9E71 /* NotesViewController.swift */; };
+		3E191E391B7B6CD300BB9E71 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E371B7B6CD300BB9E71 /* Main.storyboard */; };
+		3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E3A1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld */; };
+		3E191E3E1B7B6CD300BB9E71 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */; };
+		3E191E411B7B6CD300BB9E71 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 3E191E3F1B7B6CD300BB9E71 /* LaunchScreen.storyboard */; };
+		3E191E4C1B7B6CD300BB9E71 /* SeamDemoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E4B1B7B6CD300BB9E71 /* SeamDemoTests.swift */; };
+		3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */; };
+		3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E191E591B7B6D1D00BB9E71 /* CoreData.framework */; };
+		3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */; };
+		3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */; };
+		3E75DC221BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC211BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift */; };
+		3E75DC241BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */; };
+		3E75DC261BFC84F800FB5E40 /* NoteDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC251BFC84F800FB5E40 /* NoteDetailViewController.swift */; };
+		3E75DC2A1BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E75DC291BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift */; };
+		3E75DC371BFCA5D500FB5E40 /* Size Classes.png in Resources */ = {isa = PBXBuildFile; fileRef = 3E75DC361BFCA5D500FB5E40 /* Size Classes.png */; };
+		3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */; };
+		3EBF6C4E1BF3989B00A8B7C3 /* Seam.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; };
+		3EBF6C4F1BF3989B00A8B7C3 /* Seam.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3EBF6C401BF397C600A8B7C3 /* Seam.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3EDA41111BFDE44C00A3EF78 /* FoldersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */; };
+		3EDA41141BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41131BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift */; };
+		3EDA41161BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41151BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift */; };
+		3EDA41191BFDE4E100A3EF78 /* FolderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41181BFDE4E100A3EF78 /* FolderTableViewCell.swift */; };
+		3EDA412D1BFDE57E00A3EF78 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41271BFDE57E00A3EF78 /* Folder.swift */; };
+		3EDA412F1BFDE57E00A3EF78 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA41291BFDE57E00A3EF78 /* Photo.swift */; };
+		3EDA41311BFDE57E00A3EF78 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDA412B1BFDE57E00A3EF78 /* Note.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		3E191E481B7B6CD300BB9E71 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3E191E281B7B6CD300BB9E71 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3E191E2F1B7B6CD300BB9E71;
+			remoteInfo = SeamDemo;
+		};
+		3EBF6C3F1BF397C600A8B7C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3E8E26C11B7B11BD009C47EA;
+			remoteInfo = "Seam iOS";
+		};
+		3EBF6C411BF397C600A8B7C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3E3CE2B51BF36F1800C7F66D;
+			remoteInfo = "Seam iOS Tests";
+		};
+		3EBF6C431BF397C600A8B7C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3EBF6BE61BF3838700A8B7C3;
+			remoteInfo = "Seam OSX";
+		};
+		3EBF6C451BF397C600A8B7C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 3EBF6BEF1BF3838700A8B7C3;
+			remoteInfo = "Seam OSX Tests";
+		};
+		3EBF6C501BF3989B00A8B7C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 3E8E26C01B7B11BD009C47EA;
+			remoteInfo = "Seam iOS";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		3E3A94C81B89AB9C009BEF07 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				3EBF6C4F1BF3989B00A8B7C3 /* Seam.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		3E127D561C1ED37100036F51 /* Folder+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Folder+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E127D571C1ED37100036F51 /* Note+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Note+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E127D581C1ED37100036F51 /* Photo+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Photo+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		3E191E301B7B6CD300BB9E71 /* SeamDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SeamDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		3E191E351B7B6CD300BB9E71 /* NotesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesViewController.swift; sourceTree = "<group>"; };
+		3E191E381B7B6CD300BB9E71 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		3E191E3B1B7B6CD300BB9E71 /* SeamDemo.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SeamDemo.xcdatamodel; sourceTree = "<group>"; };
+		3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		3E191E401B7B6CD300BB9E71 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		3E191E421B7B6CD300BB9E71 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3E191E471B7B6CD300BB9E71 /* SeamDemoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SeamDemoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		3E191E4B1B7B6CD300BB9E71 /* SeamDemoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeamDemoTests.swift; sourceTree = "<group>"; };
+		3E191E4D1B7B6CD300BB9E71 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		3E191E561B7B6CF100BB9E71 /* SeamDemo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = SeamDemo.entitlements; sourceTree = "<group>"; };
+		3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		3E191E591B7B6D1D00BB9E71 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
+		3E75DC211BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NotesViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
+		3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NotesViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
+		3E75DC251BFC84F800FB5E40 /* NoteDetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NoteDetailViewController.swift; sourceTree = "<group>"; };
+		3E75DC291BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NoteDetailViewController+UITextViewDelegate.swift"; sourceTree = "<group>"; };
+		3E75DC361BFCA5D500FB5E40 /* Size Classes.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Size Classes.png"; path = "../../../../../../Desktop/Size Classes.png"; sourceTree = "<group>"; };
+		3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSManagedObject+Helper.swift"; sourceTree = "<group>"; };
+		3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Seam.xcodeproj; path = ../Seam.xcodeproj; sourceTree = "<group>"; };
+		3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FoldersViewController.swift; sourceTree = "<group>"; };
+		3EDA41131BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FoldersViewController+UITableViewDataSource.swift"; sourceTree = "<group>"; };
+		3EDA41151BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "FoldersViewController+UITableViewDelegate.swift"; sourceTree = "<group>"; };
+		3EDA41181BFDE4E100A3EF78 /* FolderTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FolderTableViewCell.swift; sourceTree = "<group>"; };
+		3EDA41271BFDE57E00A3EF78 /* Folder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
+		3EDA41291BFDE57E00A3EF78 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		3EDA412B1BFDE57E00A3EF78 /* Note.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3E191E2D1B7B6CD300BB9E71 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E191E5A1B7B6D1D00BB9E71 /* CoreData.framework in Frameworks */,
+				3EBF6C4E1BF3989B00A8B7C3 /* Seam.framework in Frameworks */,
+				3E191E581B7B6CFF00BB9E71 /* CloudKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3E191E441B7B6CD300BB9E71 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3E02263B1B7C62C10080F9AB /* CoreData Models */ = {
+			isa = PBXGroup;
+			children = (
+				3EDA41271BFDE57E00A3EF78 /* Folder.swift */,
+				3EDA41291BFDE57E00A3EF78 /* Photo.swift */,
+				3EDA412B1BFDE57E00A3EF78 /* Note.swift */,
+				3E127D561C1ED37100036F51 /* Folder+CoreDataProperties.swift */,
+				3E127D571C1ED37100036F51 /* Note+CoreDataProperties.swift */,
+				3E127D581C1ED37100036F51 /* Photo+CoreDataProperties.swift */,
+			);
+			name = "CoreData Models";
+			sourceTree = "<group>";
+		};
+		3E191E271B7B6CD300BB9E71 = {
+			isa = PBXGroup;
+			children = (
+				3E75DC361BFCA5D500FB5E40 /* Size Classes.png */,
+				3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */,
+				3E191E321B7B6CD300BB9E71 /* SeamDemo */,
+				3EBF6C331BF3940400A8B7C3 /* Frameworks */,
+				3E191E4A1B7B6CD300BB9E71 /* SeamDemoTests */,
+				3E191E311B7B6CD300BB9E71 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		3E191E311B7B6CD300BB9E71 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3E191E301B7B6CD300BB9E71 /* SeamDemo.app */,
+				3E191E471B7B6CD300BB9E71 /* SeamDemoTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3E191E321B7B6CD300BB9E71 /* SeamDemo */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC091BFC7CFD00FB5E40 /* Custom Cells */,
+				3E02263B1B7C62C10080F9AB /* CoreData Models */,
+				3E191E561B7B6CF100BB9E71 /* SeamDemo.entitlements */,
+				3E191E331B7B6CD300BB9E71 /* AppDelegate.swift */,
+				3EDA410C1BFDE43600A3EF78 /* FolderViewController */,
+				3E75DC1F1BFC80E400FB5E40 /* NotesViewController */,
+				3E75DC271BFC850100FB5E40 /* NoteDetailViewController */,
+				3E191E741B7B772D00BB9E71 /* CoreDataStack.swift */,
+				3EB1ECC11BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift */,
+				3E191E371B7B6CD300BB9E71 /* Main.storyboard */,
+				3E191E3D1B7B6CD300BB9E71 /* Assets.xcassets */,
+				3E191E3F1B7B6CD300BB9E71 /* LaunchScreen.storyboard */,
+				3E191E421B7B6CD300BB9E71 /* Info.plist */,
+				3E191E3A1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld */,
+			);
+			path = SeamDemo;
+			sourceTree = "<group>";
+		};
+		3E191E4A1B7B6CD300BB9E71 /* SeamDemoTests */ = {
+			isa = PBXGroup;
+			children = (
+				3E191E4B1B7B6CD300BB9E71 /* SeamDemoTests.swift */,
+				3E191E4D1B7B6CD300BB9E71 /* Info.plist */,
+			);
+			path = SeamDemoTests;
+			sourceTree = "<group>";
+		};
+		3E75DC091BFC7CFD00FB5E40 /* Custom Cells */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC0D1BFC7D1A00FB5E40 /* CustomTableViewCell.swift */,
+			);
+			name = "Custom Cells";
+			sourceTree = "<group>";
+		};
+		3E75DC1F1BFC80E400FB5E40 /* NotesViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3E191E351B7B6CD300BB9E71 /* NotesViewController.swift */,
+				3E75DC201BFC80EC00FB5E40 /* Extensions */,
+			);
+			name = NotesViewController;
+			sourceTree = "<group>";
+		};
+		3E75DC201BFC80EC00FB5E40 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC211BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift */,
+				3E75DC231BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		3E75DC271BFC850100FB5E40 /* NoteDetailViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC251BFC84F800FB5E40 /* NoteDetailViewController.swift */,
+				3E75DC281BFC8BC800FB5E40 /* Extensions */,
+			);
+			name = NoteDetailViewController;
+			sourceTree = "<group>";
+		};
+		3E75DC281BFC8BC800FB5E40 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				3E75DC291BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		3EBF6C331BF3940400A8B7C3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				3E191E591B7B6D1D00BB9E71 /* CoreData.framework */,
+				3E191E571B7B6CFF00BB9E71 /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			path = SeamDemo;
+			sourceTree = "<group>";
+		};
+		3EBF6C361BF397C600A8B7C3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3EBF6C401BF397C600A8B7C3 /* Seam.framework */,
+				3EBF6C421BF397C600A8B7C3 /* Seam iOS Tests.xctest */,
+				3EBF6C441BF397C600A8B7C3 /* Seam.framework */,
+				3EBF6C461BF397C600A8B7C3 /* Seam OSX Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		3EDA410C1BFDE43600A3EF78 /* FolderViewController */ = {
+			isa = PBXGroup;
+			children = (
+				3EDA41101BFDE44C00A3EF78 /* FoldersViewController.swift */,
+				3EDA41171BFDE4D100A3EF78 /* CustomCell */,
+				3EDA41121BFDE47300A3EF78 /* Extensions */,
+			);
+			name = FolderViewController;
+			sourceTree = "<group>";
+		};
+		3EDA41121BFDE47300A3EF78 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				3EDA41131BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift */,
+				3EDA41151BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift */,
+			);
+			name = Extensions;
+			sourceTree = "<group>";
+		};
+		3EDA41171BFDE4D100A3EF78 /* CustomCell */ = {
+			isa = PBXGroup;
+			children = (
+				3EDA41181BFDE4E100A3EF78 /* FolderTableViewCell.swift */,
+			);
+			name = CustomCell;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3E191E2F1B7B6CD300BB9E71 /* SeamDemo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3E191E501B7B6CD300BB9E71 /* Build configuration list for PBXNativeTarget "SeamDemo" */;
+			buildPhases = (
+				3E191E2C1B7B6CD300BB9E71 /* Sources */,
+				3E191E2D1B7B6CD300BB9E71 /* Frameworks */,
+				3E191E2E1B7B6CD300BB9E71 /* Resources */,
+				3E3A94C81B89AB9C009BEF07 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3EBF6C511BF3989B00A8B7C3 /* PBXTargetDependency */,
+			);
+			name = SeamDemo;
+			productName = SeamDemo;
+			productReference = 3E191E301B7B6CD300BB9E71 /* SeamDemo.app */;
+			productType = "com.apple.product-type.application";
+		};
+		3E191E461B7B6CD300BB9E71 /* SeamDemoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3E191E531B7B6CD300BB9E71 /* Build configuration list for PBXNativeTarget "SeamDemoTests" */;
+			buildPhases = (
+				3E191E431B7B6CD300BB9E71 /* Sources */,
+				3E191E441B7B6CD300BB9E71 /* Frameworks */,
+				3E191E451B7B6CD300BB9E71 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3E191E491B7B6CD300BB9E71 /* PBXTargetDependency */,
+			);
+			name = SeamDemoTests;
+			productName = SeamDemoTests;
+			productReference = 3E191E471B7B6CD300BB9E71 /* SeamDemoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		3E191E281B7B6CD300BB9E71 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0700;
+				ORGANIZATIONNAME = CloudKitSpace;
+				TargetAttributes = {
+					3E191E2F1B7B6CD300BB9E71 = {
+						CreatedOnToolsVersion = 7.0;
+						DevelopmentTeam = UBAKNBA97C;
+						SystemCapabilities = {
+							com.apple.Push = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
+								enabled = 1;
+							};
+						};
+					};
+					3E191E461B7B6CD300BB9E71 = {
+						CreatedOnToolsVersion = 7.0;
+						TestTargetID = 3E191E2F1B7B6CD300BB9E71;
+					};
+				};
+			};
+			buildConfigurationList = 3E191E2B1B7B6CD300BB9E71 /* Build configuration list for PBXProject "SeamDemo" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 3E191E271B7B6CD300BB9E71;
+			productRefGroup = 3E191E311B7B6CD300BB9E71 /* Products */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 3EBF6C361BF397C600A8B7C3 /* Products */;
+					ProjectRef = 3EBF6C351BF397C600A8B7C3 /* Seam.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				3E191E2F1B7B6CD300BB9E71 /* SeamDemo */,
+				3E191E461B7B6CD300BB9E71 /* SeamDemoTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		3EBF6C401BF397C600A8B7C3 /* Seam.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Seam.framework;
+			remoteRef = 3EBF6C3F1BF397C600A8B7C3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3EBF6C421BF397C600A8B7C3 /* Seam iOS Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Seam iOS Tests.xctest";
+			remoteRef = 3EBF6C411BF397C600A8B7C3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3EBF6C441BF397C600A8B7C3 /* Seam.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Seam.framework;
+			remoteRef = 3EBF6C431BF397C600A8B7C3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		3EBF6C461BF397C600A8B7C3 /* Seam OSX Tests.xctest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = "Seam OSX Tests.xctest";
+			remoteRef = 3EBF6C451BF397C600A8B7C3 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3E191E2E1B7B6CD300BB9E71 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E75DC371BFCA5D500FB5E40 /* Size Classes.png in Resources */,
+				3E191E411B7B6CD300BB9E71 /* LaunchScreen.storyboard in Resources */,
+				3E191E3E1B7B6CD300BB9E71 /* Assets.xcassets in Resources */,
+				3E191E391B7B6CD300BB9E71 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3E191E451B7B6CD300BB9E71 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3E191E2C1B7B6CD300BB9E71 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3EDA41141BFDE48800A3EF78 /* FoldersViewController+UITableViewDataSource.swift in Sources */,
+				3E75DC261BFC84F800FB5E40 /* NoteDetailViewController.swift in Sources */,
+				3E75DC2A1BFC8BE900FB5E40 /* NoteDetailViewController+UITextViewDelegate.swift in Sources */,
+				3EDA412D1BFDE57E00A3EF78 /* Folder.swift in Sources */,
+				3EDA41191BFDE4E100A3EF78 /* FolderTableViewCell.swift in Sources */,
+				3EDA41161BFDE4AF00A3EF78 /* FoldersViewController+UITableViewDelegate.swift in Sources */,
+				3E191E361B7B6CD300BB9E71 /* NotesViewController.swift in Sources */,
+				3E75DC221BFC810A00FB5E40 /* NotesViewController+UITableViewDataSource.swift in Sources */,
+				3E191E3C1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld in Sources */,
+				3E191E341B7B6CD300BB9E71 /* AppDelegate.swift in Sources */,
+				3EB1ECC21BE8BAE700B6A6A3 /* NSManagedObject+Helper.swift in Sources */,
+				3EDA412F1BFDE57E00A3EF78 /* Photo.swift in Sources */,
+				3E127D5A1C1ED37100036F51 /* Note+CoreDataProperties.swift in Sources */,
+				3E75DC0E1BFC7D1A00FB5E40 /* CustomTableViewCell.swift in Sources */,
+				3E127D591C1ED37100036F51 /* Folder+CoreDataProperties.swift in Sources */,
+				3EDA41311BFDE57E00A3EF78 /* Note.swift in Sources */,
+				3EDA41111BFDE44C00A3EF78 /* FoldersViewController.swift in Sources */,
+				3E75DC241BFC812500FB5E40 /* NotesViewController+UITableViewDelegate.swift in Sources */,
+				3E127D5B1C1ED37100036F51 /* Photo+CoreDataProperties.swift in Sources */,
+				3E191E751B7B772D00BB9E71 /* CoreDataStack.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3E191E431B7B6CD300BB9E71 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E191E4C1B7B6CD300BB9E71 /* SeamDemoTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3E191E491B7B6CD300BB9E71 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3E191E2F1B7B6CD300BB9E71 /* SeamDemo */;
+			targetProxy = 3E191E481B7B6CD300BB9E71 /* PBXContainerItemProxy */;
+		};
+		3EBF6C511BF3989B00A8B7C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Seam iOS";
+			targetProxy = 3EBF6C501BF3989B00A8B7C3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		3E191E371B7B6CD300BB9E71 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3E191E381B7B6CD300BB9E71 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		3E191E3F1B7B6CD300BB9E71 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				3E191E401B7B6CD300BB9E71 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		3E191E4E1B7B6CD300BB9E71 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		3E191E4F1B7B6CD300BB9E71 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3E191E511B7B6CD300BB9E71 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SeamDemo/SeamDemo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				INFOPLIST_FILE = SeamDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+			};
+			name = Debug;
+		};
+		3E191E521B7B6CD300BB9E71 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = SeamDemo/SeamDemo.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
+				INFOPLIST_FILE = SeamDemo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+			};
+			name = Release;
+		};
+		3E191E541B7B6CD300BB9E71 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = SeamDemoTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SeamDemo.app/SeamDemo";
+			};
+			name = Debug;
+		};
+		3E191E551B7B6CD300BB9E71 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				INFOPLIST_FILE = SeamDemoTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.CloudKitSpace.SeamDemoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SeamDemo.app/SeamDemo";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3E191E2B1B7B6CD300BB9E71 /* Build configuration list for PBXProject "SeamDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3E191E4E1B7B6CD300BB9E71 /* Debug */,
+				3E191E4F1B7B6CD300BB9E71 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3E191E501B7B6CD300BB9E71 /* Build configuration list for PBXNativeTarget "SeamDemo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3E191E511B7B6CD300BB9E71 /* Debug */,
+				3E191E521B7B6CD300BB9E71 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3E191E531B7B6CD300BB9E71 /* Build configuration list for PBXNativeTarget "SeamDemoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3E191E541B7B6CD300BB9E71 /* Debug */,
+				3E191E551B7B6CD300BB9E71 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		3E191E3A1B7B6CD300BB9E71 /* SeamDemo.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				3E191E3B1B7B6CD300BB9E71 /* SeamDemo.xcdatamodel */,
+			);
+			currentVersion = 3E191E3B1B7B6CD300BB9E71 /* SeamDemo.xcdatamodel */;
+			path = SeamDemo.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 3E191E281B7B6CD300BB9E71 /* Project object */;
+}

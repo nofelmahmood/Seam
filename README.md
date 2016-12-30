@@ -1,34 +1,177 @@
-![](http://s14.postimg.org/ll5smugr5/Logo.png)
+![seamlogo](https://cloud.githubusercontent.com/assets/3306263/11891970/83208bf0-a585-11e5-98b5-3ac6bff009d9.png)
 
-<p align="center">
- <strong><i>"Simplicity is the ultimate sophistication."</i></strong>
+
+[![Pod Version](https://img.shields.io/badge/pod-v0.6-blue.svg)](https://img.shields.io/cocoapods/v/Alamofire.svg)
+[![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
+[![Platform](https://img.shields.io/badge/platform-iOS%20--%20OSX-lightgrey.svg)](https://img.shields.io/badge/platform-iOS%20--%20OSX-lightgrey.svg)
+[![License](https://img.shields.io/packagist/l/doctrine/orm.svg)](https://img.shields.io/packagist/l/doctrine/orm.svg)
+
+Seam allows you to sync your CoreData Stores with CloudKit.
+
+## Topics
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Communication](#communication)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Getting Started](#getting-started)
+- [FAQ](#faq)
+- [Apps](#apps)
+- [Author](#author)
+- [License](#license)
+
+## Features
+- Automatic mapping of CoreData Models to CloudKit Private Databases
+- Supports Assets
+- Background Sync 
+- Conflict Resolution
+
+## Requirements
+
+- iOS 8.0+ / Mac OS X 10.10+
+- Xcode 7.1+
+
+## Communication
+
+- If you want to contribute submit a [pull request](https://github.com/nofelmahmood/Seam/pulls).
+- If your app uses Seam I'll be glad to add it to the list. Edit the [List](APPS.md) and submit a [pull request](https://github.com/nofelmahmood/Seam/pulls).
+- If you found a bug [open an issue](https://github.com/nofelmahmood/Seam/issues).
+- If you have a feature request [open an issue](https://github.com/nofelmahmood/Seam/issues).
+- If you have a question, ask it on [Stack Overflow](http://stackoverflow.com).
+
+Please read the [Contributing Guidelines](CONTRIBUTING.md) before doing any of above.
+
+## Installation
+
+### Cocoapods
+
+[CocoaPods](http://cocoapods.org) is a dependency manager for Cocoa projects. You can install it with the following command:
+
+```bash
+$ gem install cocoapods
+```
+
+To integrate Seam into your Xcode project using CocoaPods, specify it in your `Podfile`:
+
+```ruby
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '8.0'
+use_frameworks!
+
+pod 'Seam', '~> 0.6'
+```
+
+Then, run the following command:
+
+```bash
+$ pod install
+```
+
+### Carthage
+
+[Carthage](https://github.com/Carthage/Carthage) is a decentralized dependency manager that builds your dependencies and provides you with binary frameworks.
+
+You can install Carthage with [Homebrew](http://brew.sh/) using the following command:
+
+```bash
+$ brew update
+$ brew install carthage
+```
+
+To integrate Seam into your Xcode project using Carthage, specify it in your `Cartfile`:
+
+```ogdl
+github "Seam/Seam" ~> 0.6
+```
+
+Run `carthage update` to build the framework and drag the built `Seam.framework` into your Xcode project.
+
+## Usage
+
+Add a Store type of ```SeamStoreType``` to a NSPersistentStoreCoordinator in your CoreData stack:
+
+``` swift
+let persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: yourModel)
+let seamStore = try persistentStoreCoordinator.addPersistentStoreWithType(SeamStoreType, 
+                                                                          configuration: nil, 
+                                                                          URL: url, options: nil) as? Store
+```
+Observe the following two Notifications to know when the Sync Operation starts and finishes:
+
+``` swift
+
+NSNotificationCenter.defaultCenter().addObserver(self, selector: "didStartSyncing:",
+                                                name: SMStoreDidStartSyncingNotification,
+                                                object: seamStore)
+
+NSNotificationCenter.defaultCenter().addObserver(self, selector: "didFinishSyncing:",
+                                                name: SMStoreDidFinishSyncingNotification,
+                                                object: seamStore)                                               
+
+func didStartSyncing(notification: NSNotification) {
+  // Prepare for new data before syncing completes
+}
   
-- Leonardo da Vinci
- </p>
+func didFinishSyncing(notification: NSNotification) {
+  // Merge Changes into your context after syncing completes
+  mainContext.mergeChangesFromStoreDidFinishSyncingNotification(notification)
+}
+  
+```
+
+Finally call sync whenever and wherever you want:
+
+```swift
+seamStore.sync(nil)
+```
+
+To trigger sync whenever a change happens on the CloudKit Servers. Subscribe the store to receive Push Notifications from the CloudKit Servers.
+
+```swift
+seamStore.subscribeToPushNotifications({ successful in
+    guard successful else { return }
+    // Ensured that subscription was created successfully
+})
+
+// In your AppDelegate
+
+func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) {
+    seamStore.sync(nil)
+}
+```
 
 
-Seam is a framework built to bridge gaps between CoreData and CloudKit. It almost handles all the CloudKit hassle. All you have to do is use it as a store type for your CoreData store. Local caching and sync is taken care of. It builds and exposes different features to facilitate and give control to the developer where it is demanded and required.
+## Attributes
 
-## CoreData to CloudKit
+All CloudKit Attributes are mapped automatically to your CoreData attributes with the exception of [CKAsset](https://developer.apple.com/library/ios/documentation/CloudKit/Reference/CKAsset_class/) and [CLLocation](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocation_Class/).
 
-### Attributes
+CKAsset and CLLocation can be used by setting the corresponding attribute as Transformable in your CoreData Model.
 
-| CoreData  | CloudKit |
+| CloudKit  | CoreData |
 | ------------- | ------------- |
-| NSDate    | Date/Time
-| NSData | Bytes
-| NSString  | String   |
-| Integer16 | Int(64) |
-| Integer32 | Int(64) |
-| Integer64 | Int(64) |
-| Decimal | Double | 
-| Float | Double |
-| Boolean | Int(64) |
-| NSManagedObject | Reference |
+| NSDate    | NSDate
+| NSData | NSData
+| NSString  | NSString   |
+| NSNumber | NSNumber |
+| CKReference | NSManagedObject |
+| CKAsset | Transformable |
+| CLLocation | Transformable |
 
-**In the table above :** `Integer16`, `Integer32`, `Integer64`, `Decimal`, `Float` and `Boolean` are referring to the instance of `NSNumber` used to represent them in CoreData Models. `NSManagedObject` refers to a `to-one relationship` in a CoreData Model.
+### Transformable Attributes
 
-### Relationships
+CKAsset and CLLocation can be used in your CoreData model as Transformable attributes.
+
+1. To use **CKAsset** set **Transformable** as AttributeType and **CKAssetTransformer** as value transformer name for the attribute.
+
+![](https://cloud.githubusercontent.com/assets/3306263/11773251/f342fd36-a248-11e5-8b55-519400fdb600.png)
+
+2. To use **CLLocation** set **Transformable** as AttributeType and **CLLocationTransformer** as value transformer name for the attribute.
+
+![](https://cloud.githubusercontent.com/assets/3306263/11773252/f3459564-a248-11e5-89eb-197c32ef245a.png)
+
+
+## Relationships
 
 | CoreData Relationship  | Translation on CloudKit |
 | ------------- | ------------- |
@@ -37,93 +180,25 @@ Seam is a framework built to bridge gaps between CoreData and CloudKit. It almos
 
 <strong>Note :</strong> You must create inverse relationships in your app's CoreData Model or Seam wouldn't be able to translate CoreData Models in to CloudKit Records. Unexpected errors and curroption of data can possibly occur.
 
-## Sync
-
-Seam keeps the CoreData store in sync with the CloudKit Servers. It let's you know when the sync operation starts and finishes by throwing the following two notifications.
-- SMStoreDidStartSyncOperationNotification
-- SMStoreDidFinishSyncOperationNotification
-
-#### Conflict Resolution Policies
-In case of any sync conflicts, Seam exposes 4 conflict resolution policies.
-
-- ClientTellsWhichWins
-
-This policy requires you to set syncConflictResolutionBlock block of SMStore. You get both versions of the record as arguments. You do whatever changes you want on the second argument and return it.
-
-- ServerRecordWins
-
-This is the default. It considers the server record as the true record.
-
-- ClientRecordWins
-
-This considers the client record as the true record.
-
-- KeepBoth
-
-This saves both versions of the record.
-
-## How to use
-
-- Declare a SMStore type property in the class where your CoreData stack resides.
-```swift
-var smStore: SMStore?
-```
-- Add a store type of `SeamStoreType` to your app's NSPersistentStoreCoordinator and assign it to the property created in the previous step.
-```swift
-do 
-{
-   self.smStore = try coordinator.addPersistentStoreWithType(SeamStoreType, configuration: nil, URL: url, options: nil) as? SMStore
-}
-```
-- Enable Push Notifications for your app.
-![](http://s29.postimg.org/rb9vj0egn/Screen_Shot_2015_08_23_at_5_44_59_pm.png)
-- Implement didReceiveRemoteNotification Method in your AppDelegate and call `handlePush` on the instance of SMStore created earlier.
-```swift
- func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject]) 
- {
-    self.smStore?.handlePush(userInfo: userInfo)
- }
-```
-- Enjoy
-
-## Options 
-
-- SMStoreSyncConflictResolutionPolicyOption
-
-Use SMSyncConflictResolutionPolicy enum to use as a value for this option to specify the desired conflict resolution policy when adding SeamStoreType to your app's NSPersistentStoreCoordinator.
-## Requirements
-
-Xcode 7
-
-Swift 2.0
-
-## Support
-
-### What it does support
-
-Seam supports only user's CloudKit `Private Database` at this time. It creates and uses a custom zone to store data and fetch changes from the server.
-
-### What it does not support
-
-CloudKit `Public Database` and here are the two reasons why, straight from the docs.
-
-1. [The disadvantage of using the default zone for storing records is that it does not have any special capabilities. You cannot save a group of records to iCloud atomically in the default zone. Similarly, you cannot use a CKFetchRecordChangesOperation object on records in the default zone.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/occ/clm/CKRecordZone/defaultRecordZone)
-
-2. [ You cannot create custom zones in a public database.](https://developer.apple.com/library/prerelease/ios/documentation/CloudKit/Reference/CKRecordZone_class/index.html#//apple_ref/c/tdef/CKRecordZoneCapabilities)
-
 ## Getting Started 
+
 Download the demo project. Run it and see the magic as it happens.
 
-## Installation
-CocoaPods is the recommended way of adding Seam to your project.
+## FAQ
 
-Add this `'Seam', '~> 0.6'` to your pod file.
+### tvOS Support ?
+tvOS provides no persistent local storage. Seam uses SQLITE file to keep a local copy of your database which is not possible with tvOS.
 
-## Credits
-Seam was created by [Nofel Mahmood](http://twitter.com/NofelMahmood)
+## Apps
 
-## Contact 
-Follow Nofel Mahmood on [Twitter](http://twitter.com/NofelMahmood) and [GitHub](http://github.com/nofelmahmood) or email him at nofelmehmood@gmail.com
+A [list of Apps](APPS.md) which are using **Seam**.
+
+## Author
+
+Seam is owned and maintained by [Nofel Mahmood](http://twitter.com/NofelMahmood).
+
+You can follow him on [Twitter](http://twitter.com/NofelMahmood) and [Medium](http://medium.com/@nofelmahmood)
 
 ## License
-Seam is available under the MIT license. See the LICENSE file for more info.
+
+Seam is available under the MIT license. See the [LICENSE file](LICENSE.md) for more info.

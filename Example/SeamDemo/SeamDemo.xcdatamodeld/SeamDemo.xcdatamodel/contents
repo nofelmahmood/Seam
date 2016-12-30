@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9525" systemVersion="14F1021" minimumToolsVersion="Automatic">
+    <entity name="Folder" representedClassName=".Folder" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="notes" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Note" inverseName="folder" inverseEntity="Note" syncable="YES"/>
+    </entity>
+    <entity name="Note" representedClassName=".Note" syncable="YES">
+        <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="folder" maxCount="1" deletionRule="Nullify" destinationEntity="Folder" inverseName="notes" inverseEntity="Folder" syncable="YES"/>
+        <relationship name="photos" optional="YES" toMany="YES" deletionRule="Nullify" ordered="YES" destinationEntity="Photo" inverseName="note" inverseEntity="Photo" syncable="YES"/>
+    </entity>
+    <entity name="Photo" representedClassName=".Photo" syncable="YES">
+        <attribute name="photo" optional="YES" attributeType="Transformable" valueTransformerName="CKAssetTransformer" syncable="YES">
+            <userInfo>
+                <entry key="Asset" value="YES"/>
+            </userInfo>
+        </attribute>
+        <relationship name="note" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="photos" inverseEntity="Note" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Folder" positionX="-54" positionY="-9" width="128" height="75"/>
+        <element name="Note" positionX="-63" positionY="-18" width="128" height="90"/>
+        <element name="Photo" positionX="-54" positionY="9" width="128" height="75"/>
+    </elements>
+</model>

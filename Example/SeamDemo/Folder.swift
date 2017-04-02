@@ -13,7 +13,7 @@ import CoreData
 class Folder: NSManagedObject {
 
 // Insert code here to add functionality to your managed object subclass
-  class func folderWithName(name: String, inContext context: NSManagedObjectContext) -> Folder {
+  class func folderWithName(_ name: String, inContext context: NSManagedObjectContext) -> Folder {
     let folder = Folder.new(inContext: context) as! Folder
     folder.name = name
     return folder

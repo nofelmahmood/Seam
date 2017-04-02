@@ -32,7 +32,7 @@ class SeamDemoTests: XCTestCase {
   }
   
   func testDeletionOfTasks() {
-    let fetchRequest = NSFetchRequest(entityName: "Task")
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
     fetchRequest.includesPropertyValues = false
     let result = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
     XCTAssertNotNil(result)
@@ -46,7 +46,7 @@ class SeamDemoTests: XCTestCase {
   }
   
   func testDeletionOfTags() {
-    let fetchRequest = NSFetchRequest(entityName: "Tag")
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Tag")
     fetchRequest.includesPropertyValues = false
     let result = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
     XCTAssertNotNil(result)
@@ -64,7 +64,7 @@ class SeamDemoTests: XCTestCase {
     task.name = "Programming"
     let result = try? CoreDataStack.defaultStack.managedObjectContext.save()
     XCTAssertNotNil(result)
-    let fetchRequest = NSFetchRequest(entityName: "Task")
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
     let fetchResult = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
     XCTAssertNotNil(fetchResult)
     let objects = fetchResult as? [Task]
@@ -76,7 +76,7 @@ class SeamDemoTests: XCTestCase {
   }
   
   func testUpdatingOfObjects() {
-    let fetchRequest = NSFetchRequest(entityName: "Task")
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
     let result = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
     XCTAssertNotNil(result)
     let objects = result as? [Task]
@@ -90,7 +90,7 @@ class SeamDemoTests: XCTestCase {
   }
   
   func testFetchingOfObjects() {
-    let fetchRequest = NSFetchRequest(entityName: "Task")
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
     let result = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
     XCTAssertNotNil(result)
     let objects = result as? [Task]
@@ -114,7 +114,7 @@ class SeamDemoTests: XCTestCase {
   }
   
   func testFetchingOfObjectsWithRelationships() {
-    let fetchRequest = NSFetchRequest(entityName: "Task")
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
     let result = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
     XCTAssertNotNil(result)
     let objects = result as? [Task]
@@ -140,7 +140,7 @@ class SeamDemoTests: XCTestCase {
     let saveResult = try? CoreDataStack.defaultStack.managedObjectContext.save()
     XCTAssertNotNil(saveResult)
     CoreDataStack.defaultStack.managedObjectContext.reset()
-    let fetchRequest = NSFetchRequest(entityName: "Task")
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Task")
     let fetchResult = try? CoreDataStack.defaultStack.managedObjectContext.executeFetchRequest(fetchRequest)
     XCTAssertNotNil(fetchResult)
     let tasks = fetchResult as? [Task]
@@ -200,7 +200,7 @@ class SeamDemoTests: XCTestCase {
   
   func testPerformanceExample() {
     // This is an example of a performance test case.
-    self.measureBlock {
+    self.measure {
       // Put the code you want to measure the time of here.
     }
   }

@@ -15,7 +15,7 @@ extension NoteDetailViewController: UITextViewDelegate {
 //    note.text = textView.text
 //  }
   
-  func textViewDidEndEditing(textView: UITextView) {
+  func textViewDidEndEditing(_ textView: UITextView) {
     print("Printing from END EDITING ",note)
     note.text = textView.text
   }

@@ -9,7 +9,7 @@
 import UIKit
 
 extension NotesViewController: UITableViewDataSource {
-  func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     guard let sectionInfo = fetchedResultsController.sections?[section] else {
       return 0
     }
@@ -17,10 +17,10 @@ extension NotesViewController: UITableViewDataSource {
     return sectionInfo.numberOfObjects
   }
   
-  func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCellWithIdentifier("CustomTableViewCell", forIndexPath: indexPath) as? CustomTableViewCell
-    print(fetchedResultsController.objectAtIndexPath(indexPath))
-    let note = fetchedResultsController.objectAtIndexPath(indexPath) as! Note
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: "CustomTableViewCell", for: indexPath) as? CustomTableViewCell
+    print(fetchedResultsController.object(at: indexPath))
+    let note = fetchedResultsController.object(at: indexPath) as! Note
     cell?.configureWithNote(note)
     return cell!
   }

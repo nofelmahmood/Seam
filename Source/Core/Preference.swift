@@ -64,8 +64,8 @@ class Preference: NSManagedObject {
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
         attributeDescription.name = name
-        attributeDescription.attributeType = .StringAttributeType
-        attributeDescription.optional = false
+        attributeDescription.attributeType = .stringAttributeType
+        attributeDescription.isOptional = false
         return attributeDescription
       }
     }
@@ -74,8 +74,8 @@ class Preference: NSManagedObject {
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
         attributeDescription.name = name
-        attributeDescription.attributeType = .StringAttributeType
-        attributeDescription.optional = false
+        attributeDescription.attributeType = .stringAttributeType
+        attributeDescription.isOptional = false
         return attributeDescription
       }
     }
@@ -102,8 +102,8 @@ class Preference: NSManagedObject {
      
      - parameter name: Name of the CloudKit custom zone.
      */
-    func saveZoneName(name: String) {
-      let preference = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as! Preference
+    func saveZoneName(_ name: String) {
+      let preference = NSEntityDescription.insertNewObject(forEntityName: Entity.name, into: context) as! Preference
       preference.key = Default.zoneName
       preference.value = name
       try! context.save()
@@ -114,8 +114,8 @@ class Preference: NSManagedObject {
      
      - parameter name: Name of the CloudKit custom zone subscription.
      */
-    func saveZoneSubscriptionName(name: String) {
-      let preference = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as! Preference
+    func saveZoneSubscriptionName(_ name: String) {
+      let preference = NSEntityDescription.insertNewObject(forEntityName: Entity.name, into: context) as! Preference
       preference.key = Default.zoneSubscriptionName
       preference.value = name
       try! context.save()
@@ -129,9 +129,9 @@ class Preference: NSManagedObject {
      - returns: An optional that might or might not contain saved custom zone name.
      */
     func zoneName() throws -> String? {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+      let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate.preferenceZoneNamePredicate
-      return (try context.executeFetchRequest(fetchRequest).first as? Preference)?.value
+      return (try context.fetch(fetchRequest).first as? Preference)?.value
     }
     
     /**
@@ -142,9 +142,9 @@ class Preference: NSManagedObject {
      - returns: An optional that might or might not contain saved custom zone subscription name.
      */
     func zoneSubscriptionName() throws -> String? {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+      let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate.preferenceZoneSubscriptionNamePredicate
-      return (try context.executeFetchRequest(fetchRequest).first as? Preference)?.value
+      return (try context.fetch(fetchRequest).first as? Preference)?.value
     }
   }
 }

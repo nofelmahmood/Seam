@@ -42,7 +42,7 @@ extension NSEntityDescription {
   var allAttributesByName: [String: NSAttributeDescription] {
     var allAttributesByName = [String: NSAttributeDescription]()
     attributeNames.forEach { name in
-      if let attribute = propertiesByName[name] as? NSAttributeDescription where attribute.isCKAsset == false {
+      if let attribute = propertiesByName[name] as? NSAttributeDescription, attribute.isCKAsset == false {
         allAttributesByName[name] = attribute
       }
     }
@@ -94,7 +94,7 @@ extension NSEntityDescription {
   }
   
   var toOneRelationships: [NSRelationshipDescription] {
-    return Array(relationshipsByName.values).filter({ $0.toMany == false })
+    return Array(relationshipsByName.values).filter({ $0.isToMany == false })
   }
   
   var toOneRelationshipNames: [String] {
@@ -104,7 +104,7 @@ extension NSEntityDescription {
   var toOneRelationshipsByName: [String:NSRelationshipDescription] {
     var dictionary = [String: NSRelationshipDescription]()
     relationshipsByName.forEach({ (key,value) in
-      if value.toMany == false {
+      if value.isToMany == false {
         dictionary[key] = value
       }
     })

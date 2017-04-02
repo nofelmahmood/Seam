@@ -9,14 +9,14 @@
 import UIKit
 
 extension FoldersViewController: UITableViewDelegate {
-  func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-    if editingStyle == .Delete {
-      let folder = fetchedResultsController.objectAtIndexPath(indexPath) as! Folder
+  func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    if editingStyle == .delete {
+      let folder = fetchedResultsController.object(at: indexPath) as! Folder
       self.confirmDeletion(folder)
     }
   }
   
-  func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
-    self.performSegueWithIdentifier("Notes", sender: self)
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    self.performSegue(withIdentifier: "Notes", sender: self)
   }
 }

@@ -12,7 +12,7 @@ class FolderTableViewCell: UITableViewCell {
   static let reuseIdentifier = "FolderTableViewCell"
   @IBOutlet var nameLabel: UILabel!
   
-  func configureWithFolder(folder: Folder) {
+  func configureWithFolder(_ folder: Folder) {
     nameLabel.text = folder.name
   }
   override func prepareForReuse() {

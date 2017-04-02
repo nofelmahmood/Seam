@@ -9,16 +9,16 @@
 import UIKit
 
 extension FoldersViewController: UITableViewDataSource {
-  func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     guard let sectionInfo = fetchedResultsController.sections?[section] else {
       return 0
     }
     return sectionInfo.numberOfObjects
   }
   
-  func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCellWithIdentifier(FolderTableViewCell.reuseIdentifier, forIndexPath: indexPath) as! FolderTableViewCell
-    let folder = fetchedResultsController.objectAtIndexPath(indexPath) as! Folder
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    let cell = tableView.dequeueReusableCell(withIdentifier: FolderTableViewCell.reuseIdentifier, for: indexPath) as! FolderTableViewCell
+    let folder = fetchedResultsController.object(at: indexPath) as! Folder
     cell.configureWithFolder(folder)
     return cell
   }

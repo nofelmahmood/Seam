@@ -29,7 +29,7 @@ import CloudKit
 // Metadata is a subclass of NSManagedObject. This class is added to backing store model automatically and used by the backing store to save record metadata received from CloudKit against every CKRecord.
 class Metadata: NSManagedObject {
   @NSManaged var entityName: String?
-  @NSManaged var data: NSData?
+  @NSManaged var data: Data?
   
   /**
    *  Entity information for Metadata.
@@ -57,8 +57,8 @@ class Metadata: NSManagedObject {
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
         attributeDescription.name = name
-        attributeDescription.attributeType = .BinaryDataAttributeType
-        attributeDescription.optional = false
+        attributeDescription.attributeType = .binaryDataAttributeType
+        attributeDescription.isOptional = false
         return attributeDescription
       }
     }
@@ -87,10 +87,10 @@ class Metadata: NSManagedObject {
      
      - returns: An optional that might or might not contain saved instance of Metadata for the provided unique ID.
      */
-    func metadataWithUniqueID(id: String) throws -> Metadata? {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+    func metadataWithUniqueID(_ id: String) throws -> Metadata? {
+      let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate(equalsToUniqueID: id)
-      return try context.executeFetchRequest(fetchRequest).first as? Metadata
+      return try context.fetch(fetchRequest).first as? Metadata
     }
     
     /**
@@ -104,10 +104,10 @@ class Metadata: NSManagedObject {
       let uniqueID = record.recordID.recordName
       let encodedData = record.encodedSystemFields
       if let metadata = try metadataWithUniqueID(uniqueID) {
-        metadata.data = encodedData
-      } else if let metadata = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as? Metadata {
+        metadata.data = encodedData as Data
+      } else if let metadata = NSEntityDescription.insertNewObject(forEntityName: Entity.name, into: context) as? Metadata {
         metadata.uniqueID = uniqueID
-        metadata.data = encodedData
+        metadata.data = encodedData as Data
       }
       try context.saveIfHasChanges()
     }
@@ -119,12 +119,12 @@ class Metadata: NSManagedObject {
      
      - throws: CoreData fetch request error.
      */
-    func deleteMetadataForUniqueIDs(ids: [String]) throws {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+    func deleteMetadataForUniqueIDs(_ ids: [String]) throws {
+      let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: Entity.name)
       fetchRequest.predicate = NSPredicate(inUniqueIDs: ids)
-      (try context.executeFetchRequest(fetchRequest)).forEach { object in
+      (try context.fetch(fetchRequest)).forEach { object in
         let managedObject = object as! NSManagedObject
-        context.deleteObject(managedObject)
+        context.delete(managedObject)
       }
     }
   }

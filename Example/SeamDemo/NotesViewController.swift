@@ -11,36 +11,36 @@ import CoreData
 import Seam
 
 extension NotesViewController: NSFetchedResultsControllerDelegate {
-  func controllerWillChangeContent(controller: NSFetchedResultsController) {
+  func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
     tableView.beginUpdates()
   }
-  func controllerDidChangeContent(controller: NSFetchedResultsController) {
+  func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
     tableView.endUpdates()
   }
-  func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+  func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
     switch(type) {
-    case .Insert:
+    case .insert:
       if let indexPath = newIndexPath {
-        tableView.insertRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        tableView.insertRows(at: [indexPath], with: .automatic)
       }
-    case .Update:
+    case .update:
       if let indexPath = indexPath {
-        if let cell = tableView.cellForRowAtIndexPath(indexPath) as? CustomTableViewCell {
-          let note = controller.objectAtIndexPath(indexPath) as! Note
+        if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell {
+          let note = controller.object(at: indexPath) as! Note
           cell.configureWithNote(note)
         }
       }
-    case .Delete:
+    case .delete:
       if let indexPath = indexPath {
-        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
       }
-    case .Move:
+    case .move:
       if let indexPath = indexPath, let newIndexPath = newIndexPath {
-        let object = controller.objectAtIndexPath(newIndexPath) as! Note
-        if let cell = tableView.cellForRowAtIndexPath(indexPath) as? CustomTableViewCell {
+        let object = controller.object(at: newIndexPath) as! Note
+        if let cell = tableView.cellForRow(at: indexPath) as? CustomTableViewCell {
           cell.configureWithNote(object)
         }
-        tableView.moveRowAtIndexPath(indexPath, toIndexPath: newIndexPath)
+        tableView.moveRow(at: indexPath, to: newIndexPath)
       }
     }
   }
@@ -48,14 +48,14 @@ extension NotesViewController: NSFetchedResultsControllerDelegate {
 class NotesViewController: UIViewController {
   let context = CoreDataStack.defaultStack.managedObjectContext
   var folderObjectID: NSManagedObjectID!
-  var fetchedResultsController: NSFetchedResultsController!
+  var fetchedResultsController: NSFetchedResultsController<NSFetchRequestResult>!
   var segueForNewNote = true
   @IBOutlet var tableView: UITableView!
   
   override func viewDidLoad() {
     super.viewDidLoad()
-    let fetchRequest = NSFetchRequest(entityName: "Note")
-    let folder = context.objectWithID(folderObjectID) as! Folder
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Note")
+    let folder = context.object(with: folderObjectID) as! Folder
     fetchRequest.predicate = NSPredicate(format: "folder == %@", folder.uniqueObjectID!)
     let sortDescriptor = NSSortDescriptor(key: "text", ascending: false)
     fetchRequest.sortDescriptors = [sortDescriptor]
@@ -75,13 +75,13 @@ class NotesViewController: UIViewController {
     try fetchedResultsController.performFetch()
   }
   
-  func tempContextDidSave(notification: NSNotification) {
+  func tempContextDidSave(_ notification: Notification) {
     print("GOT FROM TEMPCONTEXT ",notification)
     let context = CoreDataStack.defaultStack.managedObjectContext
-    context.mergeChangesFromContextDidSaveNotification(notification)
+    context.mergeChanges(fromContextDidSave: notification)
   }
   
-  override func viewWillAppear(animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
   }
   
@@ -90,16 +90,16 @@ class NotesViewController: UIViewController {
     // Dispose of any resources that can be recreated.
   }
   
-  override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-    let destinationViewController = segue.destinationViewController as! NoteDetailViewController
-    let tempContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    let destinationViewController = segue.destination as! NoteDetailViewController
+    let tempContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
     tempContext.persistentStoreCoordinator = CoreDataStack.defaultStack.persistentStoreCoordinator
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "tempContextDidSave:", name: NSManagedObjectContextDidSaveNotification, object: tempContext)
+    NotificationCenter.default.addObserver(self, selector: #selector(NotesViewController.tempContextDidSave(_:)), name: NSNotification.Name.NSManagedObjectContextDidSave, object: tempContext)
     destinationViewController.tempContext = tempContext
     if segueForNewNote {
       destinationViewController.folderObjectID = folderObjectID
     } else if let selectedItemIndexPath = tableView.indexPathForSelectedRow {
-      let note = fetchedResultsController.objectAtIndexPath(selectedItemIndexPath) as! Note
+      let note = fetchedResultsController.object(at: selectedItemIndexPath) as! Note
       destinationViewController.folderObjectID = folderObjectID
       destinationViewController.noteObjectID = note.objectID
     }

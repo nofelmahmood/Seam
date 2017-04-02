@@ -11,7 +11,7 @@ import UIKit
 class CustomTableViewCell: UITableViewCell {
   @IBOutlet var noteLabel: UILabel!
   
-  func configureWithNote(note: Note) {
+  func configureWithNote(_ note: Note) {
     noteLabel.text = note.text
   }
   

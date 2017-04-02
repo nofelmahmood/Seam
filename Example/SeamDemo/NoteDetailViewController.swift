@@ -12,17 +12,17 @@ import CoreData
 // MARK: UIImagePickerControllerDelegate
 
 extension NoteDetailViewController: UIImagePickerControllerDelegate {
-  func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
+  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
     let textAttachment = NSTextAttachment()
     textAttachment.image = image
     let attributedString = NSAttributedString(attachment: textAttachment)
     let mutableAttributedTextViewString = NSMutableAttributedString(attributedString: textView.attributedText)
-    mutableAttributedTextViewString.appendAttributedString(attributedString)
+    mutableAttributedTextViewString.append(attributedString)
     textView.attributedText = mutableAttributedTextViewString
-    dismissViewControllerAnimated(true, completion: nil)
+    dismiss(animated: true, completion: nil)
   }
-  func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-    dismissViewControllerAnimated(true, completion: nil)
+  func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+    dismiss(animated: true, completion: nil)
   }
 }
 
@@ -35,7 +35,7 @@ class NoteDetailViewController: UIViewController {
   lazy var imagePickerController: UIImagePickerController = {
     let imagePickerController = UIImagePickerController()
     imagePickerController.delegate = self
-    imagePickerController.sourceType = .SavedPhotosAlbum
+    imagePickerController.sourceType = .savedPhotosAlbum
     return imagePickerController
   }()
   var tempContext: NSManagedObjectContext!
@@ -43,7 +43,7 @@ class NoteDetailViewController: UIViewController {
   var noteObjectID: NSManagedObjectID?
   var folderObjectID: NSManagedObjectID!
   
-  override func viewDidAppear(animated: Bool) {
+  override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     textView.becomeFirstResponder()
   }
@@ -51,66 +51,66 @@ class NoteDetailViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     if let noteObjectID = noteObjectID {
-      note = tempContext.objectWithID(noteObjectID) as! Note
+      note = tempContext.object(with: noteObjectID) as! Note
     } else {
       note = Note.new(inContext: tempContext) as! Note
-      note.folder = tempContext.objectWithID(folderObjectID) as? Folder
+      note.folder = tempContext.object(with: folderObjectID) as? Folder
     }
     textView.text = note.text
   }
   
-  override func viewWillAppear(animated: Bool) {
+  override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillShow:", name: UIKeyboardWillShowNotification, object: nil)
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "keyboardWillHide:", name: UIKeyboardWillHideNotification, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(NoteDetailViewController.keyboardWillShow(_:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+    NotificationCenter.default.addObserver(self, selector: #selector(NoteDetailViewController.keyboardWillHide(_:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
   }
   
-  override func viewWillDisappear(animated: Bool) {
+  override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
-    NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillShowNotification, object: nil)
-    NSNotificationCenter.defaultCenter().removeObserver(self, name: UIKeyboardWillHideNotification, object: nil)
+    NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+    NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: nil)
   }
   
   // MARK: Keyboard
 
-  func keyboardWillShow(notification: NSNotification) {
+  func keyboardWillShow(_ notification: Notification) {
     guard let userInfo = notification.userInfo else {
       return
     }
-    var keyboardFrame = userInfo["UIKeyboardFrameEndUserInfoKey"]!.CGRectValue
-    keyboardFrame = textView.convertRect(keyboardFrame, fromView: nil)
-    let intersect = CGRectIntersection(keyboardFrame, textView.bounds)
-    if !CGRectIsNull(intersect) {
-      let duration = userInfo["UIKeyboardAnimationDurationUserInfoKey"]!.doubleValue
-      UIView.animateWithDuration(duration, animations: {
-        self.textView.contentInset = UIEdgeInsetsMake(0, 0, intersect.size.height, 0)
-        self.textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, intersect.size.height, 0)
+    var keyboardFrame = (userInfo["UIKeyboardFrameEndUserInfoKey"]! as AnyObject).cgRectValue
+    keyboardFrame = textView.convert(keyboardFrame!, from: nil)
+    let intersect = keyboardFrame?.intersection(textView.bounds)
+    if !(intersect?.isNull)! {
+      let duration = (userInfo["UIKeyboardAnimationDurationUserInfoKey"]! as AnyObject).doubleValue
+      UIView.animate(withDuration: duration!, animations: {
+        self.textView.contentInset = UIEdgeInsetsMake(0, 0, (intersect?.size.height)!, 0)
+        self.textView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, (intersect?.size.height)!, 0)
       })
     }
   }
   
-  func keyboardWillHide(notification: NSNotification) {
+  func keyboardWillHide(_ notification: Notification) {
     guard let userInfo = notification.userInfo else {
       return
     }
-    let duration = userInfo["UIKeyboardAnimationDurationUserInfoKey"]!.doubleValue
-    UIView.animateWithDuration(duration) { 
-      self.textView.contentInset = UIEdgeInsetsZero
-      self.textView.scrollIndicatorInsets = UIEdgeInsetsZero
-    }
+    let duration = (userInfo["UIKeyboardAnimationDurationUserInfoKey"]! as AnyObject).doubleValue
+    UIView.animate(withDuration: duration!, animations: { 
+      self.textView.contentInset = UIEdgeInsets.zero
+      self.textView.scrollIndicatorInsets = UIEdgeInsets.zero
+    }) 
   }
   
   // MARK: IBAction
   
   @IBAction func cameraButtonDidPress() {
-    presentViewController(imagePickerController, animated: true, completion: nil)
+    present(imagePickerController, animated: true, completion: nil)
   }
   
-  @IBAction func doneButtonDidPress(sender: AnyObject) {
+  @IBAction func doneButtonDidPress(_ sender: AnyObject) {
     textView.resignFirstResponder()
-    if let noteText = textView.text where noteText.isEmpty == false {
+    if let noteText = textView.text, noteText.isEmpty == false {
       note.text = noteText
-      tempContext.performBlockAndWait {
+      tempContext.performAndWait {
         do {
          try self.tempContext.save()
         } catch {

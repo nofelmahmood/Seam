@@ -197,7 +197,7 @@ A [list of Apps](APPS.md) which are using **Seam**.
 
 Seam is owned and maintained by [Nofel Mahmood](http://twitter.com/NofelMahmood).
 
-You can follow him on [Twitter](http://twitter.com/NofelMahmood) and [Medium](http://medium.com/@nofelmahmood)
+You can follow him on [Twitter](http://twitter.com/NofelMahmood) and [Medium](http://medium.com/@nofel)
 
 ## License
 

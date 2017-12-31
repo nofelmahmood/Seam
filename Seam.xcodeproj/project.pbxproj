@@ -236,6 +236,14 @@
 			path = Helpers;
 			sourceTree = "<group>";
 		};
+		3E6DF7021FF92B4800318356 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				3E82521B1BF353E6008B3E86 /* Seam.h */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		3E8E26B71B7B11BD009C47EA = {
 			isa = PBXGroup;
 			children = (
@@ -245,6 +253,7 @@
 				3EBF6C4D1BF397F900A8B7C3 /* Frameworks */,
 				3E3CE2B61BF36F1800C7F66D /* Tests */,
 				3E8E26C21B7B11BD009C47EA /* Products */,
+				3E6DF7021FF92B4800318356 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -670,6 +679,7 @@
 				PRODUCT_NAME = Seam;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 				VALIDATE_PRODUCT = NO;
 				VALID_ARCHS = "arm64 armv7 armv7s x86_64 i386";
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -696,6 +706,7 @@
 				PRODUCT_NAME = Seam;
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.0;
 				VALID_ARCHS = "arm64 armv7 armv7s x86_64 i386";
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
@@ -719,6 +730,7 @@
 				PRODUCT_NAME = Seam;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Debug;
 		};
@@ -740,6 +752,7 @@
 				PRODUCT_NAME = Seam;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.0;
 			};
 			name = Release;
 		};

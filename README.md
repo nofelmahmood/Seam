@@ -1,10 +1,10 @@
-#CKSIncrementalStore
+# CKSIncrementalStore
 
 CKSIncrementalStore is a subclass of [NSIncrementalStore](https://developer.apple.com/library/prerelease/ios/documentation/CoreData/Reference/NSIncrementalStore_Class/index.html). It automatically creates and manages a SQLite store using CoreData to store and sync with user's private database on CloudKit Servers.
 
 It helps you to reuse your CoreData knowledge to power your apps with CloudKit. It handles almost all the CloudKit hassle.
 
-####Seeing is believing !
+#### Seeing is believing !
 ![](https://cdn.pbrd.co/images/1ueV7gsM.gif)
 
 ### Start by Adding it

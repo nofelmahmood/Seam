@@ -31,7 +31,7 @@ class Token {
   static let sharedToken = Token()
   
   func rawToken() -> CKServerChangeToken? {
-    guard let rawToken = NSUserDefaults.standardUserDefaults().objectForKey(Token.Key) as? NSData else {
+    guard let rawToken = UserDefaults.standard.object(forKey: Token.Key) as? NSData else {
       return nil
     }
     return NSKeyedUnarchiver.unarchiveObjectWithData(rawToken) as? CKServerChangeToken
@@ -54,11 +54,11 @@ class Token {
       return
     }
     let archivedToken = NSKeyedArchiver.archivedDataWithRootObject(newToken)
-    NSUserDefaults.standardUserDefaults().setObject(archivedToken, forKey: Token.Key)
+    UserDefaults.standard.set(archivedToken, forKey: Token.Key)
   }
   
   func reset() {
     discard()
-    NSUserDefaults.standardUserDefaults().setObject(nil, forKey: Token.Key)
+    UserDefaults.standard.set(nil, forKey: Token.Key)
   }
 }

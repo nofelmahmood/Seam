@@ -29,8 +29,8 @@ struct Transformers {
   static func registerAll() {
     let assetTransformer = CKAssetTransformer()
     let locationTransformer = CLLocationTransformer()
-    ValueTransformer.setValueTransformer(assetTransformer, forName: CKAssetTransformer.name)
-    ValueTransformer.setValueTransformer(locationTransformer, forName: CLLocationTransformer.name)
+    ValueTransformer.setValueTransformer(assetTransformer, forName: NSValueTransformerName(rawValue: CKAssetTransformer.name))
+    ValueTransformer.setValueTransformer(locationTransformer, forName: NSValueTransformerName(rawValue: CLLocationTransformer.name))
   }
 }
 

@@ -34,8 +34,9 @@ class Change: NSManagedObject {
   @NSManaged var creationDate: NSDate
   
   var separatedProperties: [String]? {
-    return properties?.componentsSeparatedByString(Change.propertySeparator)
+    return properties?.components(separatedBy: Change.propertySeparator)
   }
+
   var isDeletedType: Bool {
     return type == ChangeType.Deleted
   }
@@ -51,17 +52,17 @@ class Change: NSManagedObject {
   
   func addProperties(props: [String]) {
     guard let separatedProperties = separatedProperties else {
-      properties = props.joinWithSeparator(Change.propertySeparator)
+      properties = props.joined(separator: Change.propertySeparator)
       return
     }
     let union = Set(separatedProperties).union(Set(props))
-    properties = union.joinWithSeparator(Change.propertySeparator)
+    properties = union.joined(separator: Change.propertySeparator)
   }
   
   struct ChangeType {
-    static let Inserted = NSNumber(int: 0)
-    static let Updated = NSNumber(int: 1)
-    static let Deleted = NSNumber(int: 2)
+    static let Inserted = NSNumber(value: 0)
+    static let Updated = NSNumber(value: 1)
+    static let Deleted = NSNumber(value: 2)
   }
   static let propertySeparator = ","
   
@@ -90,9 +91,9 @@ class Change: NSManagedObject {
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
         attributeDescription.name = name
-        attributeDescription.attributeType = .Integer16AttributeType
-        attributeDescription.optional = false
-        attributeDescription.indexed = true
+        attributeDescription.attributeType = .integer16AttributeType
+        attributeDescription.isOptional = false
+        attributeDescription.isIndexed = true
         return attributeDescription
       }
     }
@@ -101,9 +102,9 @@ class Change: NSManagedObject {
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
         attributeDescription.name = name
-        attributeDescription.attributeType = .StringAttributeType
-        attributeDescription.optional = false
-        attributeDescription.indexed = true
+        attributeDescription.attributeType = .stringAttributeType
+        attributeDescription.isOptional = false
+        attributeDescription.isIndexed = true
         return attributeDescription
       }
     }
@@ -112,8 +113,8 @@ class Change: NSManagedObject {
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
         attributeDescription.name = name
-        attributeDescription.attributeType = .StringAttributeType
-        attributeDescription.optional = true
+        attributeDescription.attributeType = .stringAttributeType
+        attributeDescription.isOptional = true
         return attributeDescription
       }
     }
@@ -122,8 +123,8 @@ class Change: NSManagedObject {
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
         attributeDescription.name = name
-        attributeDescription.attributeType = .DateAttributeType
-        attributeDescription.optional = false
+        attributeDescription.attributeType = .dateAttributeType
+        attributeDescription.isOptional = false
         return attributeDescription
       }
     }
@@ -145,13 +146,18 @@ class Change: NSManagedObject {
     }
     
     func hasChanges() -> Bool {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
-      var error: NSError?
-      return changeContext.countForFetchRequest(fetchRequest, error: &error) > 0 ? true: false
+      let fetchRequest = Change.fetchRequest()
+      
+      let countResult = try? changeContext.count(for: fetchRequest)
+      guard let count = countResult else {
+        return false
+      }
+      
+      return count > 0 ? true: false
     }
     
     func new(uniqueID: String,type: NSNumber, entityName: String) -> Change {
-      let change = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: changeContext) as! Change
+      let change = NSEntityDescription.insertNewObject(forEntityName: Entity.name, into: changeContext) as! Change
       change.uniqueID = uniqueID
       change.type = type
       change.entityName = entityName
@@ -160,29 +166,31 @@ class Change: NSManagedObject {
     }
     
     func new(uniqueID: String,changedObject: NSManagedObject)  -> Change {
-      if changedObject.inserted {
-        return new(uniqueID,type: ChangeType.Inserted,
+      if changedObject.isInserted {
+        return new(uniqueID: uniqueID,type: ChangeType.Inserted,
           entityName: changedObject.entity.name!)
-      } else if changedObject.updated {
-        let change = new(uniqueID, type: Change.ChangeType.Updated, entityName: changedObject.entity.name!)
+      } else if changedObject.isUpdated {
+        let change = new(uniqueID: uniqueID, type: Change.ChangeType.Updated, entityName: changedObject.entity.name!)
         change.addProperties(changedObject.changedValueKeys)
         return change
       } else {
-        return new(uniqueID, type: Change.ChangeType.Deleted, entityName: changedObject.entity.name!)
+        return new(uniqueID: uniqueID, type: Change.ChangeType.Deleted, entityName: changedObject.entity.name!)
       }
     }
     
     func all() throws -> [Change]? {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+      let fetchRequest = Change.fetchRequest()
       fetchRequest.fetchLimit = 50
-      return try changeContext.executeFetchRequest(fetchRequest) as? [Change]
+      
+      return try changeContext.fetch(fetchRequest) as? [Change]
     }
     
     func all(forUniqueID uniqueID: String, type: NSNumber) throws -> [Change]? {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+      let fetchRequest = Change.fetchRequest()
       fetchRequest.fetchBatchSize = 50
       fetchRequest.predicate = NSPredicate(equalsToUniqueID: uniqueID, andChangeType: type)
-      return try changeContext.executeFetchRequest(fetchRequest) as? [Change]
+
+      return try changeContext.fetch(fetchRequest) as? [Change]
     }
     
     func allUpdatedType(forUniqueID uniqueID: String) throws -> [Change]? {
@@ -190,15 +198,17 @@ class Change: NSManagedObject {
     }
     
     func remove(changes: [Change]) {
-      changes.forEach { changeContext.deleteObject($0) }
+      changes.forEach { changeContext.delete($0) }
     }
     
     func changedPropertyValuesDictionaryForChange(change: Change, changedObject: NSManagedObject) -> [String: AnyObject]? {
-      if let changedProperties = change.separatedProperties where change.isUpdatedType {
-        return changedObject.dictionaryWithValuesForKeys(changedProperties)
+      if let changedProperties = change.separatedProperties, change.isUpdatedType {
+        return changedObject.dictionaryWithValues(forKeys: changedProperties) as [String : AnyObject]
+        
       } else  {
         let keys = Array(changedObject.entity.attributesByName.keys) + changedObject.entity.toOneRelationshipNames
-        return changedObject.dictionaryWithValuesForKeys(keys)
+        
+        return changedObject.dictionaryWithValues(forKeys: keys) as [String : AnyObject]
       }
     }
   }

@@ -57,8 +57,8 @@ class Metadata: NSManagedObject {
       static var attributeDescription: NSAttributeDescription {
         let attributeDescription = NSAttributeDescription()
         attributeDescription.name = name
-        attributeDescription.attributeType = .BinaryDataAttributeType
-        attributeDescription.optional = false
+        attributeDescription.attributeType = .binaryDataAttributeType
+        attributeDescription.isOptional = false
         return attributeDescription
       }
     }
@@ -88,9 +88,10 @@ class Metadata: NSManagedObject {
      - returns: An optional that might or might not contain saved instance of Metadata for the provided unique ID.
      */
     func metadataWithUniqueID(id: String) throws -> Metadata? {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+      let fetchRequest = Metadata.fetchRequest()
       fetchRequest.predicate = NSPredicate(equalsToUniqueID: id)
-      return try context.executeFetchRequest(fetchRequest).first as? Metadata
+      
+      return try context.fetch(fetchRequest).first as? Metadata
     }
     
     /**
@@ -103,9 +104,9 @@ class Metadata: NSManagedObject {
     func setMetadata(forRecord record: CKRecord) throws {
       let uniqueID = record.recordID.recordName
       let encodedData = record.encodedSystemFields
-      if let metadata = try metadataWithUniqueID(uniqueID) {
+      if let metadata = try metadataWithUniqueID(id: uniqueID) {
         metadata.data = encodedData
-      } else if let metadata = NSEntityDescription.insertNewObjectForEntityForName(Entity.name, inManagedObjectContext: context) as? Metadata {
+      } else if let metadata = NSEntityDescription.insertNewObject(forEntityName: Entity.name, into: context) as? Metadata {
         metadata.uniqueID = uniqueID
         metadata.data = encodedData
       }
@@ -120,11 +121,13 @@ class Metadata: NSManagedObject {
      - throws: CoreData fetch request error.
      */
     func deleteMetadataForUniqueIDs(ids: [String]) throws {
-      let fetchRequest = NSFetchRequest(entityName: Entity.name)
+      let fetchRequest = Metadata.fetchRequest()
       fetchRequest.predicate = NSPredicate(inUniqueIDs: ids)
-      (try context.executeFetchRequest(fetchRequest)).forEach { object in
+      
+      let result = try context.fetch(fetchRequest)
+      result.forEach { object in
         let managedObject = object as! NSManagedObject
-        context.deleteObject(managedObject)
+        context.delete(managedObject)
       }
     }
   }

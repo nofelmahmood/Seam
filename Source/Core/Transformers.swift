@@ -82,6 +82,6 @@ class CLLocationTransformer: ValueTransformer {
     guard let value = value as? NSData else {
       return nil
     }
-    return NSKeyedUnarchiver.unarchiveObjectWithData(value as Data)
+    return NSKeyedUnarchiver.unarchiveObject(with: value as Data)
   }
 }

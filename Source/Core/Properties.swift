@@ -50,9 +50,9 @@ struct UniqueID {
   static var attributeDescription: NSAttributeDescription {
     let attributeDescription = NSAttributeDescription()
     attributeDescription.name = name
-    attributeDescription.attributeType = .StringAttributeType
-    attributeDescription.optional = false
-    attributeDescription.indexed = true
+    attributeDescription.attributeType = .stringAttributeType
+    attributeDescription.isOptional = false
+    attributeDescription.isIndexed = true
     return attributeDescription
   }
 }

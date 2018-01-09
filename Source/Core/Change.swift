@@ -171,7 +171,7 @@ class Change: NSManagedObject {
           entityName: changedObject.entity.name!)
       } else if changedObject.isUpdated {
         let change = new(uniqueID: uniqueID, type: Change.ChangeType.Updated, entityName: changedObject.entity.name!)
-        change.addProperties(changedObject.changedValueKeys)
+        change.addProperties(props: changedObject.changedValueKeys)
         return change
       } else {
         return new(uniqueID: uniqueID, type: Change.ChangeType.Deleted, entityName: changedObject.entity.name!)

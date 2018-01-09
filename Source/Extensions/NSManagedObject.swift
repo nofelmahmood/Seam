@@ -30,7 +30,7 @@ extension NSManagedObject {
 
   var uniqueID: String {
     get {
-      return valueForKey(UniqueID.name) as! String
+        return value(forKey: UniqueID.name) as! String
     } set {
       setValue(newValue, forKey: UniqueID.name)
     }
@@ -48,9 +48,9 @@ extension NSManagedObject {
         seamStore = store
       }
     }
-    let referenceObject = seamStore?.referenceObjectForObjectID(objectID) as! String
+    let referenceObject = seamStore?.referenceObject(for: objectID) as! String
     do {
-      let backingObjectID = try seamStore?.objectIDForBackingObjectForEntity(entity.name!, withReferenceObject: referenceObject)
+        let backingObjectID = try seamStore?.objectIDForBackingObjectForEntity(entityName: entity.name!, withReferenceObject: referenceObject)
       return backingObjectID
     } catch {
       return nil

@@ -32,7 +32,7 @@ public typealias ConflictResolutionBlock = ((_ conflictResolutionInfo: ConflictR
 
 public class Store: NSIncrementalStore {
   
-  var zone: Zone!
+  var currentZone: Zone!
 //    if let zoneName = self.zoneName {
 //      return Zone(zoneName: zoneName)
 //    } else if let zoneName = try? self.preferenceManager.zoneName() where zoneName != nil {
@@ -126,16 +126,16 @@ public class Store: NSIncrementalStore {
     
     guard isNewStore else {
       if let zoneName = try preferenceManager.zoneName() {
-        zone = Zone(zoneName: zoneName)
+        currentZone = Zone(zoneName: zoneName)
       }
       return
     }
     if let zoneName = optionValues.zoneName {
       preferenceManager.saveZoneName(name: zoneName)
-      zone = Zone(zoneName: zoneName)
+      currentZone = Zone(zoneName: zoneName)
     } else {
-      zone = Zone()
-      preferenceManager.saveZoneName(name: zone.zone.zoneID.zoneName)
+      currentZone = Zone()
+      preferenceManager.saveZoneName(name: currentZone.zone.zoneID.zoneName)
     }
   }
 
@@ -158,12 +158,12 @@ public class Store: NSIncrementalStore {
   
   public func subscribeToPushNotifications(completionBlock: ((_ successful: Bool) -> ())?) {
     
-    try? self.zone.createSubscription({ successful in
+    currentZone.createSubscription(completionBlock: { successful in
       guard successful else {
-        completionBlock?(successful: false)
+        completionBlock?(false)
         return
       }
-      completionBlock?(successful: true)
+      completionBlock?(true)
     })
   }
   
@@ -356,7 +356,7 @@ public class Store: NSIncrementalStore {
         self.setAttributeValuesForBackingObject(backingObject: backingObject, sourceObject: sourceObject)
         try self.setRelationshipValuesForBackingObject(backingObject: backingObject, fromSourceObject: sourceObject)
         if context.doesNotAllowChangeRecording == false {
-          self.changeManager.new(uniqueID: backingObject.uniqueID, changedObject: sourceObject)
+          let _ = self.changeManager.new(uniqueID: backingObject.uniqueID, changedObject: sourceObject)
         }
       }
     }
@@ -378,7 +378,7 @@ public class Store: NSIncrementalStore {
         guard context.doesNotAllowChangeRecording == false && changedValueKeys.count > 0 else {
           return
         }
-        self.changeManager.new(uniqueID: referenceObject, changedObject: sourceObject)
+        let _ = self.changeManager.new(uniqueID: referenceObject, changedObject: sourceObject)
       }
     }
   }
@@ -398,7 +398,7 @@ public class Store: NSIncrementalStore {
         guard context.doesNotAllowChangeRecording == false else {
           return
         }
-        self.changeManager.new(uniqueID: referenceObject, changedObject: sourceObject)
+        let _ = self.changeManager.new(uniqueID: referenceObject, changedObject: sourceObject)
       }
     }
   }

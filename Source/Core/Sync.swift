@@ -51,7 +51,7 @@ class Sync: Operation {
   var store: Store!
   
   private var zone: Zone {
-    return self.store.zone
+    return self.store.currentZone
   }
   
   private var backingPersistentStoreCoordinator: NSPersistentStoreCoordinator {
@@ -385,20 +385,25 @@ class Sync: Operation {
     let recordZoneID = zone.zone.zoneID
     
     // Implement the new api
-    let fetchRecordChangesOperation = CKFetchRecordZoneChangesOperation(recordZoneIDs: [recordZoneID], optionsByRecordZoneID: token)
+    let options = CKFetchRecordZoneChangesOptions()
+    options.previousServerChangeToken = token
+    let fetchRecordChangesOperation = CKFetchRecordZoneChangesOperation(recordZoneIDs:
+      [recordZoneID], optionsByRecordZoneID: [recordZoneID: options])
+    
     var insertedOrUpdatedCKRecords: [CKRecord] = [CKRecord]()
     var deletedCKRecordIDs: [CKRecordID] = [CKRecordID]()
-    fetchRecordChangesOperation.fetchRecordChangesCompletionBlock = { changeToken,clientChangeToken,operationError in
+
+    fetchRecordChangesOperation.recordZoneChangeTokensUpdatedBlock = { recordZoneID,changeToken,operationError in
       guard let changeToken = changeToken, operationError == nil else {
         return
       }
-      Token.sharedToken.save(changeToken)
+      Token.sharedToken.save(token: changeToken)
       Token.sharedToken.commit()
     }
     fetchRecordChangesOperation.recordChangedBlock = { record in
       insertedOrUpdatedCKRecords.append(record)
     }
-    fetchRecordChangesOperation.recordWithIDWasDeletedBlock = { recordID in
+    fetchRecordChangesOperation.recordWithIDWasDeletedBlock = { recordID, string in
       deletedCKRecordIDs.append(recordID)
     }
     operationQueue.addOperation(fetchRecordChangesOperation)

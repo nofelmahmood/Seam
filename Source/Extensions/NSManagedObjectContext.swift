@@ -32,7 +32,7 @@ let UniqueIDsForInsertedObjectsKey = "UniqueIDsForInsertedObjectsKey"
 extension NSManagedObjectContext {
   var doesNotAllowChangeRecording: Bool {
     get {
-      guard let optionValue = userInfo[ContextDoesNotAllowChangeRecording]?.boolValue else {
+      guard let optionValue = (userInfo[ContextDoesNotAllowChangeRecording] as AnyObject).boolValue else {
         return false
       }
       return optionValue
@@ -64,8 +64,8 @@ extension NSManagedObjectContext {
   }
   
   func performBlockAndWait(block: () throws -> ()) throws {
-    var blockError: ErrorType?
-    performBlockAndWait {
+    var blockError: Error?
+    try performBlockAndWait {
       do {
         try block()
       } catch {
@@ -78,51 +78,56 @@ extension NSManagedObjectContext {
   }
   
   func objectWithUniqueID(id: String, inEntity entityName: String) throws -> NSManagedObject? {
-    let fetchRequest = NSFetchRequest(entityName: entityName)
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: id)
-    return try executeFetchRequest(fetchRequest).first as? NSManagedObject
+    
+    return try fetchRequest.execute().first as? NSManagedObject
   }
   
   func objectIDWithUniqueID(id: String, inEntity entityName: String) throws -> NSManagedObjectID? {
-    let fetchRequest = NSFetchRequest(entityName: entityName)
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: id)
-    fetchRequest.resultType = .ManagedObjectIDResultType
-    return try executeFetchRequest(fetchRequest).first as? NSManagedObjectID
+    fetchRequest.resultType = .managedObjectIDResultType
+    
+    return try fetchRequest.execute().first as? NSManagedObjectID
   }
   
   func objectWithBackingObjectID(backingObjectID: NSManagedObjectID) throws -> NSManagedObject? {
-    let fetchRequest = NSFetchRequest(entityName: backingObjectID.entity.name!)
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: backingObjectID.entity.name!)
     fetchRequest.predicate = NSPredicate(backingObjectID: backingObjectID)
-    return try executeFetchRequest(fetchRequest).first as? NSManagedObject
+    
+    return try fetchRequest.execute().first as? NSManagedObject
   }
   
   func newObject(uniqueID: String, encodedValues: NSData?, inEntity entityName: String) -> NSManagedObject {
-    let managedObject = NSEntityDescription.insertNewObjectForEntityForName(entityName, inManagedObjectContext: self)
+    let managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: self)
+    
     return managedObject
   }
   
   func objectIDForBackingObjectForEntity(entityName: String, uniqueID: String) throws -> NSManagedObjectID? {
-    let fetchRequest = NSFetchRequest(entityName: entityName)
+    let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: uniqueID)
-    fetchRequest.resultType = .ManagedObjectIDResultType
-    return try executeFetchRequest(fetchRequest).first as? NSManagedObjectID
+    fetchRequest.resultType = .managedObjectIDResultType
+    
+    return try fetch(fetchRequest).first as? NSManagedObjectID
   }
   
   func deleteObjectsWithUniqueIDs(ids: [String], inEntities entityNames: [String]) throws {
     try entityNames.forEach { entityName in
       try ids.forEach { uniqueID in
-        let fetchRequest = NSFetchRequest(entityName: entityName)
+        let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         fetchRequest.predicate = NSPredicate(equalsToUniqueID: uniqueID)
         fetchRequest.includesPropertyValues = false
-        guard let managedObject = try executeFetchRequest(fetchRequest).first as? NSManagedObject else {
+        guard let managedObject = try fetch(fetchRequest).first as? NSManagedObject else {
           return
         }
-        deleteObject(managedObject)
+        delete(managedObject)
       }      
     }
   }
   
-  public func mergeChangesFromStoreDidFinishSyncingNotification(notification: NSNotification) {
-    mergeChangesFromContextDidSaveNotification(notification)
+  public func mergeChangesFromStoreDidFinishSyncingNotification(notification: Notification) {
+    mergeChanges(fromContextDidSave: notification)
   }
 }

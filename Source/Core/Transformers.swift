@@ -29,12 +29,12 @@ struct Transformers {
   static func registerAll() {
     let assetTransformer = CKAssetTransformer()
     let locationTransformer = CLLocationTransformer()
-    NSValueTransformer.setValueTransformer(assetTransformer, forName: CKAssetTransformer.name)
-    NSValueTransformer.setValueTransformer(locationTransformer, forName: CLLocationTransformer.name)
+    ValueTransformer.setValueTransformer(assetTransformer, forName: NSValueTransformerName(rawValue: CKAssetTransformer.name))
+    ValueTransformer.setValueTransformer(locationTransformer, forName: NSValueTransformerName(rawValue: CLLocationTransformer.name))
   }
 }
 
-class CKAssetTransformer: NSValueTransformer {
+class CKAssetTransformer: ValueTransformer {
   static let name = "CKAssetTransformer"
   
   override class func transformedValueClass() -> AnyClass {
@@ -45,22 +45,22 @@ class CKAssetTransformer: NSValueTransformer {
     return true
   }
   
-  override func transformedValue(value: AnyObject?) -> AnyObject? {
+  override func transformedValue(_ value: Any?) -> Any? {
     guard let value = value else {
       return nil
     }
-    return NSKeyedArchiver.archivedDataWithRootObject(value)
+    return NSKeyedArchiver.archivedData(withRootObject: value)
   }
   
-  override func reverseTransformedValue(value: AnyObject?) -> AnyObject? {
+  override func reverseTransformedValue(_ value: Any?) -> Any? {
     guard let value = value as? NSData else {
       return nil
     }
-    return NSKeyedUnarchiver.unarchiveObjectWithData(value)
+    return NSKeyedUnarchiver.unarchiveObject(with: value as Data)
   }
 }
 
-class CLLocationTransformer: NSValueTransformer {
+class CLLocationTransformer: ValueTransformer {
   static let name = "CLLocationTransformer"
   
   override class func transformedValueClass() -> AnyClass {
@@ -71,17 +71,17 @@ class CLLocationTransformer: NSValueTransformer {
     return true
   }
   
-  override func transformedValue(value: AnyObject?) -> AnyObject? {
+  override func transformedValue(_ value: Any?) -> Any? {
     guard let value = value else {
       return nil
     }
-    return NSKeyedArchiver.archivedDataWithRootObject(value)
+    return NSKeyedArchiver.archivedData(withRootObject: value)
   }
   
-  override func reverseTransformedValue(value: AnyObject?) -> AnyObject? {
+  override func reverseTransformedValue(_ value: Any?) -> Any? {
     guard let value = value as? NSData else {
       return nil
     }
-    return NSKeyedUnarchiver.unarchiveObjectWithData(value)
+    return NSKeyedUnarchiver.unarchiveObject(with: value as Data)
   }
 }

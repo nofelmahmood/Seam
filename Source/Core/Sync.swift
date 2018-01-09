@@ -27,23 +27,23 @@ import CloudKit
 import CoreData
 
 public typealias Changes = (insertedOrUpdatedObjectsInfo: [(uniqueID: String, entityName: String)], deletedObjectsInfo: [(uniqueID: String, entityName: String)])
-typealias CompletionBlock = ((saveNotification: NSNotification? ,syncError: ErrorType?) -> ())
+typealias CompletionBlock = ((_ saveNotification: NSNotification? ,_ syncError: Error?) -> ())
 
-class Sync: NSOperation {
+class Sync: Operation {
   
   // MARK: Error
   
   static let errorDomain = "com.seam.error.sync.errorDomain"
   
-  enum Error: ErrorType {
+  enum SyncError: Error {
     case LocalChangesFetchError
     case ConflictsDetected(conflictedRecordsWithChanges: [(record: CKRecord, change: Change)])
     case ConflictedRecordsFetchFailed
     case UnknownError
   }
   
-  private lazy var operationQueue: NSOperationQueue = {
-    let operationQueue = NSOperationQueue()
+  private lazy var operationQueue: OperationQueue = {
+    let operationQueue = OperationQueue()
     operationQueue.maxConcurrentOperationCount = 1
     return operationQueue
   }()
@@ -51,7 +51,7 @@ class Sync: NSOperation {
   var store: Store!
   
   private var zone: Zone {
-    return self.store.zone
+    return self.store.currentZone
   }
   
   private var backingPersistentStoreCoordinator: NSPersistentStoreCoordinator {
@@ -67,17 +67,19 @@ class Sync: NSOperation {
   }
   
   private lazy var backingStoreContext: NSManagedObjectContext = {
-    let backingStoreContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+    let backingStoreContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
     backingStoreContext.persistentStoreCoordinator = self.backingPersistentStoreCoordinator
     return backingStoreContext
   }()
   
   private lazy var storeContext: NSManagedObjectContext = {
-    let storeContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+    let storeContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
     storeContext.persistentStoreCoordinator = self.persistentStoreCoordinator
     storeContext.retainsRegisteredObjects = true
     storeContext.doesNotAllowChangeRecording = true
-    NSNotificationCenter.defaultCenter().addObserver(self, selector: "storeContextDidSave:", name: NSManagedObjectContextDidSaveNotification, object: storeContext)
+    
+    NotificationCenter.default.addObserver(self, selector: Selector(("storeContextDidSave:")), name: Notification.Name.NSManagedObjectContextDidSave, object: storeContext)
+    
     return storeContext
   }()
   
@@ -87,7 +89,7 @@ class Sync: NSOperation {
   }()
   
   private lazy var metadataManager: Metadata.Manager = {
-    var metadataContext = NSManagedObjectContext(concurrencyType: .PrivateQueueConcurrencyType)
+    var metadataContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
     metadataContext.persistentStoreCoordinator = self.backingPersistentStoreCoordinator
     return Metadata.Manager(context: metadataContext)
   }()
@@ -108,11 +110,12 @@ class Sync: NSOperation {
     do {
       try setup()
       try perform()
-      print("COMPLETED SYNC ", storeContextSaveNotification)
-      onCompletion?(saveNotification: storeContextSaveNotification, syncError: nil)
+      
+      print("COMPLETED SYNC ", storeContextSaveNotification!)
+      onCompletion?(storeContextSaveNotification, nil)
     } catch {
       print("COMPLETED SYNC WITH ERROR ",error)
-      onCompletion?(saveNotification: nil, syncError: error)
+      onCompletion?(nil, error)
     }
   }
   
@@ -121,12 +124,12 @@ class Sync: NSOperation {
     var zoneExists = false
     let fetchRecordZonesOperation = CKFetchRecordZonesOperation(recordZoneIDs: [zoneID])
     fetchRecordZonesOperation.fetchRecordZonesCompletionBlock = { recordZonesByID, error in
-      guard let allRecordZonesByID = recordZonesByID where error == nil else {
+      guard let allRecordZonesByID = recordZonesByID, error == nil else {
         return
       }
       zoneExists = allRecordZonesByID[zoneID] != nil
     }
-    let operationQueue = NSOperationQueue()
+    let operationQueue = OperationQueue()
     operationQueue.addOperation(fetchRecordZonesOperation)
     operationQueue.waitUntilAllOperationsAreFinished()
     guard zoneExists == false else {
@@ -147,9 +150,9 @@ class Sync: NSOperation {
       }
       try backingStoreContext.saveIfHasChanges()
       try storeContext.saveIfHasChanges()
-    } catch Error.ConflictsDetected(let conflictedRecordsWithChanges) {
+    } catch SyncError.ConflictsDetected(let conflictedRecordsWithChanges) {
       do {
-        try resolveConflicts(conflictedRecordsWithChanges)
+        try resolveConflicts(conflictedRecordsWithChanges: conflictedRecordsWithChanges)
         try applyLocalChanges()
         if changeManager.hasChanges() == false {
           try applyServerChanges()
@@ -166,7 +169,7 @@ class Sync: NSOperation {
     var record: CKRecord?
     let recordZoneID = zone.zone.zoneID
     if let metadata = encodedMetadata {
-      record = CKRecord.recordWithEncodedData(metadata)
+      record = CKRecord.recordWithEncodedData(data: metadata)
     } else {
       let recordID = CKRecordID(recordName: uniqueID, zoneID: recordZoneID)
       record = CKRecord(recordType: entity.name!, recordID: recordID)
@@ -177,9 +180,9 @@ class Sync: NSOperation {
         return
       }
       if let referenceManagedObject = value as? NSManagedObject {
-        let referenceUniqueID = store.referenceObjectForObjectID(referenceManagedObject.objectID) as! String
+        let referenceUniqueID = store.referenceObject(for: referenceManagedObject.objectID) as! String
         let referenceRecordID = CKRecordID(recordName: referenceUniqueID, zoneID: recordZoneID)
-        let reference = CKReference(recordID: referenceRecordID, action: CKReferenceAction.DeleteSelf)
+        let reference = CKReference(recordID: referenceRecordID, action: .deleteSelf)
         record?.setObject(reference, forKey: key)
       } else {
         record?.setValue(value, forKey: key)
@@ -203,15 +206,15 @@ class Sync: NSOperation {
         let entity = persistentStoreCoordinator.managedObjectModel.entitiesByName[change.entityName!]!
         let uniqueID = change.uniqueID
         let entityName = change.entityName!
-        guard let backingObjectID = try backingStoreContext.objectIDForBackingObjectForEntity(entityName, uniqueID: uniqueID) else {
+        guard let backingObjectID = try backingStoreContext.objectIDForBackingObjectForEntity(entityName: entityName, uniqueID: uniqueID) else {
           return
         }
-        guard let managedObject = try storeContext.objectWithBackingObjectID(backingObjectID) else {
+        guard let managedObject = try storeContext.objectWithBackingObjectID(backingObjectID: backingObjectID) else {
           return
         }
-        if let propertyValueDictionary = changeManager.changedPropertyValuesDictionaryForChange(change, changedObject: managedObject) {
-          let encodedMetadata = try metadataManager.metadataWithUniqueID(change.uniqueID)?.data
-          let record = ckRecord(change.uniqueID, entity: entity, propertyValuesDictionary: propertyValueDictionary, encodedMetadata: encodedMetadata)
+        if let propertyValueDictionary = changeManager.changedPropertyValuesDictionaryForChange(change: change, changedObject: managedObject) {
+          let encodedMetadata = try metadataManager.metadataWithUniqueID(id: change.uniqueID)?.data
+          let record = ckRecord(uniqueID: change.uniqueID, entity: entity, propertyValuesDictionary: propertyValueDictionary, encodedMetadata: encodedMetadata)
           insertedOrUpdatedRecordsAndChanges.append((record: record, change: change))
         }
       }
@@ -231,7 +234,9 @@ class Sync: NSOperation {
     let deletedCKRecordIDs = changes.deletedCKRecordIDs
     let modifyRecordsOperation = CKModifyRecordsOperation(recordsToSave: insertedOrUpdatedCKRecords, recordIDsToDelete: deletedCKRecordIDs)
     modifyRecordsOperation.perRecordCompletionBlock = { (record, error) in
-      if let record = record, let error = error where error.code == CKErrorCode.ServerRecordChanged.rawValue {
+      
+      // Fix: Implement new error api
+      if let error = error as NSError?, error.code == CKError.Code.serverRecordChanged.rawValue {
         conflictedRecords.append(record)
       }
     }
@@ -248,10 +253,10 @@ class Sync: NSOperation {
         }
         conflictedRecordsWithChanges.append(recordWithChange)
       }
-      throw Error.ConflictsDetected(conflictedRecordsWithChanges: conflictedRecordsWithChanges)
+      throw SyncError.ConflictsDetected(conflictedRecordsWithChanges: conflictedRecordsWithChanges)
     }
     let changeObjects = changes.insertedOrUpdatedRecordsAndChanges.map { $0.change }
-    changeManager.remove(changeObjects)
+    changeManager.remove(changes: changeObjects)
   }
   
   // MARK: - Conflict Resolution
@@ -273,7 +278,7 @@ class Sync: NSOperation {
     operationQueue.addOperation(fetchRecordsOperation)
     operationQueue.waitUntilAllOperationsAreFinished()
     guard let recordsByRecordIDs = fetchedRecordsByRecordIDs else {
-      throw Error.ConflictedRecordsFetchFailed
+      throw SyncError.ConflictedRecordsFetchFailed
     }
     try recordsByRecordIDs.forEach { (recordID, record) in
       try metadataManager.setMetadata(forRecord: record)
@@ -281,7 +286,7 @@ class Sync: NSOperation {
         try self.insertOrUpdateObject(fromRecord: record)
         let conflictedRecordAndChange = conflictedRecordsByRecordIDsAndChanges[recordID]!
         let change = conflictedRecordAndChange.change
-        self.changeManager.remove([change])
+        self.changeManager.remove(changes: [change])
       }
       if let conflictResolutionBlock = conflictResolutionBlock {
         let info: ConflictResolutionInfo
@@ -291,19 +296,19 @@ class Sync: NSOperation {
           var allChangedProperties = Set<String>()
           allUpdatedTypeChanges.forEach { change in
             let separatedProperties = change.separatedProperties!
-            allChangedProperties.unionInPlace(separatedProperties)
+            allChangedProperties.formUnion(separatedProperties)
           }
           info.pendingLocallyChangedProperties = Array(allChangedProperties)
           let localRecord = conflictedRecordAndChange.record
           let serverRecord = record
-          let localRecordValueDictionary = try recordValueDictionaryForConflictResolution(localRecord)
-          let serverRecordValueDictionary = try recordValueDictionaryForConflictResolution(serverRecord)
+          let localRecordValueDictionary = try recordValueDictionaryForConflictResolution(record: localRecord)
+          let serverRecordValueDictionary = try recordValueDictionaryForConflictResolution(record: serverRecord)
           info.localValues = localRecordValueDictionary
           info.serverValues = serverRecordValueDictionary
-          let conflictResolutionReturnedInfo = conflictResolutionBlock(conflictResolutionInfo: info)
-          changeManager.remove(allUpdatedTypeChanges)
-          let change = changeManager.new(uniqueID, type: Change.ChangeType.Updated, entityName: record.recordType)
-          change.properties = conflictResolutionReturnedInfo.pendingLocallyChangedProperties.joinWithSeparator(Change.propertySeparator)
+          let conflictResolutionReturnedInfo = conflictResolutionBlock(info)
+          changeManager.remove(changes: allUpdatedTypeChanges)
+          let change = changeManager.new(uniqueID: uniqueID, type: Change.ChangeType.Updated, entityName: record.recordType)
+          change.properties = conflictResolutionReturnedInfo.pendingLocallyChangedProperties.joined(separator: Change.propertySeparator)
         }
       }
       if let conflictResolutionPolicy = conflictResolutionPolicy {
@@ -322,40 +327,39 @@ class Sync: NSOperation {
     let toOneRelationshipKeys = entity.toOneRelationshipNames
     let toOneRelationshipsByName = entity.toOneRelationshipsByName
     let propertyKeys = Array(entity.attributesByName.keys) + toOneRelationshipKeys
-    var valueDictionary = record.dictionaryWithValuesForKeys(propertyKeys)
+    var valueDictionary = record.dictionaryWithValues(forKeys: propertyKeys)
     try toOneRelationshipKeys.forEach { key in
       guard let reference = valueDictionary[key] as? CKReference else {
         return
       }
       let uniqueReferenceID = reference.recordID.recordName
       let destinationEntityName = toOneRelationshipsByName[key]!.destinationEntity!.name!
-      let relationshipObjectID = try storeContext.objectIDForBackingObjectForEntity(uniqueReferenceID, uniqueID: destinationEntityName)
+      let relationshipObjectID = try storeContext.objectIDForBackingObjectForEntity(entityName: uniqueReferenceID, uniqueID: destinationEntityName)
       valueDictionary[key] = relationshipObjectID
     }
-    return valueDictionary
+    return valueDictionary as [String : AnyObject]
   }
   
   // MARK: - Server Changes
-  
   func insertOrUpdateObject(fromRecord record: CKRecord) throws {
     try storeContext.performBlockAndWait {
       let entityName = record.recordType
       let uniqueID = record.recordID.recordName
       var managedObject: NSManagedObject!
-      if let objectID = try self.backingStoreContext.objectIDForBackingObjectForEntity(entityName, uniqueID: uniqueID) {
-        managedObject = try self.storeContext.objectWithBackingObjectID(objectID)
+      if let objectID = try self.backingStoreContext.objectIDForBackingObjectForEntity(entityName: entityName, uniqueID: uniqueID) {
+        managedObject = try self.storeContext.objectWithBackingObjectID(backingObjectID: objectID)
       }
       if managedObject == nil {
-        managedObject = NSEntityDescription.insertNewObjectForEntityForName(entityName, inManagedObjectContext: self.storeContext)
+        managedObject = NSEntityDescription.insertNewObject(forEntityName: entityName, into: self.storeContext)
         self.insertedObjectsWithUniqueIDs[uniqueID] = managedObject
-        self.store.setUniqueIDForInsertedObject(uniqueID, insertedObject: managedObject)
-        try self.storeContext.obtainPermanentIDsForObjects([managedObject])
+        self.store.setUniqueIDForInsertedObject(uniqueID: uniqueID, insertedObject: managedObject)
+        try self.storeContext.obtainPermanentIDs(for: [managedObject])
       }
       let entity = managedObject.entity
       let attributeKeys = Array(entity.attributesByName.keys)
-      let attributeValues = record.dictionaryWithValuesForKeys(attributeKeys)
-      managedObject.setValuesForKeysWithDictionary(attributeValues)
-      let relationshipReferences = record.dictionaryWithValuesForKeys(entity.toOneRelationshipNames)
+      let attributeValues = record.dictionaryWithValues(forKeys: attributeKeys)
+      managedObject.setValuesForKeys(attributeValues)
+      let relationshipReferences = record.dictionaryWithValues(forKeys: entity.toOneRelationshipNames)
       try relationshipReferences.forEach { (name,reference) in
         guard reference as! NSObject != NSNull() else {
           return
@@ -363,11 +367,11 @@ class Sync: NSOperation {
         guard let referenceDestinationEntity = entity.relationshipsByName[name]!.destinationEntity else {
           return
         }
-        let relationshipUniqueID = reference.recordID.recordName
+        let relationshipUniqueID = (reference as! CKReference).recordID.recordName
         if let relationshipManagedObject = self.insertedObjectsWithUniqueIDs[relationshipUniqueID] {
           managedObject.setValue(relationshipManagedObject, forKey: name)
-        } else if let relationshipBackingObjectID = try self.backingStoreContext.objectIDForBackingObjectForEntity(referenceDestinationEntity.name!, uniqueID: relationshipUniqueID) {
-          guard let relationshipManagedObject = try self.storeContext.objectWithBackingObjectID(relationshipBackingObjectID) else {
+        } else if let relationshipBackingObjectID = try self.backingStoreContext.objectIDForBackingObjectForEntity(entityName: referenceDestinationEntity.name!, uniqueID: relationshipUniqueID) {
+          guard let relationshipManagedObject = try self.storeContext.objectWithBackingObjectID(backingObjectID: relationshipBackingObjectID) else {
             return
           }
           managedObject.setValue(relationshipManagedObject, forKey: name)
@@ -379,20 +383,27 @@ class Sync: NSOperation {
   func serverChanges() -> (insertedOrUpdatedCKRecords: [CKRecord],deletedRecordIDs: [CKRecordID]) {
     let token = Token.sharedToken.rawToken()
     let recordZoneID = zone.zone.zoneID
-    let fetchRecordChangesOperation = CKFetchRecordChangesOperation(recordZoneID: recordZoneID, previousServerChangeToken: token)
+    
+    // Implement the new api
+    let options = CKFetchRecordZoneChangesOptions()
+    options.previousServerChangeToken = token
+    let fetchRecordChangesOperation = CKFetchRecordZoneChangesOperation(recordZoneIDs:
+      [recordZoneID], optionsByRecordZoneID: [recordZoneID: options])
+    
     var insertedOrUpdatedCKRecords: [CKRecord] = [CKRecord]()
     var deletedCKRecordIDs: [CKRecordID] = [CKRecordID]()
-    fetchRecordChangesOperation.fetchRecordChangesCompletionBlock = { changeToken,clientChangeToken,operationError in
-      guard let changeToken = changeToken where operationError == nil else {
+
+    fetchRecordChangesOperation.recordZoneChangeTokensUpdatedBlock = { recordZoneID,changeToken,operationError in
+      guard let changeToken = changeToken, operationError == nil else {
         return
       }
-      Token.sharedToken.save(changeToken)
+      Token.sharedToken.save(token: changeToken)
       Token.sharedToken.commit()
     }
     fetchRecordChangesOperation.recordChangedBlock = { record in
       insertedOrUpdatedCKRecords.append(record)
     }
-    fetchRecordChangesOperation.recordWithIDWasDeletedBlock = { recordID in
+    fetchRecordChangesOperation.recordWithIDWasDeletedBlock = { recordID, string in
       deletedCKRecordIDs.append(recordID)
     }
     operationQueue.addOperation(fetchRecordChangesOperation)
@@ -404,11 +415,11 @@ class Sync: NSOperation {
     let changes = serverChanges()
     let deletedObjectUniqueIDs = changes.deletedRecordIDs.map { $0.recordName }
     let entityNames = Array(persistentStoreCoordinator.managedObjectModel.entitiesByName.keys)
-    try storeContext.deleteObjectsWithUniqueIDs(deletedObjectUniqueIDs, inEntities: entityNames)
+    try storeContext.deleteObjectsWithUniqueIDs(ids: deletedObjectUniqueIDs, inEntities: entityNames)
     try changes.insertedOrUpdatedCKRecords.forEach { record in
       try insertOrUpdateObject(fromRecord: record)
     }
-    try metadataManager.deleteMetadataForUniqueIDs(deletedObjectUniqueIDs)
+    try metadataManager.deleteMetadataForUniqueIDs(ids: deletedObjectUniqueIDs)
     try changes.insertedOrUpdatedCKRecords.forEach {
       try metadataManager.setMetadata(forRecord: $0)
     }

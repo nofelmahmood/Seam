@@ -29,15 +29,18 @@ import CloudKit
 extension CKRecord {
   var encodedSystemFields: NSData {
     let data = NSMutableData()
-    let coder = NSKeyedArchiver(forWritingWithMutableData: data)
-    encodeSystemFieldsWithCoder(coder)
+    let coder = NSKeyedArchiver(forWritingWith: data)
+    
+    encodeSystemFields(with: coder)
     coder.finishEncoding()
+        
     return data
   }
   
   class func recordWithEncodedData(data: NSData) -> CKRecord {
-    let coder = NSKeyedUnarchiver(forReadingWithData: data)
+    let coder = NSKeyedUnarchiver(forReadingWith: data as Data)
     let record = CKRecord(coder: coder)!
+    
     coder.finishDecoding()
     return record
   }

@@ -81,7 +81,7 @@ extension NSManagedObjectContext {
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: id)
     
-    return try fetchRequest.execute().first as? NSManagedObject
+    return try fetch(fetchRequest).first as? NSManagedObject
   }
   
   func objectIDWithUniqueID(id: String, inEntity entityName: String) throws -> NSManagedObjectID? {
@@ -89,14 +89,14 @@ extension NSManagedObjectContext {
     fetchRequest.predicate = NSPredicate(equalsToUniqueID: id)
     fetchRequest.resultType = .managedObjectIDResultType
     
-    return try fetchRequest.execute().first as? NSManagedObjectID
+    return try fetch(fetchRequest).first as? NSManagedObjectID
   }
   
   func objectWithBackingObjectID(backingObjectID: NSManagedObjectID) throws -> NSManagedObject? {
     let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: backingObjectID.entity.name!)
     fetchRequest.predicate = NSPredicate(backingObjectID: backingObjectID)
     
-    return try fetchRequest.execute().first as? NSManagedObject
+    return try fetch(fetchRequest).first as? NSManagedObject
   }
   
   func newObject(uniqueID: String, encodedValues: NSData?, inEntity entityName: String) -> NSManagedObject {
